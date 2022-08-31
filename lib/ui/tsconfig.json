@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+        "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+		"outDir": "./dist/",
+		"sourceMap": true,
+		"noImplicitAny": false,
+		"module": "es6",
+		"target": "es6",
+		"removeComments": true,
+        "baseUrl": "./",
+        "typeRoots": [
+            "node_modules/@types"
+        ],
+		"moduleResolution": "node",
+    },
+	"include": [
+        "./src/app/**/*"
+	]
+}

@@ -1,0 +1,1093 @@
+// Typography
+@import "scss/0-base/base";
+
+// Typography
+@import "scss/0-base/typography";
+
+// Variables
+@import "scss/1-variables/app";
+
+@import "scss/0-base/icons";
+
+@import "scss/0-base/bootstrap";
+
+
+// TODO move to .bot namespace
+[data-gui-mode] {
+	--bot-ui-background-color: #927263;
+	--bot-ui-base-background-color: #28568C;
+	//--bot-ui-base-background-color: #f1f4f7;
+	--bot-ui-window-width: 100vw;
+	--bot-ui-window-height: 100vh;
+	--bot-ui-image-background-color: rgba(0, 0, 0, .25);
+	--bot-ui-background-url: none;
+	--bot-ui-animation-speed: 500ms;
+	--bot-ui-background-url-blur: 0px;
+	--bot-ui-scrollbar-background: transparent;
+	--bot-ui-thumb-background: rgba(0, 0, 0, .5);
+	--bot-ui-message-color-bot: #ffffff;
+	--bot-ui-message-color-outline-bot: rgba(0, 0, 0, .5);;
+	--bot-ui-message-color-user: #ffffff;
+	--bot-ui-message-color-outline-user: rgba(0, 0, 0, .5);;
+	--bot-ui-message-background-bot: rgba(0, 0, 0, .4);
+	--bot-ui-message-background-user: rgba(255, 255, 255, .3);
+	--bot-ui-avatar-height: 0px;
+	--bot-ui-chat-input-height: 0px;
+	--bot-ui-avatar-text-overlap: 0px;
+	--bot-ui-chat-pcm-height: 80px;
+}
+
+body {
+	margin: 0;
+}
+
+$base-color: #5e5e5e;
+$particleSizeLandscape: 100vw;
+$particleSizePortrait: 100vh;
+$particleSize: 100vw / 1.5;
+$animationDuration: 1s;
+$amount: 20;
+
+.bot {
+	background-color: transparent;
+	overflow: hidden;
+	box-sizing: border-box;
+	font-family: 'Century Gothic', sans-serif;
+	line-height: 1.5;
+	height: 100%;
+	display: flex;
+	position: relative;
+
+	* {
+		box-sizing: border-box;
+	}
+
+	.column {
+		padding: 0;
+		z-index: 1;
+
+		&-messages {
+			display: none;
+		}
+
+		&-image {
+			display: none;
+		}
+
+		&-avatar {
+			display: none;
+		}
+	}
+
+	.chat-message {
+		display: none;
+	}
+
+	.chat-input {
+		display: none;
+	}
+
+	.pcm {
+		position: absolute;
+		width: 100%;
+	}
+}
+
+@media only screen and (max-width: 100px) {
+	[data-with-chat-input] {
+		.bot .chat-input {
+			display: none;
+		}
+	}
+}
+
+[data-text-input-wrap]{
+	display: none;
+	height: 100%;
+}
+
+[data-sound-input-wrap]{
+	display:block;
+}
+
+[data-with-chat-input] {
+
+	.chat-input {
+		display: flex;
+		height: var(--bot-ui-chat-input-height);
+		z-index: 1;
+		bottom: 0;
+		padding: calc(var(--bot-ui-chat-input-height) / 4) .7rem;
+		width: 100%;
+		position: absolute;
+		justify-content: center;
+		opacity: .75;
+
+		&[no-controls] {
+			//padding: 0 #{$chat-height} 0 0.7rem;
+			display: none;
+		}
+
+		&-wrapper {
+			position: relative;
+			width: 100%;
+			max-width: calc( ( var(--bot-ui-chat-input-height) - var(--bot-ui-chat-input-height) / 4 * 2 ) * 16 );
+			min-width: calc( var(--bot-ui-chat-input-height) * 1.5 );
+
+			input {
+				width: 100%;
+				border-radius: .7rem;
+				height: 100%;
+				background-color: #ffffff;
+				padding: 0 var(--bot-ui-chat-input-height) 0 4rem;
+				border-width: 0;
+
+				&:focus {
+					outline: none;
+				}
+
+				&[disabled] {
+					background-color: rgba(255, 255, 255, .75);
+					cursor: not-allowed;
+				}
+			}
+
+			.icon {
+				cursor: pointer;
+				position: absolute;
+				width: 20px;
+				height: 20px;
+				text-align: center;
+				color: #000000;
+
+				&--minus {
+					right: 22.6%;
+					bottom: 10px;
+					-ms-transform: rotate(40deg); /* IE 9 */
+					transform: rotate(40deg);
+				}
+				&--blocked {
+					right: 10px;
+					bottom: 10px;
+				}
+
+				&--mic {
+					text-align: center;
+					vertical-align: middle;
+					width: $icon-size-largest + 2rem;
+					height: $icon-size-largest + 2rem;
+					line-height: $icon-size-largest + 2rem;
+					border-radius: 100%;
+					background-color: #ffffff;
+					position: absolute;
+					left: 50%;
+					top: -100%;
+					transform: translateX(-50%);
+					transition: 300ms ease-out;
+
+					&--active{
+						width: $icon-size-large + 1.2rem;
+						height: $icon-size-large + 1.2rem;
+						line-height: $icon-size-large + 1.2rem;
+						top: -40%;
+					}
+				}
+
+				&--mic2{
+					right: 35px;
+					top: calc(50% - 10px);
+				}
+
+				&--volume {
+					left: 35px;
+					top: calc(50% - 10px);
+				}
+
+				&--volume-mute {
+					left: 35px;
+					top: calc(50% - 10px);
+				}
+
+				&--speaking-head {
+					left: 10px;
+					top: calc(50% - 10px);
+				}
+
+				&--arrow-up {
+					right: 10px;
+					top: calc(50% - 10px);
+				}
+
+				&--keyboard {
+					right: 35px;
+					top: calc(50% - 10px);
+				}
+
+				&--play {
+					left: 10px;
+					top: calc(50% - 10px);
+				}
+
+				&--pause {
+					left: 10px;
+					top: calc(50% - 10px);
+				}
+
+				&--stop {
+					left: 10px;
+					top: calc(50% - 10px);
+				}
+
+				&--menu-down {
+					right: 10px;
+					top: calc(50% - 10px);
+				}
+
+				&--menu-up {
+					right: 10px;
+					top: calc(50% - 10px);
+				}
+
+				&--equalizer {
+					right: 10px;
+					top: calc(50% - 10px);
+				}
+
+				&--menu {
+					right: 10px;
+					top: calc(50% - 10px);
+				}
+			}
+
+			.settings {
+				bottom: 50px;
+				position: absolute;
+				background-color: white;
+				width: 40px;
+				height: 70px;
+				right: 1px;
+				border-radius: .7rem;
+
+				&--visible{
+					display: block;
+				}
+
+				&--hidden{
+					display: none;
+				}
+			}
+
+			.controls {
+				&--visible{
+					display: block;
+				}
+
+				&--hidden{
+					display: none;
+				}
+			}
+		}
+	}
+}
+
+[data-with-avatar] {
+	.bot {
+		.column {
+			&-avatar {
+				height: var(--bot-ui-avatar-height);
+				background: rgba(0, 0, 0, .5);
+				display: flex;
+				justify-content: center;
+
+				video {
+					width: auto;
+					height: 100%;
+				}
+			}
+		}
+	}
+}
+
+[data-gui-mode="chat"] {
+
+	&:not([data-with-chat-input]) {
+		.bot {
+			.column {
+				&-messages {
+					padding-bottom: .7rem;
+				}
+			}
+		}
+	}
+
+	.bot {
+
+		flex-direction: column;
+
+		.column {
+
+			&-messages {
+				display: flex;
+				flex-direction: column;
+				height: calc( 100% -  var(--bot-ui-chat-input-height) - var(--bot-ui-avatar-height) );
+				width: 100%;
+				overflow-x: hidden;
+				overflow-y: auto;
+				padding: .7rem 0 0 0;
+				scrollbar-width: thin;
+				scrollbar-color: var(--bot-ui-thumb-background) var(--bot-ui-scrollbar-background);
+
+				&::-webkit-scrollbar {
+					width: 11px;
+				}
+				&::-webkit-scrollbar-track {
+					background: var(--bot-ui-scrollbar-background);
+				}
+				&::-webkit-scrollbar-thumb {
+					background-color: var(--bot-ui-thumb-background) ;
+					border-radius: 6px;
+					border: 3px solid var(--bot-ui-scrollbar-background);
+				}
+			}
+
+			&-avatar {
+				height: var(--bot-ui-avatar-height);
+				background: rgba(0, 0, 0, .5);
+				display: flex;
+				justify-content: center;
+
+				video {
+					width: auto;
+					height: 100%;
+				}
+			}
+		}
+
+		.chat-message {
+			display: block;
+			align-self: flex-end;
+			max-width: min(500px, 95%);
+			position: relative;
+			overflow-wrap: break-word;
+			padding: .5rem;
+			border-radius: .7rem;
+			margin: .2rem .7rem 0 .7rem;
+
+
+			&.chat-message-last {
+				margin-bottom: 1rem;
+
+				&:after {
+					content: '';
+					position: absolute;
+					width: .7rem;
+					height: .7rem;
+					bottom: - 1rem;
+					right: .7rem;
+					border-radius: 0 0 0 .7rem;
+
+				}
+			}
+
+			&[data-message-type='bot'] {
+				color: var(--bot-ui-message-color-bot);
+				align-self: flex-start;
+				background-color: var(--bot-ui-message-background-bot);
+				margin-right: 1.4rem;
+
+				&:after {
+					right: auto;
+					left: .7rem;
+					background-color: var(--bot-ui-message-background-bot);
+					border-radius: 0 0 .7rem 0;
+				}
+
+				img, video, iframe {
+					width: 100%;
+					height: auto;
+					border-radius: .7rem;
+					margin-bottom: -.5rem;
+				}
+			}
+
+			&[data-message-type='user'] {
+				color: var(--bot-ui-message-color-user);
+				background-color: var(--bot-ui-message-background-user);
+				margin-left: 1.4rem;
+
+				&:after {
+					background-color: var(--bot-ui-message-background-user);
+				}
+			}
+
+			span:empty {
+				display: none;
+			}
+		}
+
+		.pcm {
+			@include pcm(var(--bot-ui-chat-input-height), var(--bot-ui-animation-speed))
+		}
+	}
+
+	&[data-avatar-reverse-order] {
+		.bot {
+			.column {
+				&-avatar {
+					order: 1;
+				}
+
+				&-messages {
+					height: calc( 100% - var(--bot-ui-avatar-height) );
+					padding-bottom: .7rem;
+				}
+			}
+		}
+		&[data-with-chat-input][data-with-avatar] {
+			.chat-input {
+				&-wrapper {
+					input,
+					.settings {
+						border: 1px $overlay-outline-color solid;
+					}
+				}
+			}
+		}
+	}
+
+}
+
+[data-gui-mode="kiosk"] {
+
+	&:not([data-with-avatar]) {
+		.bot {
+			.column {
+				height: 100%;
+			}
+		}
+	}
+
+	.bot {
+
+		.column {
+			position: relative;
+
+			&-messages {
+				display: block;
+			}
+
+			&-image {
+				display: none;
+			}
+		}
+
+		.message {
+			z-index: 1;
+			quotes: "“" "”" "‘" "’";
+			padding: 0 10px;
+
+			span {
+				transition: all var(--bot-ui-animation-speed) linear;
+				opacity: 0;
+			}
+
+			span:not([data-empty]) {
+				transition: all var(--bot-ui-animation-speed) linear;
+				opacity: .5;
+			}
+
+			&-user {
+				color: var(--bot-ui-message-color-user);
+
+				span:not([data-empty]) {
+					&:before {
+						content: open-quote;
+					}
+					&:after {
+						content: close-quote;
+					}
+				}
+			}
+
+			&-bot {
+				color: var(--bot-ui-message-color-bot);
+				margin: auto;
+
+				span:not([data-empty]) {
+					opacity: 1;
+				}
+			}
+		}
+
+		.image {
+			z-index: 1;
+		}
+
+		.pcm {
+			@include pcm(var(--bot-ui-chat-pcm-height), var(--bot-ui-animation-speed))
+		}
+	}
+
+	&[data-orientation="landscape"] {
+
+		.background span {
+			$particleSize: $particleSizeLandscape;
+		}
+
+		&:not([data-width-image]) {
+
+			.bot {
+
+				.column {
+					&-messages {
+						display: flex;
+					}
+				}
+
+				&-wrapper {
+					flex-direction: column;
+				}
+
+				.message {
+					&-user {
+						flex: 1 1 50%;
+						font-size: calc( var(--bot-ui-window-width) / 35 );
+						width: 50%;
+						display: inline-flex;
+						text-align: center;
+						align-self: center;
+						justify-content: center;
+						align-items: center;
+					}
+
+					&-bot {
+						flex: 1 1 50%;
+						font-size: calc( var(--bot-ui-window-width) / 25 );
+						width: 50%;
+						display: inline-flex;
+						text-align: center;
+						align-self: center;
+						justify-content: center;
+						align-items: center;
+					}
+				}
+			}
+
+		}
+
+		&[data-width-image] {
+
+			.bot {
+
+				.column {
+					width: 50%;
+					&-image {
+						display: flex;
+					}
+
+					&-messages {
+
+						.message {
+							&-user {
+								padding: 5% 5% 0 5%;
+								min-height: 20%;
+								text-align: center;
+							}
+
+							&-bot {
+								padding: 5% 5% 0 5%;
+								text-align: center;
+							}
+						}
+					}
+				}
+
+				.message {
+					&-user {
+						font-size: calc( var(--bot-ui-window-width) / 35 );
+					}
+
+					&-bot {
+						font-size: calc( var(--bot-ui-window-width) / 25 );
+					}
+				}
+
+				.image {
+					text-align: center;
+					align-self: center;
+					display: inline-flex;
+					height: 100%;
+					background: var(--bot-ui-image-background-color);
+					align-items: center;
+					width: 100%;
+
+					img, video, iframe {
+						width: 100%;
+						height: auto;
+					}
+				}
+			}
+		}
+
+		&[data-with-avatar] {
+			.bot {
+				&-wrapper {
+					flex-direction: column;
+				}
+
+				.column {
+					&-avatar {
+						width: 100%;
+					}
+
+					&-messages {
+						display: flex;
+						flex-direction: row;
+						width: 100%;
+						transform: translateY(var(--bot-ui-avatar-text-overlap)) translateY(calc( var(--bot-ui-chat-input-height) * -1 ));
+						//background: linear-gradient(0deg, rgba(0, 0, 0, .4) 90%, rgba(0, 0, 0, 0) 100%);
+
+						.message {
+							width: 50%;
+							padding-top: 2%;
+							margin: unset;
+
+							&-bot {
+								font-size: calc( var(--bot-ui-window-width) / 30 );
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	&[data-orientation="portrait"] {
+		.background span {
+			$particleSize: $particleSizePortrait;
+		}
+
+		&:not([data-width-image]) {
+
+			.bot {
+
+				.column {
+					&-messages {
+						display: flex;
+						flex-direction: column;
+					}
+				}
+
+				&-wrapper {
+					flex-direction: column;
+				}
+
+				.message {
+					&-user {
+						flex: 0 0 50%;
+						font-size: calc( var(--bot-ui-window-height) / 35 );
+						display: inline-flex;
+						text-align: center;
+						align-self: center;
+						justify-content: center;
+						align-items: center;
+					}
+
+					&-bot {
+						flex: 0 0 50%;
+						font-size: calc( var(--bot-ui-window-height) / 25 );
+						display: inline-flex;
+						text-align: center;
+						align-self: center;
+						justify-content: center;
+						align-items: center;
+					}
+				}
+			}
+
+		}
+
+		&[data-width-image] {
+
+			.bot {
+
+				.column {
+					&-image {
+						display: flex;
+						height: 50%;
+						overflow: hidden;
+					}
+
+					&-messages {
+
+						.message {
+							&-user {
+								padding: 5% 5% 0 5%;
+								min-height: 20%;
+								text-align: center;
+							}
+
+							&-bot {
+								padding: 5% 5% 0 5%;
+								text-align: center;
+							}
+						}
+					}
+				}
+
+				&-wrapper {
+					flex-direction: column;
+				}
+
+				.message {
+					&-user {
+						font-size: calc( var(--bot-ui-window-height) / 35 );
+					}
+
+					&-bot {
+						font-size: calc( var(--bot-ui-window-height) / 25 );
+					}
+				}
+
+				.image {
+					text-align: center;
+					align-self: center;
+					display: inline-flex;
+					height: 100%;
+					background: var(--bot-ui-image-background-color);
+					align-items: center;
+
+					img, video, iframe {
+						width: 100%;
+						height: auto;
+					}
+				}
+			}
+		}
+
+		&[data-with-avatar] {
+			.bot {
+				&-wrapper {
+					flex-direction: column;
+				}
+
+				.column {
+					&-avatar {
+						width: 100%;
+					}
+
+					&-messages {
+						display: flex;
+						flex-direction: column;
+						width: 100%;
+						transform: translateY(var(--bot-ui-avatar-text-overlap)) translateY(calc( var(--bot-ui-chat-input-height) * -1 ));
+						//background: linear-gradient(0deg, rgba(0, 0, 0, .4) 90%, rgba(0, 0, 0, 0) 100%);
+
+						.message {
+							padding-top: 1%;
+							width: 100%;
+							margin: unset;
+
+							&-bot {
+								font-size: calc( var(--bot-ui-window-height) / 30 );
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	&[data-orientation="portrait"][data-with-avatar],
+	&[data-orientation="landscape"][data-with-avatar] {
+		.bot {
+			.column {
+				&-image {
+					display: none;
+				}
+				&-messages {
+					scroll-behavior: smooth;
+					display: flex;
+					height: calc( ( 100% - var(--bot-ui-avatar-height) + ( var(--bot-ui-avatar-text-overlap) * -1 ) ) );
+					width: 100%;
+					margin-bottom: var(--bot-ui-avatar-text-overlap);
+					padding-bottom: var(--bot-ui-chat-input-height);
+
+					.message {
+						&-user {
+							@include text-outline(var(--bot-ui-message-color-outline-user));
+						}
+						&-bot {
+							@include text-outline(var(--bot-ui-message-color-outline-bot));
+						}
+					}
+				}
+			}
+		}
+		&[data-with-chat-input] {
+			.chat-input {
+				&-wrapper {
+					input,
+					.settings {
+						border: 1px $overlay-outline-color solid;
+					}
+				}
+			}
+		}
+	}
+}
+
+[data-collapsable] {
+	margin-bottom: .7rem;
+	position: fixed;
+	bottom: 0;
+	right: 20px;
+
+	.bot {
+		border-radius: 0.7rem;
+		margin-bottom: .7rem;
+		box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, .4);
+		transition: all calc( var(--bot-ui-animation-speed) / 2 ) linear;
+		opacity: 1;
+	}
+
+	[data-trigger] {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		cursor: pointer;
+
+		&:after {
+			content: "";
+			background-image: url("../assets/images/logo.svg");
+			width: 90%;
+			height: 90%;
+			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center;
+		}
+	}
+}
+
+[data-collapsable="expanded"] {
+	padding-bottom: 65px;
+
+	[data-trigger] {
+		background-image: none;
+		background-color: white;
+		border: 1px solid black;
+	}
+}
+
+[data-collapsable="collapsed"] {
+
+	.bot {
+		display: none;
+		opacity: 0;
+	}
+
+	[data-trigger] {
+		background-image:
+			radial-gradient(
+							ellipse,
+							var(--bot-ui-background-color),
+							var(--bot-ui-base-background-color)
+			);
+
+		img {
+			transform:rotate(0deg);
+		}
+	}
+}
+
+[data-gui-mode]:not([data-collapsable]) {
+	position: relative;
+}
+
+[data-trigger] {
+	display: none;
+	position: relative;
+	width: 60px;
+	height: 50px;
+	border-radius: .7rem;
+	color: white;
+	right: calc(-100% + 60px);
+
+	img {
+		width: 40px;
+		height: auto;
+		transition: all calc( var(--bot-ui-animation-speed) / 10 ) linear;
+	}
+}
+
+/* TODO implement tooltips */
+//.tooltip {
+//	position: relative;
+//	display: inline-block;
+//
+//	.tooltiptext {
+//		font-family: "Century Gothic", sans-serif;
+//		font-size: 1rem;
+//		visibility: hidden;
+//		width: 100px;
+//		background-color: black;
+//		color: #fff;
+//		text-align: center;
+//		border-radius: 6px;
+//		padding: 5px 5px;
+//
+//		/* Position the tooltip */
+//		position: absolute;
+//		z-index: 1;
+//		bottom: 150%;
+//		left: 50%;
+//		margin-left: -50px; /* Use half of the width (120/2 = 60), to center the tooltip */
+//
+//		&::after {
+//			content: " ";
+//			position: absolute;
+//			top: 100%; /* At the bottom of the tooltip */
+//			left: 50%;
+//			margin-left: -5px;
+//			border-width: 5px;
+//			border-style: solid;
+//			border-color: black transparent transparent transparent;
+//		}
+//	}
+//
+//	&:hover {
+//		.tooltiptext {
+//			visibility: visible;
+//		}
+//	}
+//}
+
+.background {
+	width: 100%;
+	height: 100%;
+	background-color: var(--bot-ui-base-background-color);
+	z-index: 0;
+	position: absolute;
+	transition: background-image var(--bot-ui-animation-speed) linear;
+	background-image:
+		radial-gradient(
+				ellipse,
+				var(--bot-ui-background-color),
+				//darken($base-color, 30)
+				var(--bot-ui-base-background-color)
+		);
+
+	&--image {
+		background-image: var(--bot-ui-background-url);
+		background-size: cover;
+		filter: blur(var(--bot-ui-background-url-blur));
+
+		&:before {
+			background-image:
+				radial-gradient(
+						ellipse,
+						transparent,
+						//darken($base-color, 30)
+						var(--bot-ui-base-background-color)
+				);
+		}
+
+		&:after {
+			background-image: none;
+		}
+	}
+
+	&[data-background-animation]:before {
+		opacity: 0.2;
+		width: 100%;
+		height: 100%;
+		content: '';
+		top: 0;
+		left: 0;
+		position: absolute;
+		transition: background-image var(--bot-ui-animation-speed) linear;
+		background-image:
+			radial-gradient(
+					ellipse at 75% 75%,
+					var(--bot-ui-background-color),
+					//darken($base-color, 30)
+					var(--bot-ui-base-background-color)
+			);
+		z-index: 1;
+		animation-name: pulse;
+		animation-duration: 5s;
+		animation-timing-function: linear;
+		animation-iteration-count: infinite;
+	}
+
+	&[data-background-animation]:after {
+		opacity: 0.2;
+		width: 100%;
+		height: 100%;
+		content: '';
+		top: 0;
+		left: 0;
+		position: absolute;
+		transition: background-image var(--bot-ui-animation-speed) linear;
+		background-image:
+			radial-gradient(
+					ellipse at 25% 25%,
+					var(--bot-ui-background-color),
+					//darken($base-color, 30)
+					var(--bot-ui-base-background-color)
+			);
+		z-index: 2;
+		animation-name: pulse;
+		animation-duration: 10s;
+		animation-timing-function: linear;
+		animation-iteration-count: infinite;
+	}
+
+	span {
+		z-index: 3;
+		width: $particleSize;
+		height: $particleSize;
+		border-radius: $particleSize;
+		backface-visibility: hidden;
+		position: absolute;
+		animation-name: move;
+		animation-duration: $animationDuration;
+		animation-timing-function: linear;
+		animation-iteration-count: infinite;
+		$colors: (
+			#000000
+		);
+		@for $i from 1 through $amount {
+			&:nth-child(#{$i}) {
+				opacity: random(50) / 100;
+				color: nth($colors, random(length($colors)));
+				top: random(100) * 1%;
+				left: random(100) * 1%;
+				animation-duration: (random($animationDuration * 10) / 10) * 1s + 10s;
+				animation-delay: random(($animationDuration + 10s) * 10) / 10 * -1s;
+				transform-origin: (random(50) - 25) * 1vw (random(50) - 25) * 1vh;
+				$blurRadius: (random() + 0.5) * $particleSize * 0.5;
+				$x: if(random() > 0.5, -1, 1);
+				box-shadow: ($particleSize * 2 * $x) 0 $blurRadius currentColor;
+			}
+		}
+	}
+}
+
+@keyframes move {
+	100% {
+		transform: translate3d(0, 0, 1px) rotate(360deg);
+	}
+}
+
+@keyframes pulse {
+	0% {
+		opacity: 0;
+	}
+	50% {
+		opacity: random(70) / 100;
+	}
+	100% {
+		opacity: 0;
+	}
+}
