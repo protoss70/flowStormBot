@@ -488,6 +488,8 @@ class BotUI  {
         }
     }
 
+
+
     public setVideo = (url: string = null, callback: () => any) => {
         BotUI.videoCallback = callback;
         if (BotUI.settings.guiMode === GUIMode.CHAT) {
@@ -529,6 +531,24 @@ class BotUI  {
             }
         }
 
+    }
+
+    public setButton = (url: string = null) => {
+        const messageElement = BotUI.messagesElement;
+
+        const button = document.createElement('button');
+        const newImg = new Image();
+        button.append(newImg);
+
+        button.classList.add("inputButton", "chat-message", "chat-message-bot");
+        button.setAttribute("data-message-type", "bot")
+
+        newImg.src = url; 
+
+        button.style.background = `transparent`;
+        messageElement.appendChild(button);
+
+        messageElement.appendChild(button);
     }
 
     public setImage = (url: string = null) => {

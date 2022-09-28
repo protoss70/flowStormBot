@@ -1074,6 +1074,20 @@ $amount: 20;
 	}
 }
 
+.inputButton{
+	padding: 0 !important;
+	border: none;
+	width: 100%;
+	
+	&:hover{
+		cursor: pointer;
+	}
+
+	&> img{
+		max-height: 125px;
+	}
+}
+
 @keyframes move {
 	100% {
 		transform: translate3d(0, 0, 1px) rotate(360deg);
