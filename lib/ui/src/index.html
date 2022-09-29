@@ -31,7 +31,8 @@
             botUI.setImage('https://upload.wikimedia.org/wikipedia/tr/7/77/Lukepromo2321.jpg');
             botUI.setBotText("Bot said something more interesting ...");
             botUI.setUserText("You said");
-            botUI.setButton("https://www.pngall.com/wp-content/uploads/4/Learn-More-PNG-Free-Image.png")
+            botUI.setButton("https://core.flowstorm.ai/file/assets/spaces/6294cab68f488e0f08ab5ead", ()=>{botUI.setButton("https://core.flowstorm.ai/file/assets/spaces/6294cab68f488e0f08ab5ead")}, "TestbedrobotsHELP");
+            botUI.setButton("https://core.flowstorm.ai/file/assets/spaces/6294cab68f488e0f08ab5ead", ()=>{}, "TestbedrobotsHELP");
 
             botUI.chatInputCallback = ((inputValue) => {
                console.log(`Do something with input value - ${inputValue}`);

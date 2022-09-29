@@ -316,34 +316,41 @@ const createBot = (botUI, settings) => {
 	defaultCallback.handleCommand = (command, code) => {
         const payload = JSON.parse(code);
 	    switch(command) {
-          case '#expression':
-            botUI.sendRTCData({'Expression': { 'Name': payload['name']}});
-            break;
-          case '#animation':
-            botUI.sendRTCData({'Animation': payload['name']});
-            break;
-          case '#gesture':
-            botUI.sendRTCData({'Animation': payload['name']});
-            break;
-          case '#snow':
-            botUI.sendRTCData({'Snowing': payload['snowing']});
-            break;
-          case '#transition':
-            botUI.sendRTCData({'Transition': ""});
-            break;
-          case '#shirt':
-            botUI.sendRTCData({'ChangeShirt': payload['state']});
-            break;
-          case '#level':
-            botUI.sendRTCData({'Level': payload['name'] + 'Level'});
-            break;
-          case '#avatar':
-            botUI.sendRTCData({'Character': payload['name']});
-            break;
-          case '#walk':
-            botUI.sendRTCData({'Walk': payload['action']});
-            break;
-          default:
+			case '#expression':
+				botUI.sendRTCData({'Expression': { 'Name': payload['name']}});
+				break;
+			case '#animation':
+				botUI.sendRTCData({'Animation': payload['name']});
+				break;
+			case '#gesture':
+				botUI.sendRTCData({'Animation': payload['name']});
+				break;
+			case '#snow':
+				botUI.sendRTCData({'Snowing': payload['snowing']});
+				break;
+			case '#transition':
+				botUI.sendRTCData({'Transition': ""});
+				break;
+			case '#shirt':
+				botUI.sendRTCData({'ChangeShirt': payload['state']});
+				break;
+			case '#level':
+				botUI.sendRTCData({'Level': payload['name'] + 'Level'});
+				break;
+			case '#avatar':
+				botUI.sendRTCData({'Character': payload['name']});
+				break;
+			case '#walk':
+				botUI.sendRTCData({'Walk': payload['action']});
+				break;
+			case "#actions":
+				payload.tiles.forEach(button => {
+					botUI.setButton(button.background, () => {
+						if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") bot.handleOnTextInput(`#${button.action}`)
+					}, payload.title.replaceAll(" ", ""));
+				});
+				
+			default:
 
         }
 	}

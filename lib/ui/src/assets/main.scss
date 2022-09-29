@@ -1078,13 +1078,14 @@ $amount: 20;
 	padding: 0 !important;
 	border: none;
 	width: 100%;
+	margin-bottom: 0.8em !important;
 	
 	&:hover{
 		cursor: pointer;
 	}
 
 	&> img{
-		max-height: 125px;
+		max-height: 100px;
 	}
 }
 

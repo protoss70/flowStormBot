@@ -533,7 +533,7 @@ class BotUI  {
 
     }
 
-    public setButton = (url: string = null) => {
+    public setButton = (url: string = null, callback: Function = null, title: string = "general", disableGroup: boolean = true) => {
         const messageElement = BotUI.messagesElement;
 
         const button = document.createElement('button');
@@ -541,14 +541,24 @@ class BotUI  {
         button.append(newImg);
 
         button.classList.add("inputButton", "chat-message", "chat-message-bot");
-        button.setAttribute("data-message-type", "bot")
+        button.setAttribute("data-message-type", "bot");
+        button.setAttribute("data-button-group", title);
 
         newImg.src = url; 
+        button.onclick = () => {
+            callback();
+            if (disableGroup){
+                document.querySelectorAll(`[data-button-group=${title}]`).forEach(elem => {
+                    elem.setAttribute('disabled', '');
+                });
+            }
+        };
 
         button.style.background = `transparent`;
-        messageElement.appendChild(button);
 
         messageElement.appendChild(button);
+        messageElement.scrollTop = messageElement.scrollHeight;
+        BotUI.scrollToLastMessage(messageElement);
     }
 
     public setImage = (url: string = null) => {
