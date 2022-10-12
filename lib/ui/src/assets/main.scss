@@ -110,6 +110,24 @@ $amount: 20;
 	display:block;
 }
 
+[data-chat-input-controllers]{
+	position: absolute;
+	right: 8px;
+	width: 65px;
+	height: 25px;
+	border-radius: 5px;
+	background-color: #ffffff;
+	box-shadow: 0px 0px 1px black;
+	top: calc(50% - 10px);
+
+	&.text-mode{
+		position:	unset;
+		background: none;
+		box-shadow: none;
+
+	}
+}
+
 [data-with-chat-input] {
 
 	.chat-input {
@@ -139,8 +157,11 @@ $amount: 20;
 				border-radius: .7rem;
 				height: 100%;
 				background-color: #ffffff;
-				padding: 0 var(--bot-ui-chat-input-height) 0 4rem;
+				padding: 0 var(--bot-ui-chat-input-height) 0 2.3rem;
 				border-width: 0;
+				position: absolute;
+				width: 88%;
+				right: 5px;
 
 				&:focus {
 					outline: none;
@@ -194,18 +215,19 @@ $amount: 20;
 				}
 
 				&--mic2{
-					right: 35px;
+					right: 10px;
+					bottom: 10px;
 					top: calc(50% - 10px);
 				}
 
 				&--volume {
-					left: 35px;
-					top: calc(50% - 10px);
+					right: 10px;
+					bottom: 30px;
 				}
 
 				&--volume-mute {
-					left: 35px;
-					top: calc(50% - 10px);
+					right: 10px;
+					top: 10px;
 				}
 
 				&--speaking-head {
@@ -214,18 +236,30 @@ $amount: 20;
 				}
 
 				&--arrow-up {
-					right: 10px;
+					right: 40px;
 					top: calc(50% - 10px);
+					&--visible{
+						display: block;
+					}
+	
+					&--hidden{
+						display: none;
+					}
 				}
 
 				&--keyboard {
-					right: 35px;
-					top: calc(50% - 10px);
+					right: 10px;
+					bottom: 10px;
 				}
 
 				&--play {
-					left: 10px;
+					right: 40px;
 					top: calc(50% - 10px);
+				
+					&--text-mode{
+						left: 50px;
+						top: calc(50% - 10px);
+					}
 				}
 
 				&--pause {
@@ -241,6 +275,17 @@ $amount: 20;
 				&--menu-down {
 					right: 10px;
 					top: calc(50% - 10px);
+				}
+
+				&--back {
+					left: 10px;
+					top: calc(50% - 10px);
+					background-color: #ffffff;
+					border-radius: 50%;
+					padding: 3px;
+					height: 25px;
+					width: 25px;
+					transform: rotate(-90deg);
 				}
 
 				&--menu-up {
@@ -455,6 +500,18 @@ $amount: 20;
 		}
 	}
 
+}
+
+[data-chat-input]{
+	&.chat-input{
+		&--visible{
+			display: block;
+		}
+	
+		&--hidden{
+			display: none;
+		}
+	}
 }
 
 [data-gui-mode="kiosk"] {
@@ -781,7 +838,6 @@ $amount: 20;
 						flex-direction: column;
 						width: 100%;
 						transform: translateY(var(--bot-ui-avatar-text-overlap)) translateY(calc( var(--bot-ui-chat-input-height) * -1 ));
-						//background: linear-gradient(0deg, rgba(0, 0, 0, .4) 90%, rgba(0, 0, 0, 0) 100%);
 
 						.message {
 							padding-top: 1%;
@@ -1079,6 +1135,10 @@ $amount: 20;
 	border: none;
 	width: 100%;
 	margin-bottom: 0.8em !important;
+	min-height: 75px;
+	max-height: 100px;
+	font-size: 24px;
+	font-weight: bold;
 	
 	&:hover{
 		cursor: pointer;

@@ -34,6 +34,9 @@ export interface Settings {
     reverseAvatarOrder?: boolean;
     collapsable?: boolean;
     collapsed?: boolean;
+    inputTypeSelect?: boolean;
+    sections?: string[];
+    sectionActive?: string;
 }
 
 export interface Background {

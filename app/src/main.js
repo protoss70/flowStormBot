@@ -55,6 +55,7 @@ const botUIDefaultSettings = {
 	backgroundSimpleAnimation: true,
 	collapsed: true,
 	mode: 'voice',
+	inputTypeSelect: false,
 };
 
 const clientDefaultSetting = {
@@ -76,7 +77,7 @@ let botBackground = undefined;
 let botElement;
 let modal;
 let botState = {};
-let paused = false;
+let paused = true;
 let textInputEnabled = false;
 
 export const initFSClientBot = (initParams = {}) => {
@@ -98,7 +99,6 @@ export const initFSClientBot = (initParams = {}) => {
 	textInputEnabled = settings.textInputEnabled;
 	settings.textInputEnabled = false;
     botInitializer = new BotInitializer(startMessage, settings.attributes);
-	console.log(settings)
 
 	if (allowUrlParams) {
 	    const urlParamsObject = {};
@@ -121,7 +121,6 @@ export const initFSClientBot = (initParams = {}) => {
 			avatarURL,
 		    ...urlParamsObject,
 		}
-		console.log(settings);
 	}
 	const botUI = initUI(settings);
 	if (botUI) {
@@ -346,8 +345,10 @@ const createBot = (botUI, settings) => {
 			case "#actions":
 				payload.tiles.forEach(button => {
 					botUI.setButton(button.background, () => {
-						if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") bot.handleOnTextInput(`#${button.action}`)
+						if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") bot.handleOnTextInput(`#${button.action}`);
+						bot.setInAudio(true);
 					}, payload.title.replaceAll(" ", ""));
+					bot.setInAudio(false);
 				});
 				
 			default:
@@ -411,7 +412,8 @@ const createBot = (botUI, settings) => {
 	}
 
 	const run = (minimize = false) => {
-		const status = getStatus();
+		const { status = undefined } = botState;
+		console.log(status);
 		let pauseOnListening = false;
 		switch (status) {
 			case 'SLEEPING':
@@ -503,6 +505,10 @@ const createBot = (botUI, settings) => {
 		run();
 	}
 
+	botUI.chatBackCallback = (inputValue) => {
+		bot.handleOnTextInput(`#intro`)
+	}
+
 	botUI.chatMicCallback = (inputValue) => {
 		const status = getStatus();
 		if (status === "SLEEPING" || status === undefined){
@@ -515,14 +521,11 @@ const createBot = (botUI, settings) => {
 	}
 
 	botUI.chatKeyboardCallback = (inputValue) => {
-		const status = getStatus();
-		if (status === undefined || status === "SLEEPING"){
-			const mode = settings.mode;
-			settings.mode = mode === "text" ? "voice" : "text";
-			console.log(settings.mode)
-			botUI.setInputMode(mode);
-			
-		}
+		const mode = settings.mode;
+		settings.mode = mode === "text" ? "voice" : "text";
+		console.log(settings.mode)
+		botUI.setInputMode(mode);
+		bot.setInAudio(mode === "text" ? false : true);
 	}
 
 	botUI.chatStopCallback = (inputValue) => stop();
