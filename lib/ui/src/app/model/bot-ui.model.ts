@@ -15,6 +15,8 @@ export interface Settings {
     keyboardIcon?: string;
     muteIcon?: string;
     volumeIcon?: string;
+    upSop?: string;
+    downSop?: string;
     guiMode: GUIMode,
     imageAverageColorOpacity?: number;
     userMessageBackgroundColor?: string;
@@ -34,9 +36,8 @@ export interface Settings {
     reverseAvatarOrder?: boolean;
     collapsable?: boolean;
     collapsed?: boolean;
-    inputTypeSelect?: boolean;
     sections?: string[];
-    sectionActive?: string;
+    sectionActive?: number;
 }
 
 export interface Background {

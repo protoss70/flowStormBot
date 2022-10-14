@@ -112,16 +112,15 @@ $amount: 20;
 
 [data-chat-input-controllers]{
 	position: absolute;
-	right: 8px;
-	width: 65px;
+	right: 10px;
+	width: 25px;
 	height: 25px;
 	border-radius: 5px;
+	top: calc(50% - 10px);
 	background-color: #ffffff;
 	box-shadow: 0px 0px 1px black;
-	top: calc(50% - 10px);
 
 	&.text-mode{
-		position:	unset;
 		background: none;
 		box-shadow: none;
 
@@ -157,11 +156,12 @@ $amount: 20;
 				border-radius: .7rem;
 				height: 100%;
 				background-color: #ffffff;
-				padding: 0 var(--bot-ui-chat-input-height) 0 2.3rem;
+				padding: 0 2.5rem 0 0.6rem;
 				border-width: 0;
 				position: absolute;
 				width: 88%;
 				right: 5px;
+				top: calc(50% - 18px);
 
 				&:focus {
 					outline: none;
@@ -278,18 +278,23 @@ $amount: 20;
 				}
 
 				&--back {
-					left: 10px;
+					left: 8px;
 					top: calc(50% - 10px);
 					background-color: #ffffff;
-					border-radius: 50%;
+					border-radius: 5px;
 					padding: 3px;
 					height: 25px;
 					width: 25px;
 					transform: rotate(-90deg);
+					box-shadow: 0px 0px 1px black;
+				}
+
+				&--downSop{
+					transform: rotate(180deg);
 				}
 
 				&--menu-up {
-					right: 10px;
+					right: 2.5px;
 					top: calc(50% - 10px);
 				}
 
@@ -299,7 +304,7 @@ $amount: 20;
 				}
 
 				&--menu {
-					right: 10px;
+					right: 2.5px;
 					top: calc(50% - 10px);
 				}
 			}
@@ -945,9 +950,9 @@ $amount: 20;
 	[data-trigger] {
 		background-image:
 			radial-gradient(
-							ellipse,
-							var(--bot-ui-background-color),
-							var(--bot-ui-base-background-color)
+				ellipse,
+				var(--bot-ui-background-color),
+				var(--bot-ui-base-background-color)
 			);
 
 		img {
@@ -958,6 +963,53 @@ $amount: 20;
 
 [data-gui-mode]:not([data-collapsable]) {
 	position: relative;
+}
+
+[data-chat-sop]{
+	&.sop-section{
+		display: flex;
+		justify-content: space-around;
+		height: 100%;
+		&--hidden{
+			display: none;
+		}
+
+		& > button{
+			width: 30%;
+			font-size: 20px;
+			font-weight: bold;
+
+			&:hover{
+				cursor: pointer;
+			}
+
+			&:disabled{
+				cursor: inherit;
+			}
+
+			&.next-button{
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			& > span{
+				position: static !important;
+
+				&:hover{
+					cursor: inherit;
+				}
+			}
+		}
+	}
+}
+
+[data-chat-ask]{
+	&.ask-section{
+		&--hidden{
+			display: none;
+		}
+	}
 }
 
 [data-trigger] {
@@ -1135,10 +1187,13 @@ $amount: 20;
 	border: none;
 	width: 100%;
 	margin-bottom: 0.8em !important;
-	min-height: 75px;
-	max-height: 100px;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+	height: 100px;
 	font-size: 24px;
 	font-weight: bold;
+	left: 50%;
+	transform: translateX(-50%);
 	
 	&:hover{
 		cursor: pointer;

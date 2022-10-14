@@ -54,6 +54,8 @@ const defaults: Settings = {
     keyboardIcon: 'icon--content--keyboard',
     muteIcon: 'icon--content--volume-mute',
     volumeIcon: 'icon--content--volume',
+    upSop: 'icon--content--upSop',
+    downSop: 'icon--content--downSop',
     guiMode: GUIMode.KIOSK,
     imageAverageColorOpacity: 0.5,
     widgetSize: {
@@ -72,8 +74,8 @@ const defaults: Settings = {
     reverseAvatarOrder: false,
     collapsable: false,
     collapsed: false,
-    inputTypeSelect: true,
-    sections: ["LOGIN", "INPUTSELECT", "SOP", "QUESTION"],
+    sectionActive: 0,
+    sections: ["LOGIN", "INPUTSELECT", "SOP","QUESTION"],
 };
 
 const fullScreenWidgetWidth = '100vw';
@@ -98,7 +100,10 @@ const icons = ['mic',
     'volume-mute',
     'menu',
     'mic2',
-    'back'];
+    'back',
+    'downSop',
+    'upSop',
+    ];
 const avatarTextOverlapRatio = 1 / 4;
 const micActiveClass = "icon--mic--active";
 
@@ -137,6 +142,12 @@ class BotUI  {
     private static textInput: HTMLElement;
     private static controllerWrapper: HTMLElement;
     private static chatInputBackElement: HTMLElement;
+    private static sopSection: HTMLElement;
+    private static questionSection: HTMLElement;
+    private static questionSOPButton: HTMLElement;
+    private static downSOPButton: HTMLElement;
+    private static upSOPButton: HTMLElement;
+    
 
     private static isChatEnabled: boolean = true;
     private static isMicrophoneEnabled: boolean = true;
@@ -196,6 +207,12 @@ class BotUI  {
         BotUI.textInput = BotUI.element.querySelector('[data-text-input-wrap');
         BotUI.controllerWrapper = BotUI.element.querySelector('[data-chat-input-controllers]');
         BotUI.chatInputBackElement = BotUI.element.querySelector('[data-chat-input-back]');
+        BotUI.sopSection = BotUI.element.querySelector('[data-chat-sop]');
+        BotUI.questionSection = BotUI.element.querySelector('[data-chat-ask]');
+        BotUI.questionSOPButton = BotUI.element.querySelector('[data-sop-question]');
+        BotUI.upSOPButton = BotUI.element.querySelector('[data-sop-back]');
+        BotUI.downSOPButton = BotUI.element.querySelector('[data-sop-next]');
+
 
         if (BotUI.settings.collapsable) {
             BotUI.setCollapsableUIHeight();
@@ -216,19 +233,7 @@ class BotUI  {
             );
         }
 
-        if(BotUI.settings.inputTypeSelect){
-            BotUI.chatTextInputElement.classList.add("chat-input--hidden");
-            const callback = (e) => {
-                BotUI.chatTextInputElement.classList.remove("chat-input--hidden");
-                this.setInputMode(e);
-                BotUI.settings.mode = e === "voice" ? "text" : "voice"; 
-                const messageElement = BotUI.messagesElement;
-                messageElement.textContent = "";
-            }
-            this.setBotText("Please choose an input type.");
-            this.setButton("", () => {callback("text")}, "modeSelect", true, "Voice Input");
-            this.setButton("", () => {callback("voice")}, "modeSelect", true, "Text Input");
-        }
+        this.setSection(BotUI.settings.sections[0]);
 
         if (BotUI.settings.guiMode === GUIMode.KIOSK) {
             BotUI.messagesElement.innerHTML = kioskMessageStructureTemplate;
@@ -331,13 +336,25 @@ class BotUI  {
             this.chatKeyboardCallback();
         }
 
-        BotUI.chatInputPlayElement.onclick = (e) => {
-            this.chatPlayCallback()
+        // BotUI.chatInputPlayElement.onclick = (e) => {
+        //     this.chatPlayCallback();
+        // }
+
+        BotUI.questionSOPButton.onclick = (e) => {
+            this.chatSopQuestionCallback();
         }
 
-        // BotUI.chatInputMicElement.onclick = (e) => {
-        //     this.chatMicCallback()
-        // }
+        BotUI.upSOPButton.onclick = (e) => {
+            this.chatSopPreviousCallback()
+        }
+
+        BotUI.downSOPButton.onclick = (e) => {
+            this.chatSopNextCallback()
+        }
+
+        BotUI.chatInputMicElement.onclick = (e) => {
+            this.chatMicCallback()
+        }
 
         BotUI.chatInputStopElement.onclick = (e) => {
             this.chatStopCallback()
@@ -356,13 +373,11 @@ class BotUI  {
 
     public setMicIcon(active){
         if (active){
-            BotUI.chatInputMicElement.classList.add(micActiveClass);
-            BotUI.changeClasses("icon--largest", "icon--large", BotUI.chatInputMicElement);
-            BotUI.chatInputKeyboardElement.classList.add("icon--disabled");
+            BotUI.chatInputMicElement.classList.add(micActiveClass, "icon--large");
+            BotUI.chatInputMicElement.classList.remove("icon--largest");
         }else{
-            BotUI.chatInputMicElement.classList.remove(micActiveClass);
-            BotUI.changeClasses("icon--large", "icon--largest", BotUI.chatInputMicElement);
-            BotUI.chatInputKeyboardElement.classList.remove("icon--disabled");
+            BotUI.chatInputMicElement.classList.remove(micActiveClass, "icon--large");
+            BotUI.chatInputMicElement.classList.add("icon--largest");
         }
         
     }
@@ -381,6 +396,28 @@ class BotUI  {
         }
     }
 
+    public setSection(section: string = "SOP"){
+        const index = BotUI.settings.sections.indexOf(section);
+        BotUI.settings.sectionActive = index;
+        this.setSectionUI(section);
+    }
+
+    public nextSection(){
+        if (BotUI.settings.sectionActive < BotUI.settings.sections.length - 1){
+            BotUI.settings.sectionActive += 1;
+            const nextSect = BotUI.settings.sections[BotUI.settings.sectionActive]
+            this.setSection(nextSect);
+        }
+    }
+
+    public previousSection(){
+        if (BotUI.settings.sectionActive >= 0){
+            BotUI.settings.sectionActive -= 1;
+            const nextSect = BotUI.settings.sections[BotUI.settings.sectionActive]
+            this.setSection(nextSect);
+        }
+    }
+
     public setInputMode(mode){
         BotUI.chatInputSettingsElement.classList.add("settings--hidden");
         BotUI.chatInputSettingsElement.classList.remove("settings--visible");
@@ -390,7 +427,7 @@ class BotUI  {
             BotUI.chatInputKeyboardElement.classList.remove(BotUI.settings.keyboardIcon);
             BotUI.soundInput.setAttribute("style", "display:none;");
             BotUI.textInput.setAttribute("style", "display:block;");
-            BotUI.chatInputPlayElement.classList.add("icon--play--text-mode");
+            // BotUI.chatInputPlayElement.classList.add("icon--play--text-mode");
             BotUI.controllerWrapper.classList.add("text-mode");
 
         }else if(mode === 'text'){
@@ -398,7 +435,7 @@ class BotUI  {
             BotUI.chatInputKeyboardElement.classList.add(BotUI.settings.keyboardIcon);
             BotUI.soundInput.setAttribute("style", "display:block;");
             BotUI.textInput.setAttribute("style", "display:none;");
-            BotUI.chatInputPlayElement.classList.remove("icon--play--text-mode");
+            // BotUI.chatInputPlayElement.classList.remove("icon--play--text-mode");
             BotUI.controllerWrapper.classList.remove("text-mode");
             BotUI.chatInputSettingsElement.classList.add("text-mode");
         }
@@ -411,6 +448,48 @@ class BotUI  {
         const rect: DOMRect = BotUI.element.getBoundingClientRect();
         const orientation: OrientationEnum = (rect.width > rect.height) ? OrientationEnum.LANDSCAPE : OrientationEnum.PORTRAIT;
         this.setOrientation(orientation);
+    }
+
+    private setSectionUI(section: string){
+        switch (section) {
+            case "LOGIN":
+                this.nextSection();
+                break;
+            case "INPUTSELECT":
+
+                const callback = (e) => {
+                    this.setInputMode(e);
+                    sessionStorage.setItem("INPUTSELECT", e);
+                    BotUI.settings.mode = e === "voice" ? "text" : "voice"; 
+                    const messageElement = BotUI.messagesElement;
+                    messageElement.textContent = "";
+                    this.nextSection();
+                }
+
+                const sessionIputType = sessionStorage.getItem("INPUTSELECT");
+                if (sessionIputType === null){
+                    BotUI.questionSection.classList.add("ask-section--hidden");
+                    BotUI.sopSection.classList.add("sop-section--hidden");
+
+                    this.setBotText("Please choose an input type.");
+                    this.setButton("", () => {callback("text")}, "modeSelect", true, "Voice Input");
+                    this.setButton("", () => {callback("voice")}, "modeSelect", true, "Text Input");
+                }else{
+                    callback(sessionIputType);
+                }
+                break;
+            case "SOP":
+                BotUI.questionSection.classList.add("ask-section--hidden");
+                BotUI.sopSection.classList.remove("sop-section--hidden");
+                break;
+            case "QUESTION":
+                BotUI.questionSection.classList.remove("ask-section--hidden");
+                BotUI.sopSection.classList.add("sop-section--hidden");
+                break;
+            default:
+                this.nextSection();
+                break;
+        }
     }
 
     private setupDataChannel = (label) => {
@@ -452,9 +531,10 @@ class BotUI  {
         }
 
     public setPlayIcon = (icon: string) => {
-        BotUI.chatInputPlayElement.classList.remove(BotUI.settings.pauseIcon)
-        BotUI.chatInputPlayElement.classList.remove(BotUI.settings.playIcon)
-        BotUI.chatInputPlayElement.classList.add(icon)
+        // BotUI.chatInputPlayElement.classList.remove(BotUI.settings.pauseIcon);
+        // BotUI.chatInputPlayElement.classList.remove(BotUI.settings.playIcon);
+        // BotUI.chatInputPlayElement.classList.add(icon);
+        return;
     }
 
     private static changeClasses = (class1: string, class2: string, e: HTMLElement) => {
@@ -648,25 +728,38 @@ class BotUI  {
         }
     }
 
+    public removeOverlay(){
+        BotUI.botPcmElement.classList.add('bu-invisible');
+        BotUI.botPcmElement.classList.remove('bu-visible');
+    }
+
+    public resume(mode: string, buttonInp: boolean){
+        if (!buttonInp && mode === "voice"){
+            BotUI.botPcmElement.classList.remove('bu-invisible');
+            BotUI.botPcmElement.classList.add('bu-visible');
+        }
+    }
+
     public setInputAudio = (samples: any = null) => {
         BotUI.botPcmElement.classList.add('bu-invisible');
         BotUI.botPcmElement.classList.remove('bu-visible');
         if (isNil(samples) || isEmpty(samples)) {
             BotUI.userPcmElement.classList.add('bu-invisible');
             BotUI.userPcmElement.classList.remove('bu-visible');
-        } else {
+        } else if(BotUI.settings.mode === "voice"){
             BotUI.userPcmElement.classList.add('bu-visible');
             BotUI.userPcmElement.classList.remove('bu-invisible');
         }
     }
 
-    public setOutputAudio = (samples: any = null, sampleRate = 16000, stereo = false) => {
+    public setOutputAudio = (samples: any = null, mode: string, buttonInp: boolean = false, sampleRate = 16000, stereo = false) => {
         BotUI.userPcmElement.classList.add('bu-invisible');
         BotUI.userPcmElement.classList.remove('bu-visible');
+
         if (isNil(samples) || isEmpty(samples)) {
             BotUI.botPcmElement.classList.add('bu-invisible');
             BotUI.botPcmElement.classList.remove('bu-visible');
-        } else {
+        } else if (mode === "voice" && !buttonInp){
             BotUI.botPcmElement.classList.add('bu-visible');
             BotUI.botPcmElement.classList.remove('bu-invisible');
         }
@@ -692,6 +785,15 @@ class BotUI  {
     public chatKeyboardCallback = (...value) => {
         this.setInputMode(BotUI.settings.mode);
         BotUI.settings.mode = BotUI.settings.mode === "voice" ? "text" : "voice"; 
+        console.log(BotUI.settings);
+    }
+
+    public chatSopNextCallback = (...value) => {}
+
+    public chatSopPreviousCallback = (...value) => {}
+
+    public chatSopQuestionCallback = (...value) => {
+        this.setSection("QUESTION");
     }
 
     public chatTextInputElementCallback = (...value) => {}

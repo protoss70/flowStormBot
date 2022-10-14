@@ -34,6 +34,7 @@ let termsId = undefined
 
 const converter = new Converter();
 var botInitializer = new BotInitializer();
+var buttonInput = false;
 
 const audios = {};
 
@@ -56,6 +57,7 @@ const botUIDefaultSettings = {
 	collapsed: true,
 	mode: 'voice',
 	inputTypeSelect: false,
+	sections: ["LOGIN", "SOP", "QUESTION"],
 };
 
 const clientDefaultSetting = {
@@ -223,13 +225,14 @@ const createBot = (botUI, settings) => {
 	defaultCallback.setStatus = (newState) => {
 		botState = newState;
 		if (newState.status === 'LISTENING') {
-			botUI.setOutputAudio(1);
+			console.log(settings.mode)
+			botUI.setOutputAudio(1, settings.mode, buttonInput);
 		} else {
 			botUI.setInputAudio(1);
 		}
 		changePlayIcon(newState.status === 'SLEEPING' || newState.status === 'PAUSED' || !newState.status, botUI);
 		botUI.disableStop(newState.status === 'SLEEPING')
-		if (newState.status === 'SLEEPING' && settings.mode === 'voice'){
+		if (newState.status === 'SLEEPING'){
 			botUI.setMicIcon(false);
 		}
 	}
@@ -324,7 +327,7 @@ const createBot = (botUI, settings) => {
 			case '#gesture':
 				botUI.sendRTCData({'Animation': payload['name']});
 				break;
-			case '#snow':
+			case '#snow':payload
 				botUI.sendRTCData({'Snowing': payload['snowing']});
 				break;
 			case '#transition':
@@ -343,14 +346,17 @@ const createBot = (botUI, settings) => {
 				botUI.sendRTCData({'Walk': payload['action']});
 				break;
 			case "#actions":
+				buttonInput = true;
 				payload.tiles.forEach(button => {
 					botUI.setButton(button.background, () => {
-						if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") bot.handleOnTextInput(`#${button.action}`);
-						bot.setInAudio(true);
+						if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
+							bot.handleOnTextInput(`#${button.action}`, null, {buttonInput: true});
+						}
+						bot.setInAudio(settings.mode === "text" ? false : true);
+						buttonInput = false;
 					}, payload.title.replaceAll(" ", ""));
 					bot.setInAudio(false);
 				});
-				
 			default:
 
         }
@@ -388,7 +394,8 @@ const createBot = (botUI, settings) => {
 		const status = getStatus();
 		if (bot != null) {
 			if (direction === "Input") {
-				bot.inAudio(status)
+				// bot.inAudio(status)
+				return;
 			} else {
 				bot.outAudio(status)
 			}
@@ -422,7 +429,7 @@ const createBot = (botUI, settings) => {
 				}
 				break;
 			case 'LISTENING':
-				bot.inAudio(status);
+				bot.setInAudio(false);
 				pauseOnListening = !pauseOnListening;
 				changePlayIcon(pauseOnListening, botUI);
 				break;
@@ -430,12 +437,15 @@ const createBot = (botUI, settings) => {
 				bot.pause()
 				if (settings.avatarURL) {
 				    botUI.sendRTCData({'Pause': "true"});
+					botUI.removeOverlay();
 				}
 				break;
 			case 'PAUSED':
 				bot.resume()
 				if (settings.avatarURL) {
 				    botUI.sendRTCData({'Pause': "false"});
+					bot.setInAudio(settings.mode === "text" ? false : true);
+					botUI.resume(settings.mode, buttonInput);
 				}
 				break;
 			case undefined:
@@ -505,8 +515,16 @@ const createBot = (botUI, settings) => {
 		run();
 	}
 
+	botUI.chatSopNextCallback = (inputValue) => {
+		const status = getStatus();
+		console.log(status);
+		if (status !== undefined && status !== "SLEEPING") {
+			bot.handleOnTextInput(`yes`, null, {sopInput: true});
+		}
+	}
+
 	botUI.chatBackCallback = (inputValue) => {
-		bot.handleOnTextInput(`#intro`)
+		botUI.previousSection();
 	}
 
 	botUI.chatMicCallback = (inputValue) => {
@@ -523,9 +541,8 @@ const createBot = (botUI, settings) => {
 	botUI.chatKeyboardCallback = (inputValue) => {
 		const mode = settings.mode;
 		settings.mode = mode === "text" ? "voice" : "text";
-		console.log(settings.mode)
 		botUI.setInputMode(mode);
-		bot.setInAudio(mode === "text" ? false : true);
+		bot.setInAudio(settings.mode === "text" ? false : true);
 	}
 
 	botUI.chatStopCallback = (inputValue) => stop();

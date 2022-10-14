@@ -10,9 +10,13 @@ export const baseStructureTemplate = `
         <div data-chat-input class="chat-input">
             <div class="chat-input-wrapper">
                 <div data-chat-sop class="sop-section">
-                    <button data-sop-back></button>
-                    <button data-sop-question></button>
-                    <button data-sop-next></button>
+                    <button data-sop-back disabled>
+                        <span data-chat-input-arrow-up class="icon icon--upSop"></span>
+                    </button>
+                    <button data-sop-question>Question</button>
+                    <button data-sop-next class="next-button">
+                        <div data-chat-input-arrow-down class="icon icon--downSop"></div>
+                    </button>
                 </div>
                 <div data-chat-ask class="ask-section">
                     <span data-chat-input-settings class="settings settings--hidden">
@@ -21,7 +25,7 @@ export const baseStructureTemplate = `
                     </span>
 
                     <div data-sound-input-wrap>
-                        
+                        <span data-chat-input-mic class="icon icon--largest icon--mic"></span>
                     </div>
                     <div data-text-input-wrap>
 
@@ -33,7 +37,6 @@ export const baseStructureTemplate = `
                     
                     </div>
                     <div data-chat-input-controllers class="data-chat-input-controllers">
-                        <span data-chat-input-play class="icon icon--play"></span>
                         <span data-chat-input-menu class="icon icon--menu"></span>
                     </div>    
 
