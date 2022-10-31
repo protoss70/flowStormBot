@@ -67,7 +67,8 @@ const defaults: Settings = {
     userMessageTextOutlineColor: 'rgba(0, 0, 0, .5)',
     botMessageBackgroundColor: 'rgba(0, 0, 0, .4)',
     botMessageTextColor: '#ffffff',
-    mode: "voice",
+    inputMode: "sop",
+    standardQuestionMode: "text",
     inputAudio: true,
     outputAudio: true,
     botMessageTextOutlineColor: 'rgba(0, 0, 0, .5)',
@@ -75,7 +76,7 @@ const defaults: Settings = {
     collapsable: false,
     collapsed: false,
     sectionActive: 0,
-    sections: ["LOGIN", "INPUTSELECT", "SOP","QUESTION"],
+    sections: ["LOGIN", "INPUTSELECT", "SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK"],
 };
 
 const fullScreenWidgetWidth = '100vw';
@@ -83,6 +84,9 @@ const fullScreenWidgetHeight = '100vh';
 const minAnimationParticles = 0;
 const maxAnimationParticles = 20;
 const chatHeight = '80px';
+const sopHeight = '110px';
+const chatPadding = '4';
+const sopPadding = '6';
 const disabledHeight = '0px';
 const avatarMaxHeightRatio = {
     [GUIMode.CHAT]: 2 / 3,
@@ -146,8 +150,11 @@ class BotUI  {
     private static questionSection: HTMLElement;
     private static questionSOPButton: HTMLElement;
     private static downSOPButton: HTMLElement;
-    private static upSOPButton: HTMLElement;
-    
+    private static sopName: HTMLElement;
+    private static pdfSelect: HTMLElement;
+    private static inputTakers: HTMLElement;
+    private static askAnother: HTMLElement;
+    private static continue: HTMLElement;
 
     private static isChatEnabled: boolean = true;
     private static isMicrophoneEnabled: boolean = true;
@@ -210,9 +217,12 @@ class BotUI  {
         BotUI.sopSection = BotUI.element.querySelector('[data-chat-sop]');
         BotUI.questionSection = BotUI.element.querySelector('[data-chat-ask]');
         BotUI.questionSOPButton = BotUI.element.querySelector('[data-sop-question]');
-        BotUI.upSOPButton = BotUI.element.querySelector('[data-sop-back]');
         BotUI.downSOPButton = BotUI.element.querySelector('[data-sop-next]');
-
+        BotUI.sopName = BotUI.element.querySelector('[data-sop-header]');
+        BotUI.pdfSelect = BotUI.element.querySelector('[data-chat-pdf]');
+        BotUI.inputTakers = BotUI.element.querySelector('[data-input-takers]');
+        BotUI.askAnother = BotUI.element.querySelector('[data-pdf-question-another]');
+        BotUI.continue = BotUI.element.querySelector('[data-pdf-question-continue]');
 
         if (BotUI.settings.collapsable) {
             BotUI.setCollapsableUIHeight();
@@ -283,7 +293,7 @@ class BotUI  {
         });
 
         BotUI.chatInputElement.onkeyup = (e) => {
-            if (e.keyCode === 13 && settings.mode === "text") {
+            if (e.keyCode === 13) {
                 BotUI.getInputValue((BotUI.chatInputElement as HTMLInputElement).value, this.chatInputCallback);
                 (BotUI.chatInputElement as HTMLInputElement).value = '';
                 BotUI.changeClasses("icon--arrow-up--visible", "icon--arrow-up--hidden", BotUI.chatInputArrowElement);
@@ -344,10 +354,6 @@ class BotUI  {
             this.chatSopQuestionCallback();
         }
 
-        BotUI.upSOPButton.onclick = (e) => {
-            this.chatSopPreviousCallback()
-        }
-
         BotUI.downSOPButton.onclick = (e) => {
             this.chatSopNextCallback()
         }
@@ -396,9 +402,14 @@ class BotUI  {
         }
     }
 
+    getSection(){
+        return BotUI.settings.sections[BotUI.settings.sectionActive];
+    }
+
     public setSection(section: string = "SOP"){
         const index = BotUI.settings.sections.indexOf(section);
         BotUI.settings.sectionActive = index;
+        this.sectionChangeCallback(section);
         this.setSectionUI(section);
     }
 
@@ -418,27 +429,52 @@ class BotUI  {
         }
     }
 
-    public setInputMode(mode){
+    public setModeCallback(mode: string){}
+
+    public setInputMode(mode: string){
         BotUI.chatInputSettingsElement.classList.add("settings--hidden");
         BotUI.chatInputSettingsElement.classList.remove("settings--visible");
 
-        if(mode === 'voice'){
+        if(mode === 'text'){
+            this.removeOverlay();
+            sessionStorage.setItem("INPUTSELECT", mode);
+            BotUI.chatElement.classList.remove("chat-input--hidden");
             BotUI.chatInputKeyboardElement.classList.add(BotUI.settings.micIcon +'2');
             BotUI.chatInputKeyboardElement.classList.remove(BotUI.settings.keyboardIcon);
             BotUI.soundInput.setAttribute("style", "display:none;");
             BotUI.textInput.setAttribute("style", "display:block;");
-            // BotUI.chatInputPlayElement.classList.add("icon--play--text-mode");
+            BotUI.chatInputBackElement.classList.add("text-mode");
             BotUI.controllerWrapper.classList.add("text-mode");
+            BotUI.settings.standardQuestionMode = mode;
+            BotUI.settings.inputMode = mode;
 
-        }else if(mode === 'text'){
+        }else if(mode === 'voice'){
+            sessionStorage.setItem("INPUTSELECT", mode);
+            BotUI.chatElement.classList.remove("chat-input--hidden");
             BotUI.chatInputKeyboardElement.classList.remove(BotUI.settings.micIcon +'2');
             BotUI.chatInputKeyboardElement.classList.add(BotUI.settings.keyboardIcon);
             BotUI.soundInput.setAttribute("style", "display:block;");
             BotUI.textInput.setAttribute("style", "display:none;");
-            // BotUI.chatInputPlayElement.classList.remove("icon--play--text-mode");
+            BotUI.chatInputBackElement.classList.remove("text-mode");
             BotUI.controllerWrapper.classList.remove("text-mode");
             BotUI.chatInputSettingsElement.classList.add("text-mode");
+            BotUI.settings.standardQuestionMode = mode;
+            BotUI.settings.inputMode = mode;
+
+        }else if (mode === "button"){
+            BotUI.inputTakers.classList.add("hidden");
+            BotUI.settings.inputMode = mode;
+        }else if(mode === "sop"){
+            this.removeOverlay();
+            BotUI.chatElement.classList.remove("chat-input--hidden");
+            BotUI.settings.inputMode = mode;
         }
+
+        this.setModeCallback(mode);
+    }
+
+    public getInputMode(){
+        return BotUI.settings.inputMode;
     }
 
     private changeCollapsedMode = () => {
@@ -450,43 +486,116 @@ class BotUI  {
         this.setOrientation(orientation);
     }
 
+    private removeAllProperties(){
+        BotUI.pdfSelect.classList.add("pdf-section--hidden");
+        BotUI.sopSection.classList.add("sop-section--hidden");
+        BotUI.questionSection.classList.add("ask-section--hidden");
+        BotUI.chatTextInputElement.style.setProperty("--bot-ui-chat-input-height", chatHeight);
+        BotUI.messagesElement.style.setProperty("--bot-ui-chat-input-height", chatHeight);
+        BotUI.chatTextInputElement.style.setProperty('--chat-padding-amount', chatPadding);
+    }
+
+    private inputButtonsHeightSet(){
+        BotUI.chatTextInputElement.style.setProperty("--bot-ui-chat-input-height", sopHeight);
+        BotUI.chatTextInputElement.style.setProperty('--chat-padding-amount', sopPadding);
+        BotUI.messagesElement.style.setProperty("--bot-ui-chat-input-height", sopHeight);
+    }
+
+    private newMessageSection(title: string){
+        for (let index = 0; index < BotUI.messagesElement.children.length; index++) {
+            const element = BotUI.messagesElement.children[index] as HTMLElement;
+            console.log(element);
+            if(element.getAttribute("data-button-group") === title){
+                console.log("here");
+                if (index !== 0){
+                    const element2 = BotUI.messagesElement.children[index - 1] as HTMLElement;
+                    element2.style.display = "block";
+                }
+            }else {
+                element.style.display = "none";
+            }
+        }
+    }
+
+    private oldMessagesSection(title: string){
+        for (let index = 0; index < BotUI.messagesElement.children.length; index++) {
+            const element = BotUI.messagesElement.children[index] as HTMLElement;
+            if(element.getAttribute("data-button-group") === title){
+                element.style.display = "none";
+                if (index !== 0){
+                    const element2 = BotUI.messagesElement.children[index - 1] as HTMLElement;
+                    element2.style.display = "none";
+                }
+            }else {
+                element.style.display = "block";
+            }
+        }
+    }
+
     private setSectionUI(section: string){
+        this.removeAllProperties();
+        console.log(section);
         switch (section) {
             case "LOGIN":
                 this.nextSection();
                 break;
             case "INPUTSELECT":
-
                 const callback = (e) => {
-                    this.setInputMode(e);
                     sessionStorage.setItem("INPUTSELECT", e);
-                    BotUI.settings.mode = e === "voice" ? "text" : "voice"; 
-                    const messageElement = BotUI.messagesElement;
-                    messageElement.textContent = "";
-                    this.nextSection();
+                    this.setInputMode(e);
+                    if(e === "voice"){
+                        this.setSection("QUESTION");
+                    }else{
+                        this.nextSection();
+                    }
                 }
-
                 const sessionIputType = sessionStorage.getItem("INPUTSELECT");
+                
                 if (sessionIputType === null){
-                    BotUI.questionSection.classList.add("ask-section--hidden");
-                    BotUI.sopSection.classList.add("sop-section--hidden");
-
+                    const messageElement = BotUI.messagesElement;
+                    BotUI.chatElement.classList.add("chat-input--hidden");
+                    
                     this.setBotText("Please choose an input type.");
-                    this.setButton("", () => {callback("text")}, "modeSelect", true, "Voice Input");
-                    this.setButton("", () => {callback("voice")}, "modeSelect", true, "Text Input");
+                    const mode = this.getInputMode()
+                    var settings = {
+                        url: "",
+						oldMode: mode,
+						title: "modeSelect",
+                        groupName: "modeSelect",
+						disableGroup: true,
+						buttonText: "Voice Input"
+                    }
+                    this.setButton(settings, () => {callback("voice"); messageElement.textContent = "";});
+                    this.setButton({...settings, buttonText: "Text Input"},() => {callback("text"); messageElement.textContent = "";});
+                    
                 }else{
                     callback(sessionIputType);
                 }
                 break;
             case "SOP":
-                BotUI.questionSection.classList.add("ask-section--hidden");
                 BotUI.sopSection.classList.remove("sop-section--hidden");
+                this.inputButtonsHeightSet();
+                this.setInputMode("sop");
                 break;
             case "QUESTION":
                 BotUI.questionSection.classList.remove("ask-section--hidden");
-                BotUI.sopSection.classList.add("sop-section--hidden");
+                console.log(BotUI.settings.standardQuestionMode);
+                this.setInputMode(BotUI.settings.standardQuestionMode);
+                break;
+            case "SOLUTIONS":
+                this.inputButtonsHeightSet();
+                BotUI.pdfSelect.classList.remove("pdf-section--hidden");
+                BotUI.askAnother.onclick = (e) => {
+                    this.setSection("QUESTION");
+                    BotUI.inputTakers.classList.remove("hidden");
+                }
+                BotUI.continue.onclick = (e) => {
+                    BotUI.inputTakers.classList.remove("hidden");
+                    this.setSection("SOP");
+                }
                 break;
             default:
+                console.log("SECTION NOT FOUND!");
                 this.nextSection();
                 break;
         }
@@ -653,38 +762,71 @@ class BotUI  {
 
     }
 
-    public setButton = (url: string = null,callback: Function = null, title: string = "general", disableGroup: boolean = true, buttonText: string = "") => {
+    private p
+
+    public setButton = (settings: any = {}, callback: Function = ()=>{}) => {
+        console.log(settings);
         const messageElement = BotUI.messagesElement;
-
+        this.setInputMode("button");
         const button = document.createElement('button');
+        var selector;
+        if (settings.title && settings.title !== ""){
+            selector = settings.title;
+        }else{
+            selector = settings.action;
+        }
 
-        if(url){
+        if(settings.url){
             const newImg = new Image();
             button.append(newImg);
-            newImg.src = url; 
+            newImg.src = settings.url; 
             button.style.background = `transparent`;
         }
 
-        if (buttonText){
-            button.textContent = buttonText;
+        if (settings.buttonText){
+            button.textContent = settings.buttonText;
         }
 
+        
         button.classList.add("inputButton", "chat-message", "chat-message-bot");
         button.setAttribute("data-message-type", "bot");
-        button.setAttribute("data-button-group", title);
+        button.setAttribute("data-button-group", settings.groupName.replace(/\s+/g, ''));
 
         button.onclick = () => {
-            callback();
-            if (disableGroup){
-                document.querySelectorAll(`[data-button-group=${title}]`).forEach(elem => {
+            BotUI.inputTakers.classList.remove("hidden");
+            if (callback !== null){
+                callback();
+            }
+
+            if (settings.pdf){
+                BotUI.pdfSelect.classList.add("pdf-section--hidden");
+                this.oldMessagesSection(settings.groupName.replace(/\s+/g, ''));
+            }
+
+            if (settings.appSelect){
+                messageElement.textContent = "";
+                BotUI.sopName.classList.remove("hidden");
+                BotUI.chatTextInputElement.style.setProperty("--bot-ui-sop-name-height", "50px");
+                BotUI.messagesElement.style.setProperty("--bot-ui-sop-name-height", "50px");
+                BotUI.sopName.textContent = selector;
+            }
+            if (settings.disableGroup){
+                document.querySelectorAll(`[data-button-group=${selector.replace(/\s+/g, '')}]`).forEach(elem => {
                     elem.setAttribute('disabled', '');
                 });
             }
+            this.setInputMode(settings.oldMode);
         };
 
         messageElement.appendChild(button);
         messageElement.scrollTop = messageElement.scrollHeight;
         BotUI.scrollToLastMessage(messageElement);
+
+        if (settings.pdf){
+            console.log("pdf");
+            this.newMessageSection(settings.groupName.replace(/\s+/g, ''));
+            this.setSection("SOLUTIONS");
+        }
     }
 
     public setImage = (url: string = null) => {
@@ -733,8 +875,13 @@ class BotUI  {
         BotUI.botPcmElement.classList.remove('bu-visible');
     }
 
-    public resume(mode: string, buttonInp: boolean){
-        if (!buttonInp && mode === "voice"){
+    public addOverlay(){
+        BotUI.botPcmElement.classList.remove('bu-invisible');
+        BotUI.botPcmElement.classList.add('bu-visible');
+    }
+
+    public resume(){
+        if (BotUI.settings.inputMode === "voice"){
             BotUI.botPcmElement.classList.remove('bu-invisible');
             BotUI.botPcmElement.classList.add('bu-visible');
         }
@@ -746,20 +893,20 @@ class BotUI  {
         if (isNil(samples) || isEmpty(samples)) {
             BotUI.userPcmElement.classList.add('bu-invisible');
             BotUI.userPcmElement.classList.remove('bu-visible');
-        } else if(BotUI.settings.mode === "voice"){
+        } else{
             BotUI.userPcmElement.classList.add('bu-visible');
             BotUI.userPcmElement.classList.remove('bu-invisible');
         }
     }
 
-    public setOutputAudio = (samples: any = null, mode: string, buttonInp: boolean = false, sampleRate = 16000, stereo = false) => {
+    public setOutputAudio = (samples: any = null, sampleRate = 16000, stereo = false) => {
         BotUI.userPcmElement.classList.add('bu-invisible');
         BotUI.userPcmElement.classList.remove('bu-visible');
 
         if (isNil(samples) || isEmpty(samples)) {
             BotUI.botPcmElement.classList.add('bu-invisible');
             BotUI.botPcmElement.classList.remove('bu-visible');
-        } else if (mode === "voice" && !buttonInp){
+        } else if (BotUI.settings.inputMode === "voice"){
             BotUI.botPcmElement.classList.add('bu-visible');
             BotUI.botPcmElement.classList.remove('bu-invisible');
         }
@@ -780,17 +927,17 @@ class BotUI  {
 
     public chatMicCallback = (...value) => {}
 
-    public chatBackCallback = (...value) => {}
+    public sectionChangeCallback = (...value) => {}
+
+    public chatBackCallback = (...value) => {
+        this.previousSection();
+    }
 
     public chatKeyboardCallback = (...value) => {
-        this.setInputMode(BotUI.settings.mode);
-        BotUI.settings.mode = BotUI.settings.mode === "voice" ? "text" : "voice"; 
-        console.log(BotUI.settings);
+        this.setInputMode(BotUI.settings.standardQuestionMode === "voice" ? "text" : "voice");
     }
 
     public chatSopNextCallback = (...value) => {}
-
-    public chatSopPreviousCallback = (...value) => {}
 
     public chatSopQuestionCallback = (...value) => {
         this.setSection("QUESTION");
@@ -1133,12 +1280,14 @@ class BotUI  {
         const messageTemplate = getContentAsHtml(chatMessageStructureTemplate);
         const messageTemplateElement = messageTemplate.querySelector('div.chat-message');
         const messageTemplateTextElement = messageTemplateElement.querySelector(':scope span');
-
-        const { dataset: { messageType } = {} } = messageElement && messageElement.lastChild && <HTMLElement>messageElement.lastChild;
-        if (replace && messageElement.lastChild !== null && messageType !== MessageType.BOT) {
-            messageElement.removeChild(messageElement.lastChild);
-        } else if (messageType && messageType === type) {
-            (messageElement.lastChild as Element).classList.remove('chat-message-last')
+        
+        if(messageElement.lastChild !== null){
+            const { dataset: { messageType } = {} } = messageElement && messageElement.lastChild && <HTMLElement>messageElement.lastChild;
+            if (replace && messageElement.lastChild !== null && messageType !== MessageType.BOT) {
+                messageElement.removeChild(messageElement.lastChild);
+            } else if (messageType && messageType === type) {
+                (messageElement.lastChild as Element).classList.remove('chat-message-last')
+            }
         }
 
         messageTemplateTextElement.innerHTML = text;

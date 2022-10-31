@@ -30,7 +30,8 @@ export interface Settings {
         height: string;
         width: string;
     };
-    mode?: string;
+    inputMode?: string;
+    standardQuestionMode?: string;
     inputAudio?: boolean;
     outputAudio?: boolean;
     reverseAvatarOrder?: boolean;
