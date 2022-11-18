@@ -158,6 +158,7 @@ class BotUI  {
     private static solutionsControllers: HTMLElement;
     private static pdfViewer: HTMLObjectElement;
     private static pdfViewerContainer: HTMLElement;
+    private static loadingSpinner: HTMLElement;
 
     private static isChatEnabled: boolean = true;
     private static isMicrophoneEnabled: boolean = true;
@@ -229,6 +230,7 @@ class BotUI  {
         BotUI.solutionsControllers = BotUI.element.querySelector('[data-solutions-inputs]');
         BotUI.pdfViewer = BotUI.element.querySelector("[pdf-viewer]");
         BotUI.pdfViewerContainer = BotUI.element.querySelector("[object-container]");
+        BotUI.loadingSpinner = BotUI.element.querySelector("[loader]");
 
         if (BotUI.settings.collapsable) {
             BotUI.setCollapsableUIHeight();
@@ -801,6 +803,30 @@ class BotUI  {
 
     }
 
+    public toggleLoader = (on: boolean) => {
+        if (on){
+            BotUI.loadingSpinner.classList.remove("hidden");
+            BotUI.messagesElement.classList.add("hidden");
+        }else{
+            BotUI.loadingSpinner.classList.add("hidden");
+            BotUI.messagesElement.classList.remove("hidden");
+        }
+    }
+
+    private pdfButton = async (settings: any) => {
+        this.toggleLoader(true);
+        const url = await settings.pdf.url();
+        console.log("here", url);
+        this.toggleLoader(false);
+        const pdfUrl = url;
+        BotUI.pdfViewer.remove();
+        BotUI.pdfViewer = document.createElement("object");
+        BotUI.pdfViewer.data = pdfUrl;
+        BotUI.pdfViewer.type = "application/pdf";
+        BotUI.pdfViewerContainer.appendChild(BotUI.pdfViewer);
+        this.setSection("PDF");
+    }
+
     public setButton = (settings: any = {}, callback: Function = ()=>{}) => {
         console.log(settings);
         const messageElement = BotUI.messagesElement;
@@ -837,7 +863,9 @@ class BotUI  {
 
             if (settings.solutions){
                 if (settings.pdf){
-                    const pdfUrl = settings.pdf.url + "#toolbar=0&page=" + settings.pdf.page;
+                    this.pdfButton(settings)
+                    const url = settings.pdf.url;
+                    const pdfUrl = url + "#toolbar=0&page=" + settings.pdf.page;
                     BotUI.pdfViewer.remove();
                     BotUI.pdfViewer = document.createElement("object");
                     BotUI.pdfViewer.data = pdfUrl;

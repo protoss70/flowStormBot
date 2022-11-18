@@ -328,6 +328,38 @@ var createBot = (botUI, settings) => {
         if (bot.sessionEnded) { initBot(); }
 	}
 
+	async function handleFile(oldMode){
+		botUI.toggleLoader(true);
+		const files = (await bot.getFiles("system", "kuka")).data;
+		botUI.toggleLoader(false);
+		console.log(files);
+		botUI.continueCallback = () => {
+			bot.handleOnTextInput(`continue`, false, {sopInput: true});
+		}
+
+		botUI.askAnotherCallback = () => {
+			bot.handleOnTextInput(`ask another`, false, {sopInput: true});
+		}
+		
+		files.predictions.forEach(file => {
+			const page = parseInt(file.name.replace(".pdf", ""));
+			file.text = file.doc_name + ", page: " + page;
+			file.page = page;
+			file.url = async () => {return (await bot.getPage(page, file.doc_name.replace("_robot", ""))).data};
+			const settings = {
+				oldMode: oldMode,
+				groupName: "pdfFiles",
+				disableGroup: false,
+				appSelect: false,
+				solutions: true,
+				text:  file.text,
+				pdf: {...file}
+			}
+			botUI.setButton(settings, () => {});
+			console.log(settings);
+		});
+	}
+
 	defaultCallback.handleCommand = (command, code) => {
         const payload = JSON.parse(code);
 	    switch(command) {
@@ -382,31 +414,8 @@ var createBot = (botUI, settings) => {
 				});
 				break;
 			case "#pdf":
-				//const files = bot.getPdf(); // not implemented yet
-				const files = {files: [{text: "pdf1", url: "https://canvas.projekti.info/ebooks/Game%20Coding%20Complete%20-%204th%20Edition.pdf", page: 2}, 
-				{text: "pdf2", url: "https://canvas.projekti.info/ebooks/Game%20Coding%20Complete%20-%204th%20Edition.pdf", page: 20}]};
-				botUI.continueCallback = () => {
-					bot.handleOnTextInput(`continue`, false, {sopInput: true});
-				}
-
-				botUI.askAnotherCallback = () => {
-					bot.handleOnTextInput(`ask another`, false, {sopInput: true});
-				}
-				
-				files.files.forEach(file => {
-					const settings = {
-						oldMode: oldMode,
-						groupName: "pdfFiles",
-						disableGroup: false,
-						appSelect: false,
-						solutions: true,
-						text: file.text,
-						pdf: {...file}
-					}
-					botUI.setButton(settings, () => {});
-					console.log(settings);
-				});
-				
+				handleFile(oldMode);
+				break;
 			default:
 
         }

@@ -8,6 +8,9 @@ export const baseStructureTemplate = `
             </div>
             <div data-messages class="column column-messages">
             </div>
+            <div loader class="loader hidden">
+                <span loader-text class="loader-text">Loading PDF Files...</span>
+            </div>
             <div object-container id="object-container">
                 <object pdf-viewer class="hidden" id="pdf-viewer" type="application/pdf"></object>
             </div>
