@@ -3,11 +3,14 @@ export const baseStructureTemplate = `
         <h3 data-sop-header class="hidden">sop Name</h3>
         <div class="column column-image">
             <div data-image class="image"></div>
-        </div>
+            </div>
             <div data-avatar class="column column-avatar">
-        </div>
+            </div>
             <div data-messages class="column column-messages">
-        </div>
+            </div>
+            <div object-container id="object-container">
+                <object pdf-viewer class="hidden" id="pdf-viewer" type="application/pdf"></object>
+            </div>
         <div data-chat-input class="chat-input">
             <div class="chat-input-wrapper">
                 <div data-input-takers> 
@@ -45,8 +48,10 @@ export const baseStructureTemplate = `
                     </div>
                 </div>
                 <div data-chat-pdf class="pdf-section pdf-section--hidden">
-                    <button data-pdf-question-another>Ask Another Question</button>
-                    <button data-pdf-question-continue>Continue</button>
+                    <div data-solutions-inputs> 
+                        <button data-pdf-question-another>Ask Another Question</button>
+                        <button data-pdf-question-continue>Continue</button>
+                    </div>
                 </div>
             </div>
         </div>

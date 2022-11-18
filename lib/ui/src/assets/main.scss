@@ -174,7 +174,7 @@ $amount: 20;
 			max-width: calc( ( var(--bot-ui-chat-input-height) - var(--bot-ui-chat-input-height) / 4 * 2 ) * 16 );
 			min-width: calc( var(--bot-ui-chat-input-height) * 1.5 );
 
-			input {
+			input[type=text] {
 				width: 100%;
 				border-radius: .7rem;
 				height: 100%;
@@ -998,11 +998,11 @@ $amount: 20;
 	position: relative;
 }
 [data-chat-sop], [data-chat-pdf]{
-	&.sop-section, &.pdf-section{
+	&.sop-section, &.pdf-section > [data-solutions-inputs]{
 		display: flex;
 		justify-content: space-around;
 		height: 100%;
-		&--hidden{
+		&.pdf-section--hidden, &.sop-section--hidden{
 			display: none;
 		}
 
@@ -1011,7 +1011,7 @@ $amount: 20;
 			font-size: 20px;
 			font-weight: bold;
 
-			&[data-pdf-question]{
+			&[data-pdf-question-another], &[data-pdf-question-continue]{
 				width: 45%;
 			}
 
@@ -1038,9 +1038,73 @@ $amount: 20;
 			}
 		}
 	}
+}
 
-	&.pdf-section > button{
-		width: 45%;
+[data-messages]{
+	&.hidden{
+		display: none !important;
+	}
+}
+
+[object-container]#object-container{
+	width: 100%;
+	height: 78%;
+	z-index: 1;
+
+	&.hidden{
+		display: none;
+	}
+
+	& > object{
+		width: 100%;
+		height: 100%;
+		z-index: 1;
+	}
+}
+
+#pdf-viewer{
+	z-index: 1;
+	height: 75%;
+
+	&.hidden{
+		display: none;
+	}
+}
+
+canvas{
+	z-index: 1;
+}
+
+[data-chat-pdf]{
+	height: 100%;
+}
+
+[data-pdf-controls]{
+	&.hidden{
+		display: none;
+	}
+	display: flex;
+	height: 100%;
+	gap: 5px;
+	justify-content: center;
+	align-items: center;
+	& > button{
+		font-size: 24px;
+		height: 50%;
+	}
+	& > .pageControllers{
+		font-size: 24px;
+		height: 50%;
+		& > input{
+			font-size: 24px;
+			width: 60px;
+			height: 100%;
+		}
+
+		& > span{
+			font-weight: bold;
+			color:white;
+		}
 	}
 }
 

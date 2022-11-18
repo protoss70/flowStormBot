@@ -155,6 +155,9 @@ class BotUI  {
     private static inputTakers: HTMLElement;
     private static askAnother: HTMLElement;
     private static continue: HTMLElement;
+    private static solutionsControllers: HTMLElement;
+    private static pdfViewer: HTMLObjectElement;
+    private static pdfViewerContainer: HTMLElement;
 
     private static isChatEnabled: boolean = true;
     private static isMicrophoneEnabled: boolean = true;
@@ -223,6 +226,9 @@ class BotUI  {
         BotUI.inputTakers = BotUI.element.querySelector('[data-input-takers]');
         BotUI.askAnother = BotUI.element.querySelector('[data-pdf-question-another]');
         BotUI.continue = BotUI.element.querySelector('[data-pdf-question-continue]');
+        BotUI.solutionsControllers = BotUI.element.querySelector('[data-solutions-inputs]');
+        BotUI.pdfViewer = BotUI.element.querySelector("[pdf-viewer]");
+        BotUI.pdfViewerContainer = BotUI.element.querySelector("[object-container]");
 
         if (BotUI.settings.collapsable) {
             BotUI.setCollapsableUIHeight();
@@ -327,7 +333,6 @@ class BotUI  {
         BotUI.chatInputMenuElement.onclick = (e) => {
             BotUI.changeClasses('settings--visible', 'settings--hidden', BotUI.chatInputSettingsElement);
         }
-        // !!GETTING TEXT INPUT IS DONE HERE!!
         BotUI.chatInputArrowElement.onclick = (e) => {
             const inputString = (BotUI.chatInputElement as HTMLInputElement).value
             if (inputString !== ''){
@@ -368,6 +373,20 @@ class BotUI  {
 
         BotUI.chatInputBackElement.onclick = (e) => {
             this.chatBackCallback(e);
+        }
+
+        BotUI.askAnother.onclick = (e) => {
+            this.oldMessagesSection("pdfFiles");
+            this.setSection("QUESTION");
+            BotUI.inputTakers.classList.remove("hidden");
+            this.askAnotherCallback();
+        }
+
+        BotUI.continue.onclick = (e) => {
+            this.oldMessagesSection("pdfFiles");
+            BotUI.inputTakers.classList.remove("hidden");
+            this.setSection("SOP");
+            this.continueCallback();
         }
 
         BotUI.chatTextInputElement.oninput = (e) => {
@@ -487,9 +506,14 @@ class BotUI  {
     }
 
     private removeAllProperties(){
+        BotUI.pdfViewerContainer.classList.add("hidden");
         BotUI.pdfSelect.classList.add("pdf-section--hidden");
         BotUI.sopSection.classList.add("sop-section--hidden");
         BotUI.questionSection.classList.add("ask-section--hidden");
+        BotUI.solutionsControllers.classList.add("pdf-section--hidden");
+        BotUI.messagesElement.classList.remove("hidden");
+        BotUI.chatElement.classList.remove("chat-input--hidden");
+
         BotUI.chatTextInputElement.style.setProperty("--bot-ui-chat-input-height", chatHeight);
         BotUI.messagesElement.style.setProperty("--bot-ui-chat-input-height", chatHeight);
         BotUI.chatTextInputElement.style.setProperty('--chat-padding-amount', chatPadding);
@@ -502,33 +526,35 @@ class BotUI  {
     }
 
     private newMessageSection(title: string){
+        var first = true;
+        var element2: HTMLElement;
         for (let index = 0; index < BotUI.messagesElement.children.length; index++) {
             const element = BotUI.messagesElement.children[index] as HTMLElement;
-            console.log(element);
             if(element.getAttribute("data-button-group") === title){
-                console.log("here");
-                if (index !== 0){
-                    const element2 = BotUI.messagesElement.children[index - 1] as HTMLElement;
-                    element2.style.display = "block";
+                if (index !== 0 && first){
+                    if ((BotUI.messagesElement.children[index] as HTMLElement).tagName === "BUTTON"){
+                        element2 = BotUI.messagesElement.children[index - 1] as HTMLElement;
+                    }
+                    first = false;
                 }
             }else {
                 element.style.display = "none";
             }
         }
+        if (element2){
+            element2.style.display = "block";
+            element2.setAttribute("data-button-group", title);
+        }
     }
 
     private oldMessagesSection(title: string){
+        const elems = document.querySelectorAll(`[data-button-group=${title}]`);
+        elems.forEach(el => {
+            el.remove();
+        })
         for (let index = 0; index < BotUI.messagesElement.children.length; index++) {
-            const element = BotUI.messagesElement.children[index] as HTMLElement;
-            if(element.getAttribute("data-button-group") === title){
-                element.style.display = "none";
-                if (index !== 0){
-                    const element2 = BotUI.messagesElement.children[index - 1] as HTMLElement;
-                    element2.style.display = "none";
-                }
-            }else {
-                element.style.display = "block";
-            }
+            
+            (BotUI.messagesElement.children[index] as HTMLElement).style.display = "block";
         }
     }
 
@@ -558,15 +584,15 @@ class BotUI  {
                     this.setBotText("Please choose an input type.");
                     const mode = this.getInputMode()
                     var settings = {
-                        url: "",
+                        background: "",
 						oldMode: mode,
 						title: "modeSelect",
                         groupName: "modeSelect",
 						disableGroup: true,
-						buttonText: "Voice Input"
+						text: "Voice Input"
                     }
                     this.setButton(settings, () => {callback("voice"); messageElement.textContent = "";});
-                    this.setButton({...settings, buttonText: "Text Input"},() => {callback("text"); messageElement.textContent = "";});
+                    this.setButton({...settings, text: "Text Input"},() => {callback("text"); messageElement.textContent = "";});
                     
                 }else{
                     callback(sessionIputType);
@@ -579,20 +605,33 @@ class BotUI  {
                 break;
             case "QUESTION":
                 BotUI.questionSection.classList.remove("ask-section--hidden");
-                console.log(BotUI.settings.standardQuestionMode);
                 this.setInputMode(BotUI.settings.standardQuestionMode);
                 break;
             case "SOLUTIONS":
                 this.inputButtonsHeightSet();
                 BotUI.pdfSelect.classList.remove("pdf-section--hidden");
+                BotUI.solutionsControllers.classList.remove("pdf-section--hidden");
                 BotUI.askAnother.onclick = (e) => {
                     this.setSection("QUESTION");
                     BotUI.inputTakers.classList.remove("hidden");
+                    this.oldMessagesSection("pdfFiles");
+                    this.askAnotherCallback();
                 }
-                BotUI.continue.onclick = (e) => {
-                    BotUI.inputTakers.classList.remove("hidden");
-                    this.setSection("SOP");
+                BotUI.askAnother.innerText = "Ask Another Question";
+                break;
+            case "PDF":
+                this.inputButtonsHeightSet();
+                BotUI.messagesElement.classList.add("hidden");
+                BotUI.pdfSelect.classList.remove("pdf-section--hidden");
+                BotUI.pdfViewerContainer.classList.remove("hidden");
+                BotUI.solutionsControllers.classList.remove("pdf-section--hidden");
+                BotUI.askAnother.onclick = (e) => {
+                    this.setSection("SOLUTIONS");
                 }
+                BotUI.askAnother.innerText = "Back";
+                break;
+            case "FEEDBACK":
+                this.nextSection();
                 break;
             default:
                 console.log("SECTION NOT FOUND!");
@@ -762,8 +801,6 @@ class BotUI  {
 
     }
 
-    private p
-
     public setButton = (settings: any = {}, callback: Function = ()=>{}) => {
         console.log(settings);
         const messageElement = BotUI.messagesElement;
@@ -776,15 +813,15 @@ class BotUI  {
             selector = settings.action;
         }
 
-        if(settings.url){
+        if(settings.background){
             const newImg = new Image();
             button.append(newImg);
-            newImg.src = settings.url; 
+            newImg.src = settings.background; 
             button.style.background = `transparent`;
         }
 
-        if (settings.buttonText){
-            button.textContent = settings.buttonText;
+        if (settings.text){
+            button.textContent = settings.text;
         }
 
         
@@ -798,9 +835,19 @@ class BotUI  {
                 callback();
             }
 
-            if (settings.pdf){
-                BotUI.pdfSelect.classList.add("pdf-section--hidden");
-                this.oldMessagesSection(settings.groupName.replace(/\s+/g, ''));
+            if (settings.solutions){
+                if (settings.pdf){
+                    const pdfUrl = settings.pdf.url + "#toolbar=0&page=" + settings.pdf.page;
+                    BotUI.pdfViewer.remove();
+                    BotUI.pdfViewer = document.createElement("object");
+                    BotUI.pdfViewer.data = pdfUrl;
+                    BotUI.pdfViewer.type = "application/pdf";
+                    BotUI.pdfViewerContainer.appendChild(BotUI.pdfViewer);
+                    this.setSection("PDF");
+                }else{
+                    this.oldMessagesSection(settings.groupName.replace(/\s+/g, ''));
+                }
+
             }
 
             if (settings.appSelect){
@@ -822,8 +869,7 @@ class BotUI  {
         messageElement.scrollTop = messageElement.scrollHeight;
         BotUI.scrollToLastMessage(messageElement);
 
-        if (settings.pdf){
-            console.log("pdf");
+        if (settings.solutions){
             this.newMessageSection(settings.groupName.replace(/\s+/g, ''));
             this.setSection("SOLUTIONS");
         }
@@ -916,6 +962,10 @@ class BotUI  {
     public chatArrowCallback = (...value) => {}
 
     public chatMicrophoneCallback = (...value) => {}
+
+    public askAnotherCallback = (...value) => {}
+
+    public continueCallback = (...value) => {}
 
     public chatMuteCallback = (...value) => {}
 
@@ -1138,7 +1188,6 @@ class BotUI  {
                         cleanAvatar(false);
                         BotUI.avatarElement.appendChild(videoElement);
                         videoElement.playsInline = true;
-                        // videoElement.muted = true;
                         if (videoElement.srcObject){
                             (videoElement.srcObject as MediaStream).addTrack(event.track);
                         } else {
@@ -1183,7 +1232,6 @@ class BotUI  {
     public sendRTCData = (descriptor) => {
             if (BotUI.avatarDataChannel && BotUI.avatarDataChannel.readyState == 'open') {
                 console.log('Sending', descriptor);
-                // Add the UTF-16 JSON string to the array byte buffer, going two bytes at a time.
                 const descriptorAsString = JSON.stringify(descriptor);
                 const data = new DataView(new ArrayBuffer(1 + 2 + 2 * descriptorAsString.length));
                 let byteIdx = 0;

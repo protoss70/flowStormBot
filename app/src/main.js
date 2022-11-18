@@ -364,15 +364,11 @@ var createBot = (botUI, settings) => {
 				console.log(payload);
 				payload.tiles.forEach(button => {
 					const settings = {
-						url: button.background,
 						oldMode: oldMode,
-						title: button.title,
 						groupName: payload.title,
 						disableGroup: true,
-						buttonText: button.text,
-						action: button.action,
-						appSelect: payload.tiles.appSelect,
-						pdf: payload.tiles.pdf,
+						appSelect: payload.appSelect,
+						solutions: payload.solutions,
 						...button,
 					}
 					botUI.setButton(settings, () => {
@@ -384,6 +380,33 @@ var createBot = (botUI, settings) => {
 					});
 					bot.setInAudio(false);
 				});
+				break;
+			case "#pdf":
+				//const files = bot.getPdf(); // not implemented yet
+				const files = {files: [{text: "pdf1", url: "https://canvas.projekti.info/ebooks/Game%20Coding%20Complete%20-%204th%20Edition.pdf", page: 2}, 
+				{text: "pdf2", url: "https://canvas.projekti.info/ebooks/Game%20Coding%20Complete%20-%204th%20Edition.pdf", page: 20}]};
+				botUI.continueCallback = () => {
+					bot.handleOnTextInput(`continue`, false, {sopInput: true});
+				}
+
+				botUI.askAnotherCallback = () => {
+					bot.handleOnTextInput(`ask another`, false, {sopInput: true});
+				}
+				
+				files.files.forEach(file => {
+					const settings = {
+						oldMode: oldMode,
+						groupName: "pdfFiles",
+						disableGroup: false,
+						appSelect: false,
+						solutions: true,
+						text: file.text,
+						pdf: {...file}
+					}
+					botUI.setButton(settings, () => {});
+					console.log(settings);
+				});
+				
 			default:
 
         }
