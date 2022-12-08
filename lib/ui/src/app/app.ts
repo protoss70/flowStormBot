@@ -758,7 +758,14 @@ class BotUI  {
         }
     }
 
-
+    public getLastUserMessage(){
+        var doc = BotUI.messagesElement;
+        for (var i = BotUI.messagesElement.childNodes.length - 1; i > 0; i--) {
+            if ((doc.childNodes[i] as HTMLElement).classList.contains("chat-message-user")) {
+            return doc.childNodes[i];
+            }        
+        }
+    }
 
     public setVideo = (url: string = null, callback: () => any) => {
         BotUI.videoCallback = callback;
@@ -818,7 +825,7 @@ class BotUI  {
         const url = await settings.pdf.url();
         console.log("here", url);
         this.toggleLoader(false);
-        const pdfUrl = url;
+        const pdfUrl = url + "#toolbar=0";
         BotUI.pdfViewer.remove();
         BotUI.pdfViewer = document.createElement("object");
         BotUI.pdfViewer.data = pdfUrl;
@@ -864,14 +871,14 @@ class BotUI  {
             if (settings.solutions){
                 if (settings.pdf){
                     this.pdfButton(settings)
-                    const url = settings.pdf.url;
-                    const pdfUrl = url + "#toolbar=0&page=" + settings.pdf.page;
-                    BotUI.pdfViewer.remove();
-                    BotUI.pdfViewer = document.createElement("object");
-                    BotUI.pdfViewer.data = pdfUrl;
-                    BotUI.pdfViewer.type = "application/pdf";
-                    BotUI.pdfViewerContainer.appendChild(BotUI.pdfViewer);
-                    this.setSection("PDF");
+                    // const url = settings.pdf.url;
+                    // const pdfUrl = url + "#toolbar=0&page=" + settings.pdf.page;
+                    // BotUI.pdfViewer.remove();
+                    // BotUI.pdfViewer = document.createElement("object");
+                    // BotUI.pdfViewer.data = pdfUrl;
+                    // BotUI.pdfViewer.type = "application/pdf";
+                    // BotUI.pdfViewerContainer.appendChild(BotUI.pdfViewer);
+                    // this.setSection("PDF");
                 }else{
                     this.oldMessagesSection(settings.groupName.replace(/\s+/g, ''));
                 }

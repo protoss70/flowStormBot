@@ -328,9 +328,10 @@ var createBot = (botUI, settings) => {
         if (bot.sessionEnded) { initBot(); }
 	}
 
-	async function handleFile(oldMode){
+	async function handleFile(oldMode, index, query){
+		console.log(index, query);
 		botUI.toggleLoader(true);
-		const files = (await bot.getFiles("system", "kuka")).data;
+		const files = (await bot.getFiles(query, index)).data;
 		botUI.toggleLoader(false);
 		console.log(files);
 		botUI.continueCallback = () => {
@@ -345,7 +346,7 @@ var createBot = (botUI, settings) => {
 			const page = parseInt(file.name.replace(".pdf", ""));
 			file.text = file.doc_name + ", page: " + page;
 			file.page = page;
-			file.url = async () => {return (await bot.getPage(page, file.doc_name.replace("_robot", ""))).data};
+			file.url = async () => {return `https://manual-search-develop.alquist.ai/download/${index}/${page}.pdf`;};
 			const settings = {
 				oldMode: oldMode,
 				groupName: "pdfFiles",
@@ -414,7 +415,8 @@ var createBot = (botUI, settings) => {
 				});
 				break;
 			case "#pdf":
-				handleFile(oldMode);
+				const query = botUI.getLastUserMessage().children[0].textContent;
+				handleFile(oldMode, payload.index.toLowerCase(), query);
 				break;
 			default:
 
