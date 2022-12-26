@@ -12,7 +12,7 @@ import '../assets/main.scss';
 import '../assets/screencapture.png';
 
 import {
-    baseStructureTemplate,
+    sopBaseStructureTemplate,
     chatMessageStructureTemplate,
     kioskMessageStructureTemplate,
 } from './templates';
@@ -188,7 +188,7 @@ class BotUI  {
         BotUI.element.style.setProperty('--bot-ui-message-background-user', `${BotUI.settings.userMessageBackgroundColor}`);
         BotUI.element.style.setProperty('--bot-ui-chat-pcm-height', chatHeight);
         BotUI.orientation = OrientationEnum.LANDSCAPE;
-        BotUI.element.innerHTML = baseStructureTemplate;
+        BotUI.element.innerHTML = sopBaseStructureTemplate;
         BotUI.element.setAttribute('data-gui-mode', BotUI.settings.guiMode);
         if (BotUI.settings.fullScreen) {
             BotUI.element.setAttribute('data-fullscreen', '');
@@ -871,14 +871,6 @@ class BotUI  {
             if (settings.solutions){
                 if (settings.pdf){
                     this.pdfButton(settings)
-                    // const url = settings.pdf.url;
-                    // const pdfUrl = url + "#toolbar=0&page=" + settings.pdf.page;
-                    // BotUI.pdfViewer.remove();
-                    // BotUI.pdfViewer = document.createElement("object");
-                    // BotUI.pdfViewer.data = pdfUrl;
-                    // BotUI.pdfViewer.type = "application/pdf";
-                    // BotUI.pdfViewerContainer.appendChild(BotUI.pdfViewer);
-                    // this.setSection("PDF");
                 }else{
                     this.oldMessagesSection(settings.groupName.replace(/\s+/g, ''));
                 }
@@ -1014,19 +1006,13 @@ class BotUI  {
 
     public sectionChangeCallback = (...value) => {}
 
-    public chatBackCallback = (...value) => {
-        this.previousSection();
-    }
+    public chatBackCallback = (...value) => {}
 
-    public chatKeyboardCallback = (...value) => {
-        this.setInputMode(BotUI.settings.standardQuestionMode === "voice" ? "text" : "voice");
-    }
+    public chatKeyboardCallback = (...value) => {}
 
     public chatSopNextCallback = (...value) => {}
 
-    public chatSopQuestionCallback = (...value) => {
-        this.setSection("QUESTION");
-    }
+    public chatSopQuestionCallback = (...value) => {}
 
     public chatTextInputElementCallback = (...value) => {}
 

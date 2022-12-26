@@ -1,6 +1,6 @@
 {
 	"name": "@flowstorm/bot-service",
-	"version": "0.0.1",
+	"version": "0.3.8",
 	"main": "bot-service.js",
 	"license": "MIT",
 	"private": false,

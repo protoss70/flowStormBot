@@ -1,4 +1,4 @@
-export const baseStructureTemplate = `
+export const sopBaseStructureTemplate = `
     <div data-wrapper class="bot bot-wrapper">
         <h3 data-sop-header class="hidden">sop Name</h3>
         <div class="column column-image">

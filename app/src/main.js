@@ -619,6 +619,10 @@ var createBot = (botUI, settings) => {
 		
 	}
 
+	botUI.chatSopQuestionCallback = (inputValue) => {
+		botUI.setSection("QUESTION");
+	}
+
 	botUI.chatKeyboardCallback = (inputValue) => {
 		var mode = botUI.getInputMode();
 		mode = mode === "text" ? "voice" : "text";
