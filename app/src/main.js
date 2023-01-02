@@ -128,7 +128,9 @@ export const initFSClientBot = (initParams = {}) => {
 		initBot();
 		bot.stateHandler = stateHandler;
 		window.addEventListener("load", () => {
-			bot.stateHandler(botUI.getSection(), getStatus());
+		    if (settings.interactionMode == 'SOP') {
+			    bot.stateHandler(botUI.getSection(), getStatus());
+			}
 		})
 		if (!bot.getInAudio){
 			botUI.setInputMode("text");
@@ -609,12 +611,16 @@ var createBot = (botUI, settings) => {
 	}
 
 	botUI.chatMicCallback = (inputValue) => {
-		const status = getStatus();
-		if (status === "SLEEPING" || status === undefined){
-			run();
-			botUI.setMicIcon(true);
-		}else{
-			stop();
+		if (settings.interactionMode === 'SOP') {
+            const status = getStatus();
+            if (status === "SLEEPING" || status === undefined){
+                run();
+                botUI.setMicIcon(true);
+            } else {
+                stop();
+            }
+		} else {
+		    botUI.chatMicrophoneCallback()
 		}
 		
 	}
