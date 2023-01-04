@@ -223,8 +223,7 @@ var createBot = (botUI, settings) => {
 		 }
 	});
 
-
-	botUI.disableStop(status === 'SLEEPING')
+	botUI.disableStop(status === 'SLEEPING' || !status)
 
 	const defaultCallback = {};
 
@@ -620,6 +619,7 @@ var createBot = (botUI, settings) => {
                 stop();
             }
 		} else {
+            botUI.setMicIcon(BotUI.chatInputMicElement.classList.contains('icon--light'));
 		    botUI.chatMicrophoneCallback()
 		}
 		

@@ -267,11 +267,18 @@ class BotUI  {
         }
         BotUI.isChatEnabled = BotUI.settings.outputAudio;
         BotUI.isMicrophoneEnabled = BotUI.settings.inputAudio;
-        // if (BotUI.isChatEnabled) {
-        //     BotUI.chatInputMuteElement.classList.add('icon--light');
-        // } else {
-        //     BotUI.chatInputMuteElement.classList.remove('icon--light');
-        // }
+        if (BotUI.settings.interactionMode !== "SOP") {
+            if (BotUI.isChatEnabled) {
+                BotUI.chatInputMuteElement.classList.add('icon--light');
+            } else {
+                BotUI.chatInputMuteElement.classList.remove('icon--light');
+            }
+            if (BotUI.isMicrophoneEnabled) {
+                BotUI.chatInputMicElement.classList.add('icon--light');
+            } else {
+                BotUI.chatInputMicElement.classList.remove('icon--light');
+            }
+        }
         BotUI.backgroundElement = BotUI.element.querySelector('[data-background]');
 
         if (!BotUI.settings.collapsable) {
@@ -353,6 +360,10 @@ class BotUI  {
         }
 
         BotUI.chatInputMicElement.onclick = (e) => {
+            if (settings.interactionMode !== 'SOP'){
+                BotUI.isMicrophoneEnabled = !BotUI.isMicrophoneEnabled;
+                BotUI._setMicrophone();
+            }
             this.chatMicCallback()
         }
 
@@ -412,15 +423,22 @@ class BotUI  {
     }
 
     public setMicIcon(active){
+        if (BotUI.settings.interactionMode == "SOP"){
 
-        if (active){
-            BotUI.chatInputMicElement.classList.add(micActiveClass, "icon--large");
-            BotUI.chatInputMicElement.classList.remove("icon--largest");
-        }else{
-            BotUI.chatInputMicElement.classList.remove(micActiveClass, "icon--large");
-            BotUI.chatInputMicElement.classList.add("icon--largest");
+            if (active){
+                BotUI.chatInputMicElement.classList.add(micActiveClass, "icon--large");
+                BotUI.chatInputMicElement.classList.remove("icon--largest");
+            }else{
+                BotUI.chatInputMicElement.classList.remove(micActiveClass, "icon--large");
+                BotUI.chatInputMicElement.classList.add("icon--largest");
+            }
+        } else {
+            if (!active) {
+                BotUI.chatInputMuteElement.classList.add('icon--light');
+            } else {
+                BotUI.chatInputMuteElement.classList.remove('icon--light');
+            }
         }
-        
     }
 
     public setControls = (visible: boolean) => {
