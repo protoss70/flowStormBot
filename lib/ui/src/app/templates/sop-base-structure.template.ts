@@ -6,6 +6,17 @@ export const sopBaseStructureTemplate = `
             </div>
             <div data-avatar class="column column-avatar">
             </div>
+            <div bot-login class="bot-login">
+                <div bot-log-container class="bot-log-container">
+                    <h2>Welcome</h2>
+                    <p>Please login to use the bot</p>
+                    <button class="instantLogIn btn btn-light"> 
+                        <img src="https://img.icons8.com/fluency/512/google-logo.png" class="bot-googleIcon"/>
+                        <div class="bot-googleLogText">Login with Google</div>
+                    </button>
+                </div>
+                <div bot-loginPopup class="bot-login-failed-popup hidden">Account doesn't exist!</div>
+            </div>
             <div data-messages class="column column-messages">
             </div>
             <div loader class="loader hidden">

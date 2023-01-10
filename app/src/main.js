@@ -127,6 +127,11 @@ export const initFSClientBot = (initParams = {}) => {
 		createBot(botUI, settings);
 		initBot();
 		bot.stateHandler = stateHandler;
+		const user = bot.getUser();
+		console.log(user);
+		if (user && botUI.getSection() === "LOGIN"){
+			botUI.nextSection();
+		}
 		window.addEventListener("load", () => {
 			bot.stateHandler(botUI.getSection(), getStatus());
 		})
@@ -621,6 +626,17 @@ var createBot = (botUI, settings) => {
 
 	botUI.chatSopQuestionCallback = (inputValue) => {
 		botUI.setSection("QUESTION");
+	}
+
+	botUI.loginCallback = async () => {
+		await bot.signIn();
+		const res = await bot.checkExistingUser();
+		if (res){
+			botUI.nextSection();
+		}else{
+			botUI.loginPop();
+			console.log("account doesn't exist");
+		}
 	}
 
 	botUI.chatKeyboardCallback = (inputValue) => {

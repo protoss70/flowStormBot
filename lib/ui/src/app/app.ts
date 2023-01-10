@@ -159,6 +159,8 @@ class BotUI  {
     private static pdfViewer: HTMLObjectElement;
     private static pdfViewerContainer: HTMLElement;
     private static loadingSpinner: HTMLElement;
+    private static botLogin: HTMLElement;
+    private static botLoginPopup: HTMLElement;
 
     private static isChatEnabled: boolean = true;
     private static isMicrophoneEnabled: boolean = true;
@@ -231,6 +233,8 @@ class BotUI  {
         BotUI.pdfViewer = BotUI.element.querySelector("[pdf-viewer]");
         BotUI.pdfViewerContainer = BotUI.element.querySelector("[object-container]");
         BotUI.loadingSpinner = BotUI.element.querySelector("[loader]");
+        BotUI.botLogin = BotUI.element.querySelector("[bot-login]");
+        BotUI.botLoginPopup = BotUI.element.querySelector("[bot-loginPopup]");
 
         if (BotUI.settings.collapsable) {
             BotUI.setCollapsableUIHeight();
@@ -369,6 +373,10 @@ class BotUI  {
             this.chatMicCallback()
         }
 
+        BotUI.botLogin.onclick = async (e) => {
+            await this.loginCallback();
+        }
+
         BotUI.chatInputStopElement.onclick = (e) => {
             this.chatStopCallback()
         }
@@ -498,6 +506,10 @@ class BotUI  {
         return BotUI.settings.inputMode;
     }
 
+    public loginPop(){
+        BotUI.botLoginPopup.classList.remove("hidden");
+    }
+
     private changeCollapsedMode = () => {
         BotUI.settings.collapsed = !BotUI.settings.collapsed;
         BotUI.setCollapsableUIHeight();
@@ -515,6 +527,7 @@ class BotUI  {
         BotUI.solutionsControllers.classList.add("pdf-section--hidden");
         BotUI.messagesElement.classList.remove("hidden");
         BotUI.chatElement.classList.remove("chat-input--hidden");
+        BotUI.botLogin.classList.add("hidden");
 
         BotUI.chatTextInputElement.style.setProperty("--bot-ui-chat-input-height", chatHeight);
         BotUI.messagesElement.style.setProperty("--bot-ui-chat-input-height", chatHeight);
@@ -565,7 +578,8 @@ class BotUI  {
         console.log(section);
         switch (section) {
             case "LOGIN":
-                this.nextSection();
+                BotUI.messagesElement.classList.add("hidden");
+                BotUI.botLogin.classList.remove("hidden");
                 break;
             case "INPUTSELECT":
                 const callback = (e) => {
@@ -577,9 +591,9 @@ class BotUI  {
                         this.nextSection();
                     }
                 }
-                const sessionIputType = sessionStorage.getItem("INPUTSELECT");
+                const sessionInputType = sessionStorage.getItem("INPUTSELECT");
                 
-                if (sessionIputType === null){
+                if (sessionInputType === null){
                     const messageElement = BotUI.messagesElement;
                     BotUI.chatElement.classList.add("chat-input--hidden");
                     
@@ -597,7 +611,7 @@ class BotUI  {
                     this.setButton({...settings, text: "Text Input"},() => {callback("text"); messageElement.textContent = "";});
                     
                 }else{
-                    callback(sessionIputType);
+                    callback(sessionInputType);
                 }
                 break;
             case "SOP":
@@ -1003,6 +1017,8 @@ class BotUI  {
     public chatStopCallback = (...value) => {}
 
     public chatMicCallback = (...value) => {}
+    
+    public loginCallback = async (...value) => {}
 
     public sectionChangeCallback = (...value) => {}
 

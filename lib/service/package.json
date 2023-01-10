@@ -1,6 +1,6 @@
 {
   "name": "@flowstorm/bot-service",
-  "version": "0.3.8",
+  "version": "0.5.1",
   "main": "src/index.js",
   "module": "src/index.js",
   "license": "MIT",
@@ -15,6 +15,7 @@
     "babel-loader": "^8.1.0",
     "babel-polyfill": "^6.26.0",
     "copy-pkg-json-webpack-plugin": "^0.0.39",
+    "firebase": "^9.15.0",
     "remove-files-webpack-plugin": "^1.4.4",
     "uuid": "^7.0.3",
     "webpack": "^4.43.0",
