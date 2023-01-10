@@ -33,6 +33,9 @@
 	--bot-ui-message-background-user: rgba(255, 255, 255, .3);
 	--bot-ui-avatar-height: 0px;
 	--bot-ui-chat-input-height: 0px;
+	--bot-ui-sop-chat-input-height: 2.5rem;
+	--bot-ui-sop-chat-padding-left: 0.6rem;
+	--bot-ui-chat-padding-left: 4rem;
 	--bot-ui-sop-name-height: 0px;
 	--chat-padding-amount: 4;
 	--bot-ui-avatar-text-overlap: 0px;
@@ -179,12 +182,7 @@ $amount: 20;
 				border-radius: .7rem;
 				height: 100%;
 				background-color: #ffffff;
-				padding: 0 2.5rem 0 0.6rem;
 				border-width: 0;
-				position: absolute;
-				width: 88%;
-				right: 5px;
-				top: calc(50% - 18px);
 
 				&:focus {
 					outline: none;
@@ -196,7 +194,124 @@ $amount: 20;
 				}
 			}
 
-			.icon {
+			.text-input {
+				padding: 0 var(--bot-ui-chat-input-height) 0 var(--bot-ui-chat-padding-left);
+            }
+
+			.sop-text-input {
+				padding: 0 var(--bot-ui-sop-chat-input-height) 0 var(--bot-ui-sop-chat-padding-left);
+			    position: absolute;
+                width: 88% !important;
+                right: 5px;
+                top: calc(50% - 18px);
+            }
+
+            .icon {
+                cursor: pointer;
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                text-align: center;
+                color: #000000;
+
+                &--minus {
+                    right: 22.6%;
+                    bottom: 10px;
+                    -ms-transform: rotate(40deg); /* IE 9 */
+                    transform: rotate(40deg);
+                }
+                &--blocked {
+                    right: 10px;
+                    bottom: 10px;
+                }
+
+                &--mic {
+                    right: 40px;
+                    top: calc(50% - 10px);
+                }
+
+                &--volume {
+                    right: 10px;
+                    bottom: 50px;
+                }
+
+                &--volume-mute {
+                    right: 10px;
+                    bottom: 40px;
+                }
+
+                &--speaking-head {
+                    left: 10px;
+                    top: calc(50% - 10px);
+                }
+
+                &--arrow-up {
+                    right: 40px;
+                    top: calc(50% - 10px);
+                }
+
+                &--play {
+                    left: 10px;
+                    top: calc(50% - 10px);
+                }
+
+                &--pause {
+                    left: 10px;
+                    top: calc(50% - 10px);
+                }
+
+                &--stop {
+                    left: 35px;
+                    top: calc(50% - 10px);
+                }
+
+                &--menu-down {
+                    right: 10px;
+                    top: calc(50% - 10px);
+                }
+
+                &--menu-up {
+                    right: 10px;
+                    top: calc(50% - 10px);
+                }
+
+                &--equalizer {
+                    right: 10px;
+                    top: calc(50% - 10px);
+                }
+
+                &--menu {
+                    right: 10px;
+                    top: calc(50% - 10px);
+                }
+                &--back {
+                    left: 10px;
+                    top: 50%;
+                    background-color: #ffffff;
+                    border-radius: 10px;
+                    padding: 3px;
+                    height: 40px;
+                    width: 40px;
+                    transform: rotate(-90deg) translatex(45%);
+                    box-shadow: 0px 0px 1px black;
+
+                    &::before{
+                        transform: translatey(-50%);
+                        top: 20%;
+                        position: relative;
+                    }
+
+                    &.text-mode{
+                        left: -2px;
+                    }
+                }
+
+                &--downSop{
+                    transform: rotate(180deg);
+                }
+            }
+
+			.icon-sop {
 				cursor: pointer;
 				position: absolute;
 				width: 20px;
@@ -348,6 +463,23 @@ $amount: 20;
 				background-color: white;
 				width: 40px;
 				height: 70px;
+				right: 1px;
+				border-radius: .7rem;
+
+				&--visible{
+					display: block;
+				}
+
+				&--hidden{
+					display: none;
+				}
+			}
+            .settings-sop {
+				bottom: 50px;
+				position: absolute;
+				background-color: white;
+				width: 40px;
+				height: 70px;
 				right: 10px;
 				border-radius: .7rem;
 
@@ -359,7 +491,6 @@ $amount: 20;
 					display: none;
 				}
 			}
-
 			.controls {
 				&--visible{
 					display: block;

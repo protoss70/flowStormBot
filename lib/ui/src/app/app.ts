@@ -13,6 +13,7 @@ import '../assets/screencapture.png';
 
 import {
     sopBaseStructureTemplate,
+    baseStructureTemplate,
     chatMessageStructureTemplate,
     kioskMessageStructureTemplate,
 } from './templates';
@@ -77,6 +78,7 @@ const defaults: Settings = {
     collapsed: false,
     sectionActive: 0,
     sections: ["LOGIN", "INPUTSELECT", "SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK"],
+    interactionMode: "SOP",
 };
 
 const fullScreenWidgetWidth = '100vw';
@@ -190,7 +192,11 @@ class BotUI  {
         BotUI.element.style.setProperty('--bot-ui-message-background-user', `${BotUI.settings.userMessageBackgroundColor}`);
         BotUI.element.style.setProperty('--bot-ui-chat-pcm-height', chatHeight);
         BotUI.orientation = OrientationEnum.LANDSCAPE;
-        BotUI.element.innerHTML = sopBaseStructureTemplate;
+        if (BotUI.settings.interactionMode == "SOP"){
+            BotUI.element.innerHTML = sopBaseStructureTemplate;
+        } else {
+            BotUI.element.innerHTML = baseStructureTemplate;
+        }
         BotUI.element.setAttribute('data-gui-mode', BotUI.settings.guiMode);
         if (BotUI.settings.fullScreen) {
             BotUI.element.setAttribute('data-fullscreen', '');
@@ -247,7 +253,8 @@ class BotUI  {
 
         if (!BotUI.settings.customIcons) {
             icons.forEach(icon => {
-                    const element = document.querySelector('.icon--' + icon);
+                    const suffix = BotUI.settings.interactionMode == 'SOP' ? '-sop' : '';
+                    const element = document.querySelector('.icon' + suffix + '--' + icon);
                     if (element !== null){
                         element.classList.add('icon--content--' + icon)
                     }
@@ -264,11 +271,18 @@ class BotUI  {
         }
         BotUI.isChatEnabled = BotUI.settings.outputAudio;
         BotUI.isMicrophoneEnabled = BotUI.settings.inputAudio;
-        // if (BotUI.isChatEnabled) {
-        //     BotUI.chatInputMuteElement.classList.add('icon--light');
-        // } else {
-        //     BotUI.chatInputMuteElement.classList.remove('icon--light');
-        // }
+        if (BotUI.settings.interactionMode !== "SOP") {
+            if (BotUI.isChatEnabled) {
+                BotUI.chatInputMuteElement.classList.add('icon--light');
+            } else {
+                BotUI.chatInputMuteElement.classList.remove('icon--light');
+            }
+            if (BotUI.isMicrophoneEnabled) {
+                BotUI.chatInputMicElement.classList.add('icon--light');
+            } else {
+                BotUI.chatInputMicElement.classList.remove('icon--light');
+            }
+        }
         BotUI.backgroundElement = BotUI.element.querySelector('[data-background]');
 
         if (!BotUI.settings.collapsable) {
@@ -339,37 +353,21 @@ class BotUI  {
         BotUI.chatInputMenuElement.onclick = (e) => {
             BotUI.changeClasses('settings--visible', 'settings--hidden', BotUI.chatInputSettingsElement);
         }
-        BotUI.chatInputArrowElement.onclick = (e) => {
-            const inputString = (BotUI.chatInputElement as HTMLInputElement).value
-            if (inputString !== ''){
-                BotUI.changeClasses("icon--arrow-up--visible", "icon--arrow-up--hidden", BotUI.chatInputArrowElement);
-                BotUI.getInputValue(inputString, this.chatInputCallback);
-                (BotUI.chatInputElement as HTMLInputElement).value = '';
-            } else {
-                this.chatArrowCallback();
-            }
-        }
         this.setTextInputEnabled(BotUI.settings.textInputEnabled);
 
         injectCss();
 
-        BotUI.chatInputKeyboardElement.onclick = (e) => {
-            this.chatKeyboardCallback();
-        }
-
-        // BotUI.chatInputPlayElement.onclick = (e) => {
-        //     this.chatPlayCallback();
-        // }
-
-        BotUI.questionSOPButton.onclick = (e) => {
-            this.chatSopQuestionCallback();
-        }
-
-        BotUI.downSOPButton.onclick = (e) => {
-            this.chatSopNextCallback()
+        if (BotUI.chatInputPlayElement){
+            BotUI.chatInputPlayElement.onclick = (e) => {
+                this.chatPlayCallback();
+            }
         }
 
         BotUI.chatInputMicElement.onclick = (e) => {
+            if (settings.interactionMode !== 'SOP'){
+                BotUI.isMicrophoneEnabled = !BotUI.isMicrophoneEnabled;
+                BotUI._setMicrophone();
+            }
             this.chatMicCallback()
         }
 
@@ -381,40 +379,74 @@ class BotUI  {
             this.chatStopCallback()
         }
 
-        BotUI.chatInputBackElement.onclick = (e) => {
-            this.chatBackCallback(e);
-        }
-
-        BotUI.askAnother.onclick = (e) => {
-            this.oldMessagesSection("pdfFiles");
-            this.setSection("QUESTION");
-            BotUI.inputTakers.classList.remove("hidden");
-            this.askAnotherCallback();
-        }
-
-        BotUI.continue.onclick = (e) => {
-            this.oldMessagesSection("pdfFiles");
-            BotUI.inputTakers.classList.remove("hidden");
-            this.setSection("SOP");
-            this.continueCallback();
-        }
 
         BotUI.chatTextInputElement.oninput = (e) => {
             this.chatTextInputElementCallback(e);
+        }
+
+        if (BotUI.settings.interactionMode == "SOP") {
+            BotUI.chatInputKeyboardElement.onclick = (e) => {
+                this.chatKeyboardCallback();
+            }
+
+            BotUI.chatInputArrowElement.onclick = (e) => {
+                const inputString = (BotUI.chatInputElement as HTMLInputElement).value
+                if (inputString !== ''){
+                    BotUI.changeClasses("icon--arrow-up--visible", "icon--arrow-up--hidden", BotUI.chatInputArrowElement);
+                    BotUI.getInputValue(inputString, this.chatInputCallback);
+                    (BotUI.chatInputElement as HTMLInputElement).value = '';
+                } else {
+                    this.chatArrowCallback();
+                }
+            }
+
+            BotUI.questionSOPButton.onclick = (e) => {
+                this.chatSopQuestionCallback();
+            }
+
+            BotUI.downSOPButton.onclick = (e) => {
+                this.chatSopNextCallback()
+            }
+
+            BotUI.chatInputBackElement.onclick = (e) => {
+                this.chatBackCallback(e);
+            }
+
+            BotUI.askAnother.onclick = (e) => {
+                this.oldMessagesSection("pdfFiles");
+                this.setSection("QUESTION");
+                BotUI.inputTakers.classList.remove("hidden");
+                this.askAnotherCallback();
+            }
+
+            BotUI.continue.onclick = (e) => {
+                this.oldMessagesSection("pdfFiles");
+                BotUI.inputTakers.classList.remove("hidden");
+                this.setSection("SOP");
+                this.continueCallback();
+            }
         }
 
         BotUI.setBackground({});
     }
 
     public setMicIcon(active){
-        if (active){
-            BotUI.chatInputMicElement.classList.add(micActiveClass, "icon--large");
-            BotUI.chatInputMicElement.classList.remove("icon--largest");
-        }else{
-            BotUI.chatInputMicElement.classList.remove(micActiveClass, "icon--large");
-            BotUI.chatInputMicElement.classList.add("icon--largest");
+        if (BotUI.settings.interactionMode == "SOP"){
+
+            if (active){
+                BotUI.chatInputMicElement.classList.add(micActiveClass, "icon--large");
+                BotUI.chatInputMicElement.classList.remove("icon--largest");
+            }else{
+                BotUI.chatInputMicElement.classList.remove(micActiveClass, "icon--large");
+                BotUI.chatInputMicElement.classList.add("icon--largest");
+            }
+        } else {
+            if (!active) {
+                BotUI.chatInputMuteElement.classList.add('icon--light');
+            } else {
+                BotUI.chatInputMuteElement.classList.remove('icon--light');
+            }
         }
-        
     }
 
     public setControls = (visible: boolean) => {
@@ -436,10 +468,12 @@ class BotUI  {
     }
 
     public setSection(section: string = "SOP"){
-        const index = BotUI.settings.sections.indexOf(section);
-        BotUI.settings.sectionActive = index;
-        this.sectionChangeCallback(section);
-        this.setSectionUI(section);
+        if (BotUI.settings.interactionMode == 'SOP'){
+            const index = BotUI.settings.sections.indexOf(section);
+            BotUI.settings.sectionActive = index;
+            this.sectionChangeCallback(section);
+            this.setSectionUI(section);
+        }
     }
 
     public nextSection(){
@@ -695,9 +729,11 @@ class BotUI  {
         }
 
     public setPlayIcon = (icon: string) => {
-        // BotUI.chatInputPlayElement.classList.remove(BotUI.settings.pauseIcon);
-        // BotUI.chatInputPlayElement.classList.remove(BotUI.settings.playIcon);
-        // BotUI.chatInputPlayElement.classList.add(icon);
+        if (BotUI.chatInputPlayElement){
+            BotUI.chatInputPlayElement.classList.remove(BotUI.settings.pauseIcon);
+            BotUI.chatInputPlayElement.classList.remove(BotUI.settings.playIcon);
+            BotUI.chatInputPlayElement.classList.add(icon);
+        }
         return;
     }
 

@@ -10,7 +10,7 @@ export const baseStructureTemplate = `
         </div>
         <div data-chat-input class="chat-input">
             <div class="chat-input-wrapper">
-                <input type="text" id="chatWindowTextInput" placeholder="Type text..." autocomplete="off"/>
+                <input type="text" id="chatWindowTextInput" placeholder="Type text..." autocomplete="off" class="text-input"/>
                 <span data-chat-input-settings class="settings settings--hidden">
                     <span data-chat-input-microphone>
                         <span data-chat-input-mic class="icon icon--blocked"></span>

@@ -31,6 +31,7 @@ export interface Settings {
         width: string;
     };
     inputMode?: string;
+    interactionMode?: string;
     standardQuestionMode?: string;
     inputAudio?: boolean;
     outputAudio?: boolean;
