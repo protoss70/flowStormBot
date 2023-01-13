@@ -77,7 +77,7 @@ const defaults: Settings = {
     collapsable: false,
     collapsed: false,
     sectionActive: 0,
-    sections: ["LOGIN", "INPUTSELECT", "SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK"],
+    sections: ["SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK", "LOGIN", "INPUTSELECT"],
     interactionMode: "SOP",
 };
 
@@ -111,7 +111,7 @@ const icons = ['mic',
     'upSop',
     ];
 const avatarTextOverlapRatio = 1 / 4;
-const micActiveClass = "icon--mic--active";
+const micActiveClass = "icon-sop--mic--active";
 
 
 class BotUI  {
@@ -463,7 +463,7 @@ class BotUI  {
         }
     }
 
-    getSection(){
+    public getSection(){
         return BotUI.settings.sections[BotUI.settings.sectionActive];
     }
 
@@ -475,7 +475,11 @@ class BotUI  {
             this.setSectionUI(section);
         }
     }
-
+    
+    public setSectionByIndex(index: number){
+        const section = BotUI.settings.sections[index];
+        this.setSection(section);
+    }
     public nextSection(){
         if (BotUI.settings.sectionActive < BotUI.settings.sections.length - 1){
             BotUI.settings.sectionActive += 1;
@@ -616,37 +620,22 @@ class BotUI  {
                 BotUI.botLogin.classList.remove("hidden");
                 break;
             case "INPUTSELECT":
-                const callback = (e) => {
-                    sessionStorage.setItem("INPUTSELECT", e);
-                    this.setInputMode(e);
-                    if(e === "voice"){
-                        this.setSection("QUESTION");
-                    }else{
-                        this.nextSection();
-                    }
-                }
-                const sessionInputType = sessionStorage.getItem("INPUTSELECT");
+                const messageElement = BotUI.messagesElement;
+                BotUI.messagesElement.textContent = "";
+                BotUI.chatElement.classList.add("chat-input--hidden");
                 
-                if (sessionInputType === null){
-                    const messageElement = BotUI.messagesElement;
-                    BotUI.chatElement.classList.add("chat-input--hidden");
-                    
-                    this.setBotText("Please choose an input type.");
-                    const mode = this.getInputMode()
-                    var settings = {
-                        background: "",
-						oldMode: mode,
-						title: "modeSelect",
-                        groupName: "modeSelect",
-						disableGroup: true,
-						text: "Voice Input"
-                    }
-                    this.setButton(settings, () => {callback("voice"); messageElement.textContent = "";});
-                    this.setButton({...settings, text: "Text Input"},() => {callback("text"); messageElement.textContent = "";});
-                    
-                }else{
-                    callback(sessionInputType);
+                this.setBotText("Please choose an input type.");
+                const mode = this.getInputMode()
+                var settings = {
+                    background: "",
+                    oldMode: mode,
+                    title: "modeSelect",
+                    groupName: "modeSelect",
+                    disableGroup: true,
+                    text: "Voice Input"
                 }
+                this.setButton(settings, () => {this.inputModeCallback("voice"); messageElement.textContent = "";});
+                this.setButton({...settings, text: "Text Input"},() => {this.inputModeCallback("voice"); messageElement.textContent = "";});
                 break;
             case "SOP":
                 BotUI.sopSection.classList.remove("sop-section--hidden");
@@ -884,6 +873,20 @@ class BotUI  {
         this.setSection("PDF");
     }
 
+    public appSelectToggle = (active: boolean, text: string = "") => {
+        if (active){
+            BotUI.sopName.classList.remove("hidden");
+            BotUI.chatTextInputElement.style.setProperty("--bot-ui-sop-name-height", "50px");
+            BotUI.messagesElement.style.setProperty("--bot-ui-sop-name-height", "50px");
+            BotUI.sopName.textContent = text;       
+        }else{
+            BotUI.sopName.classList.add("hidden");
+            BotUI.chatTextInputElement.style.setProperty("--bot-ui-sop-name-height", "0px");
+            BotUI.messagesElement.style.setProperty("--bot-ui-sop-name-height", "0px");
+            BotUI.sopName.textContent = "";   
+        }
+    }
+
     public setButton = (settings: any = {}, callback: Function = ()=>{}) => {
         console.log(settings);
         const messageElement = BotUI.messagesElement;
@@ -929,10 +932,7 @@ class BotUI  {
 
             if (settings.appSelect){
                 messageElement.textContent = "";
-                BotUI.sopName.classList.remove("hidden");
-                BotUI.chatTextInputElement.style.setProperty("--bot-ui-sop-name-height", "50px");
-                BotUI.messagesElement.style.setProperty("--bot-ui-sop-name-height", "50px");
-                BotUI.sopName.textContent = selector;
+                this.appSelectToggle(true, selector);
             }
             if (settings.disableGroup){
                 document.querySelectorAll(`[data-button-group=${selector.replace(/\s+/g, '')}]`).forEach(elem => {
@@ -1035,6 +1035,8 @@ class BotUI  {
         }
     }
     public chatInputCallback = (...value) => {}
+
+    public inputModeCallback = (...value) => {}
 
     public chatArrowCallback = (...value) => {}
 

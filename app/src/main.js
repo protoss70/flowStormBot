@@ -55,7 +55,7 @@ const botUIDefaultSettings = {
 	animationSpeed: 500,
 	backgroundSimpleAnimation: true,
 	collapsed: true,
-	sections: ["LOGIN", "INPUTSELECT", "SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK"],
+	sections: ["SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK", "LOGIN", "INPUTSELECT"],
 };
 
 const clientDefaultSetting = {
@@ -127,11 +127,20 @@ export const initFSClientBot = (initParams = {}) => {
 		createBot(botUI, settings);
 		initBot();
 		bot.stateHandler = stateHandler;
-		const user = bot.getUser();
-		console.log(user);
-		if (user && botUI.getSection() === "LOGIN"){
-			botUI.nextSection();
-		}
+		bot.getUser().then((user) => {
+			console.log("User: ", user);
+			if (user === null){
+				botUI.setSection("LOGIN");
+			}else{
+				const userInputChoice = user.inputMode;
+				if (userInputChoice === undefined){
+					botUI.setSection("INPUTSELECT");
+				}else{
+					console.log(userInputChoice);
+					botUI.setInputMode(userInputChoice.stringValue);
+				}	
+			} 
+		});
 		window.addEventListener("load", () => {
 		    if (settings.interactionMode == 'SOP') {
 			    bot.stateHandler(botUI.getSection(), getStatus());
@@ -337,37 +346,49 @@ var createBot = (botUI, settings) => {
 	async function handleFile(oldMode, index, query){
 		console.log(index, query);
 		botUI.toggleLoader(true);
-		const files = (await bot.getFiles(query, index)).data;
+		const files = (await bot.getFiles(query, ["kuka_new"], [8431766985439058164], 10)).data;
 		botUI.toggleLoader(false);
 		console.log(files);
-		botUI.continueCallback = () => {
+		if (files === undefined){
+			//SERVER ERROR
+			defaultCallback.addMessage("received", `Sorry, something went wrong!`, null, null);
 			bot.handleOnTextInput(`continue`, false, {sopInput: true});
-		}
+		}else if(files.length === 0){
+			//NO PDF FILES FOUND
+			defaultCallback.addMessage("received", `No solutions were found.`, null, null);
 
-		botUI.askAnotherCallback = () => {
-			bot.handleOnTextInput(`ask another`, false, {sopInput: true});
-		}
-		
-		files.predictions.forEach(file => {
-			const page = parseInt(file.name.replace(".pdf", ""));
-			file.text = file.doc_name + ", page: " + page;
-			file.page = page;
-			file.url = async () => {return `https://manual-search-develop.alquist.ai/download/${index}/${page}.pdf`;};
-			const settings = {
-				oldMode: oldMode,
-				groupName: "pdfFiles",
-				disableGroup: false,
-				appSelect: false,
-				solutions: true,
-				text:  file.text,
-				pdf: {...file}
+			bot.handleOnTextInput(`continue`, false, {sopInput: true});
+		}else{
+			//SUCCESS
+			botUI.continueCallback = () => {
+				bot.handleOnTextInput(`continue`, false, {sopInput: true});
 			}
-			botUI.setButton(settings, () => {});
-			console.log(settings);
-		});
+	
+			botUI.askAnotherCallback = () => {
+				bot.handleOnTextInput(`ask another`, false, {sopInput: true});
+			}
+			
+			files.predictions.forEach(file => {
+				const page = parseInt(file.name.replace(".pdf", ""));
+				file.text = file.doc_name + ", page: " + page;
+				file.page = page;
+				file.url = async () => {return `https://manual-search-develop.alquist.ai/download/${index}/${page}.pdf`;};
+				const settings = {
+					oldMode: oldMode,
+					groupName: "pdfFiles",
+					disableGroup: false,
+					appSelect: false,
+					solutions: true,
+					text:  file.text,
+					pdf: {...file}
+				}
+				botUI.setButton(settings, () => {});
+				console.log(settings);
+			});
+		}
 	}
 
-	defaultCallback.handleCommand = (command, code) => {
+	defaultCallback.handleCommand = (command, code, t) => {
         const payload = JSON.parse(code);
 	    switch(command) {
 			case '#expression':
@@ -398,6 +419,7 @@ var createBot = (botUI, settings) => {
 				botUI.sendRTCData({'Walk': payload['action']});
 				break;
 			case "#actions":
+				console.log("__________cagri___________");
 				buttonInput = true;
 				const oldMode = botUI.getInputMode();
 				console.log(payload);
@@ -497,15 +519,19 @@ var createBot = (botUI, settings) => {
 				}
 				break;
 			case 'LISTENING':
-				bot.setInAudio(false);
-				pauseOnListening = !pauseOnListening;
-				changePlayIcon(pauseOnListening, botUI);
+				if (settings.interactionMode !== "SOP"){
+					bot.setInAudio(false);
+					pauseOnListening = !pauseOnListening;
+					changePlayIcon(pauseOnListening, botUI);
+				}
 				break;
 			case 'RESPONDING':
-				bot.pause()
-				if (settings.avatarURL) {
-				    botUI.sendRTCData({'Pause': "true"});
-					botUI.removeOverlay();
+				if (settings.interactionMode !== "SOP"){
+					bot.pause()
+					if (settings.avatarURL) {
+						botUI.sendRTCData({'Pause': "true"});
+						botUI.removeOverlay();
+					}
 				}
 				break;
 			case 'PAUSED':
@@ -564,6 +590,15 @@ var createBot = (botUI, settings) => {
         });
     }
 
+	botUI.inputModeCallback = (e) => {
+		botUI.setInputMode(e);
+		bot.updateUser({"inputMode": e});
+		if(e === "voice"){
+			botUI.setSection("QUESTION");
+		}else{
+			botUI.setSectionByIndex(0);
+		}
+	}
 
 	botUI.chatInputCallback = ((inputValue) => {
 		const status = getStatus();
@@ -593,6 +628,9 @@ var createBot = (botUI, settings) => {
 		console.log(status);
 		if (status !== undefined && status !== "SLEEPING") {
 			bot.handleOnTextInput(`yes`, false, {sopInput: true});
+		}else if(status === "SLEEPING"){
+			botUI.appSelectToggle(false);
+			run();
 		}
 	}
 
@@ -638,7 +676,14 @@ var createBot = (botUI, settings) => {
 		await bot.signIn();
 		const res = await bot.checkExistingUser();
 		if (res){
-			botUI.nextSection();
+			const user = (await bot.getUser());
+			console.log(user);
+			if (user.inputMode === undefined){
+				botUI.setSection("INPUTSELECT");
+			}else{
+				botUI.setSectionByIndex(0);
+			}
+
 		}else{
 			botUI.loginPop();
 			console.log("account doesn't exist");
@@ -650,6 +695,7 @@ var createBot = (botUI, settings) => {
 		mode = mode === "text" ? "voice" : "text";
 		botUI.setInputMode(mode);
 		bot.setInAudio(mode === "voice" ? true : false);
+		bot.updateUser({"inputMode": mode});
 		if (mode === "voice" && getState() === "LISTENING"){
 			botUI.addOverlay();
 		}
