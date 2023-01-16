@@ -1,0 +1,18 @@
+{
+  "hosting": {
+    "target": "bot",
+    "public": "app/public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "predeploy": "cd ./app && yarn install && yarn start"
+  }
+}

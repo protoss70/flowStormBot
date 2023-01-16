@@ -1,0 +1,25 @@
+{
+  "name": "flowstorm_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/protoss70/flowStormBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/protoss70/flowStormBot/issues"
+  },
+  "homepage": "https://github.com/protoss70/flowStormBot#readme",
+  "dependencies": {
+    "firebase": "^9.15.0"
+  }
+}

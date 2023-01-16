@@ -353,9 +353,10 @@ var createBot = (botUI, settings) => {
 			//SERVER ERROR
 			defaultCallback.addMessage("received", `Sorry, something went wrong!`, null, null);
 			bot.handleOnTextInput(`continue`, false, {sopInput: true});
-		}else if(files.length === 0){
+		}else if(files.predictions.length === 0){
 			//NO PDF FILES FOUND
 			defaultCallback.addMessage("received", `No solutions were found.`, null, null);
+			bot.handleOnTextInput(`continue`, false, {sopInput: true});
 
 			bot.handleOnTextInput(`continue`, false, {sopInput: true});
 		}else{
