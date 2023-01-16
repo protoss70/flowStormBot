@@ -13,6 +13,6 @@
         "destination": "/index.html"
       }
     ],
-    "predeploy": "cd ./app && yarn install && yarn start"
+    "predeploy": "cd ./app && yarn install && webpack-dev-server --hot --open --config webpack.dev.js"
   }
 }
