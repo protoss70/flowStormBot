@@ -5,18 +5,31 @@
 	<title>Bot</title>
 </head>
 <body>
-<script>
-	initFSClientBot({
-		allowUrlParams: true,
-		collapsable: false,
-		fullScreen: false,
-		guiMode: 'chat',
-		backgroundColor: '#6737ff',
-		textInputEnabled: true,
-		domain: '.flowstorm.ai',
-		mode: 'voice',
-		interactionMode: 'SOP',
-	})
-</script>
+	<div id="botContainer">
+		<div id="botDiv"></div>
+	</div>
+	<script>
+		initFSClientBot({
+			allowUrlParams: true,
+			collapsable: false,
+			fullScreen: false,
+			guiMode: 'chat',
+			backgroundColor: '#6737ff',
+			textInputEnabled: true,
+			domain: '.flowstorm.ai',
+			mode: 'voice',
+			interactionMode: 'SOP',
+			elementId: "botDiv",
+		})
+	</script>
+	<style>
+		#botContainer{
+			width: 100%;
+			height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+	</style>
 </body>
 </html>
