@@ -5,6 +5,7 @@
 	<title>Bot</title>
 </head>
 <body>
+	
 	<div id="botContainer">
 		<div id="botDiv"></div>
 	</div>
@@ -20,16 +21,9 @@
 			mode: 'voice',
 			interactionMode: 'SOP',
 			elementId: "botDiv",
+			collapsable: true,
+			widgetSize: { width: '380px', height: '600px' },
 		})
 	</script>
-	<style>
-		#botContainer{
-			width: 100%;
-			height: 100vh;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-	</style>
 </body>
 </html>

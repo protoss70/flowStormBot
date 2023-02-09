@@ -544,6 +544,10 @@ class BotUI  {
         return BotUI.settings.inputMode;
     }
 
+    public removeAllMessages(){
+        BotUI.messagesElement.textContent = "";
+    }
+
     public loginPop(){
         BotUI.botLoginPopup.classList.remove("hidden");
     }
@@ -635,7 +639,7 @@ class BotUI  {
                     text: "Voice Input"
                 }
                 this.setButton(settings, () => {this.inputModeCallback("voice"); messageElement.textContent = "";});
-                this.setButton({...settings, text: "Text Input"},() => {this.inputModeCallback("voice"); messageElement.textContent = "";});
+                this.setButton({...settings, text: "Text Input"},() => {this.inputModeCallback("text"); messageElement.textContent = "";});
                 break;
             case "SOP":
                 BotUI.sopSection.classList.remove("sop-section--hidden");

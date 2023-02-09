@@ -357,8 +357,6 @@ var createBot = (botUI, settings) => {
 			//NO PDF FILES FOUND
 			defaultCallback.addMessage("received", `No solutions were found.`, null, null);
 			bot.handleOnTextInput(`continue`, false, {sopInput: true});
-
-			bot.handleOnTextInput(`continue`, false, {sopInput: true});
 		}else{
 			//SUCCESS
 			botUI.continueCallback = () => {
@@ -420,7 +418,6 @@ var createBot = (botUI, settings) => {
 				botUI.sendRTCData({'Walk': payload['action']});
 				break;
 			case "#actions":
-				console.log("__________cagri___________");
 				buttonInput = true;
 				const oldMode = botUI.getInputMode();
 				console.log(payload);
@@ -631,6 +628,7 @@ var createBot = (botUI, settings) => {
 			bot.handleOnTextInput(`yes`, false, {sopInput: true});
 		}else if(status === "SLEEPING"){
 			botUI.appSelectToggle(false);
+			botUI.removeAllMessages();
 			run();
 		}
 	}
@@ -657,6 +655,7 @@ var createBot = (botUI, settings) => {
 		if (settings.interactionMode === 'SOP') {
             const status = getStatus();
             if (status === "SLEEPING" || status === undefined){
+				console.log("---------maraba---------");
                 run();
                 botUI.setMicIcon(true);
             } else {
