@@ -141,11 +141,6 @@ export const initFSClientBot = (initParams = {}) => {
 				}	
 			} 
 		});
-		window.addEventListener("load", () => {
-		    if (settings.interactionMode == 'SOP') {
-			    bot.stateHandler(botUI.getSection(), getStatus());
-			}
-		})
 		if (!bot.getInAudio){
 			botUI.setInputMode("text");
 		}
