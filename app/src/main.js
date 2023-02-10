@@ -621,7 +621,7 @@ var createBot = (botUI, settings) => {
 		console.log(status);
 		if (status !== undefined && status !== "SLEEPING") {
 			bot.handleOnTextInput(`yes`, false, {sopInput: true});
-		}else if(status === "SLEEPING"){
+		}else if(status === "SLEEPING" || status === undefined){
 			botUI.appSelectToggle(false);
 			botUI.removeAllMessages();
 			run();
