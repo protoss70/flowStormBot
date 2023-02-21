@@ -8,6 +8,8 @@ import isEmpty from 'ramda/es/isEmpty';
 import merge from 'ramda/es/merge';
 import times from 'ramda/es/times';
 
+import {sopSuggestionContainer} from "./templates/sop-suggestion-structure.template"
+
 import '../assets/main.scss';
 import '../assets/screencapture.png';
 
@@ -891,6 +893,30 @@ class BotUI  {
         }
     }
 
+    public removeSuggestions = () => {
+        const elemList = document.querySelectorAll("[data-messages] > div > [data-suggestions-container]");
+        elemList.forEach(element => {
+            const par = element.parentNode;
+            par.parentNode.removeChild(par);
+        });
+    }
+
+    public setSuggestion = (suggestions : string[]) => {
+        this.removeSuggestions();
+        const messageElement = BotUI.messagesElement;
+        const suggestionContainer = getContentAsHtml(sopSuggestionContainer);
+        messageElement.appendChild(suggestionContainer);
+        suggestions.forEach(sug => {
+            let btn = document.createElement("button");
+            btn.innerText = sug;
+            btn.setAttribute("data-suggestions-button", "");
+            btn.classList.add("data-suggestions-button");
+            btn.onclick = this.suggestionsCallback;
+            document.querySelector("[data-suggestions-container].data-suggestions-container").appendChild(btn);
+        });
+        BotUI.scrollToLastMessage(messageElement);
+    }
+
     public setButton = (settings: any = {}, callback: Function = ()=>{}) => {
         console.log(settings);
         const messageElement = BotUI.messagesElement;
@@ -1077,6 +1103,8 @@ class BotUI  {
     public dataChannelMessageCallback = (...value) => {}
 
     public collapsableTriggerCallback = (collapsed) => {}
+
+    public suggestionsCallback = (...value) => {}
 
     private static videoCallback: () => any = () => {};
 

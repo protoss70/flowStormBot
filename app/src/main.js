@@ -439,6 +439,11 @@ var createBot = (botUI, settings) => {
 				const query = botUI.getLastUserMessage().children[0].textContent;
 				handleFile(oldMode, payload.index.toLowerCase(), query);
 				break;
+			case "#suggestions":
+				console.log("here", payload.suggestions);
+				const opts = payload.suggestions.filter(op => op !== 'yes');
+				botUI.setSuggestion(opts);
+				break;
 			default:
 
         }
@@ -620,6 +625,7 @@ var createBot = (botUI, settings) => {
 		const status = getStatus();
 		console.log(status);
 		if (status !== undefined && status !== "SLEEPING") {
+			botUI.removeSuggestions();
 			bot.handleOnTextInput(`yes`, false, {sopInput: true});
 		}else if(status === "SLEEPING" || status === undefined){
 			botUI.appSelectToggle(false);
@@ -631,6 +637,11 @@ var createBot = (botUI, settings) => {
 	botUI.chatBackCallback = (inputValue) => {
 		botUI.previousSection();
 		bot.setInAudio(botUI.getInputMode() === "voice" ? true : false);
+	}
+
+	botUI.suggestionsCallback = (e) => {
+		bot.handleOnTextInput(e.target.innerHTML, false);
+		botUI.removeSuggestions();
 	}
 
 	botUI.setModeCallback = (mode) => {
@@ -650,7 +661,6 @@ var createBot = (botUI, settings) => {
 		if (settings.interactionMode === 'SOP') {
             const status = getStatus();
             if (status === "SLEEPING" || status === undefined){
-				console.log("---------maraba---------");
                 run();
                 botUI.setMicIcon(true);
             } else {

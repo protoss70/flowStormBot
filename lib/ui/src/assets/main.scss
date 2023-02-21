@@ -1576,6 +1576,58 @@ canvas{
 	}
 }
 
+[data-suggestions-container].data-suggestions-container{
+	display: flex;
+	position: relative;
+	align-items: center;
+	width: 90%;
+	height: 45px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	margin: 0.2rem 0.7rem 0 0.7rem;
+	padding: 3px 0;
+
+		/* width */
+	&::-webkit-scrollbar {
+		height: 5px;
+		padding: 0 3px;
+	}
+	
+	/* Track */
+	&::-webkit-scrollbar-track {
+		background: #f1f1f1; 
+		border-radius: 5px;
+		visibility: hidden;
+	}
+	
+	/* Handle */
+	&::-webkit-scrollbar-thumb {
+		background: #888; 
+		border-radius: 5px;
+	}
+	
+	/* Handle on hover */
+	&::-webkit-scrollbar-thumb:hover {
+		background: #555; 
+	}
+
+	gap: 2px;
+
+	& > button{
+		height: 100%;
+		white-space: nowrap;
+		background-color: rgba(255, 255, 255, 0.3);
+		color: white;
+		border: none;
+		border-radius: 5px;
+
+		&:hover{
+			cursor: pointer;
+			background-color: rgba(255, 255, 255, 0.5);
+		}
+	}
+}
+
 @keyframes move {
 	100% {
 		transform: translate3d(0, 0, 1px) rotate(360deg);
