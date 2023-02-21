@@ -1,18 +1,52 @@
 {
   "hosting": {
-    "target": "bot",
-    "public": "app/dist",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
+    "site": "default",
+    "targets": {
+      "bot": {
+        "hosting": {
+          "target": "bot",
+          "public": "app/dist",
+          "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+          ],
+          "rewrites": [
+            {
+              "source": "**",
+              "destination": "/index.html"
+            }
+          ],
+          "predeploy": "cd ./app && yarn install && webpack --config webpack.prod.js",
+          "github": {
+            "branch": "master",
+            "repo": "protoss70/flowStormBot"
+          }
+        }
+      },
+      "live": {
+        "hosting": {
+          "target": "live",
+          "public": "app/dist-live",
+          "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+          ],
+          "rewrites": [
+            {
+              "source": "**",
+              "destination": "/index.html"
+            }
+          ],
+          "predeploy": "cd ./app && yarn install && webpack --config webpack.prod.js && yarn build:live",
+          "github": {
+            "branch": "live",
+            "repo": "protoss70/flowStormBot"
+          }
+        }
       }
-    ],
-    "predeploy": "cd ./app && yarn install && webpack --config webpack.prod.js"
+    }
   }
 }
+
