@@ -27,7 +27,7 @@
       "live": {
         "hosting": {
           "target": "live",
-          "public": "app/dist",
+          "public": "app/dist-live",
           "ignore": [
             "firebase.json",
             "**/.*",
