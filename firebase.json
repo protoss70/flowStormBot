@@ -39,7 +39,6 @@
               "destination": "/index.html"
             }
           ],
-          "predeploy": "cd ./app && yarn install && webpack --config webpack.prod.js && yarn build:live",
           "github": {
             "branch": "live",
             "repo": "protoss70/flowStormBot"
