@@ -55,7 +55,7 @@ const botUIDefaultSettings = {
 	animationSpeed: 500,
 	backgroundSimpleAnimation: true,
 	collapsed: true,
-	sections: ["SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK", "LOGIN", "INPUTSELECT"],
+	interactionMode: "GUIDE"
 };
 
 const clientDefaultSetting = {
@@ -108,6 +108,11 @@ export const initFSClientBot = (initParams = {}) => {
 			botKey = window.location.pathname.substring(1);
 		} else if (urlBotKey !== null && urlBotKey.length === 24) {
 			botKey = urlBotKey;
+		}
+		const url = new URL(window.location.href);
+		const intMode = url.searchParams.get("m");
+		if (intMode === "guide" || intMode === "sop"){
+			settings.interactionMode = intMode.toUpperCase();
 		}
 		const backgroundAdvancedAnimationParticlesCount = urlParams.get('animObjects') === null ? 5 : parseInt(urlParams.get('animObjects'));
 		const backgroundSimpleAnimation = urlParams.get('animate') === null ? true : urlParams.get('animate') === 'true';
@@ -730,7 +735,8 @@ var createBot = (botUI, settings) => {
 
 	botUI.collapsableTriggerCallback = ((collapsed) => {
 		const status = getStatus();
-		if (!paused && status) {
+		const section = botUI.getSection();
+		if ((status === undefined || status === "SLEEPING") && !collapsed && (section === "SOP" || section === "QUESTION")) {
 			run(true);
 		}
 	});
