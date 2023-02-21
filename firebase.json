@@ -35,10 +35,10 @@
           ],
           "rewrites": [
             {
-              "source": "**",
-              "destination": "/index.html"
+                "source": "**",
+                "destination": "/index.html"
             }
-          ],
+        ],
           "github": {
             "branch": "live",
             "repo": "protoss70/flowStormBot"
@@ -48,4 +48,5 @@
     }
   }
 }
+
 
