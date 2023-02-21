@@ -173,7 +173,6 @@ class BotUI  {
     private static avatarConnection: RTCPeerConnection;
     private static avatarDataChannel: RTCDataChannel;
 
-
     constructor(element: string, settings: Settings = defaults) {
         BotUI.element = document.getElementById(element);
         defaults.textInputEnabled = settings.guiMode === GUIMode.CHAT;
@@ -194,7 +193,7 @@ class BotUI  {
         BotUI.element.style.setProperty('--bot-ui-message-background-user', `${BotUI.settings.userMessageBackgroundColor}`);
         BotUI.element.style.setProperty('--bot-ui-chat-pcm-height', chatHeight);
         BotUI.orientation = OrientationEnum.LANDSCAPE;
-        if (BotUI.settings.interactionMode == "SOP"){
+        if (BotUI.settings.interactionMode == "SOP" || BotUI.settings.interactionMode == "GUIDE"){
             BotUI.element.innerHTML = sopBaseStructureTemplate;
         } else {
             BotUI.element.innerHTML = baseStructureTemplate;
@@ -255,13 +254,19 @@ class BotUI  {
 
         if (!BotUI.settings.customIcons) {
             icons.forEach(icon => {
-                    const suffix = BotUI.settings.interactionMode == 'SOP' ? '-sop' : '';
+                    const suffix = BotUI.settings.interactionMode == 'SOP' || BotUI.settings.interactionMode == "GUIDE" ? '-sop' : '';
                     const element = document.querySelector('.icon' + suffix + '--' + icon);
                     if (element !== null){
                         element.classList.add('icon--content--' + icon)
                     }
                 }
             );
+        }
+
+        if (BotUI.settings.interactionMode === "SOP"){
+            BotUI.settings.sections = ["SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK", "LOGIN", "INPUTSELECT"];
+        }else if (BotUI.settings.interactionMode === "GUIDE"){
+            BotUI.settings.sections = ["QUESTION", "SOLUTIONS", "PDF", "FEEDBACK", "LOGIN", "INPUTSELECT"];
         }
 
         this.setSection(BotUI.settings.sections[0]);
@@ -273,7 +278,7 @@ class BotUI  {
         }
         BotUI.isChatEnabled = BotUI.settings.outputAudio;
         BotUI.isMicrophoneEnabled = BotUI.settings.inputAudio;
-        if (BotUI.settings.interactionMode !== "SOP") {
+        if (BotUI.settings.interactionMode !== "SOP" && BotUI.settings.interactionMode != "GUIDE") {
             if (BotUI.isChatEnabled) {
                 BotUI.chatInputMuteElement.classList.add('icon--light');
             } else {
@@ -366,7 +371,7 @@ class BotUI  {
         }
 
         BotUI.chatInputMicElement.onclick = (e) => {
-            if (settings.interactionMode !== 'SOP'){
+            if (settings.interactionMode !== 'SOP' && BotUI.settings.interactionMode != "GUIDE"){
                 BotUI.isMicrophoneEnabled = !BotUI.isMicrophoneEnabled;
                 BotUI._setMicrophone();
             }
@@ -386,7 +391,7 @@ class BotUI  {
             this.chatTextInputElementCallback(e);
         }
 
-        if (BotUI.settings.interactionMode == "SOP") {
+        if (BotUI.settings.interactionMode == "SOP" || BotUI.settings.interactionMode == "GUIDE") {
             BotUI.chatInputKeyboardElement.onclick = (e) => {
                 this.chatKeyboardCallback();
             }
@@ -433,7 +438,7 @@ class BotUI  {
     }
 
     public setMicIcon(active){
-        if (BotUI.settings.interactionMode == "SOP"){
+        if (BotUI.settings.interactionMode == "SOP" || BotUI.settings.interactionMode == "GUIDE"){
 
             if (active){
                 BotUI.chatInputMicElement.classList.add(micActiveClass, "icon--large");
@@ -470,7 +475,7 @@ class BotUI  {
     }
 
     public setSection(section: string = "SOP"){
-        if (BotUI.settings.interactionMode == 'SOP'){
+        if (BotUI.settings.interactionMode == 'SOP' || BotUI.settings.interactionMode == "GUIDE"){
             const index = BotUI.settings.sections.indexOf(section);
             BotUI.settings.sectionActive = index;
             this.sectionChangeCallback(section);
