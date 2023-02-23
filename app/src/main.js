@@ -310,7 +310,7 @@ var createBot = (botUI, settings) => {
 
 	stateHandler = (section, status) => {
 		console.log(section);
-		if (section === "SOP"){
+		if (section === "SOP" || section === "QUESTION"){
 			if (status === undefined || status === "SLEEPING"){
 				botUI.removeOverlay();
 				run();
@@ -663,7 +663,7 @@ var createBot = (botUI, settings) => {
 	}
 
 	botUI.chatMicCallback = (inputValue) => {
-		if (settings.interactionMode === 'SOP') {
+		if (settings.interactionMode === 'SOP' || settings.interactionMode === 'GUIDE') {
             const status = getStatus();
             if (status === "SLEEPING" || status === undefined){
                 run();
