@@ -40,6 +40,7 @@ export interface Settings {
     collapsed?: boolean;
     sections?: string[];
     sectionActive?: number;
+    sound?: boolean;
 }
 
 export interface Background {

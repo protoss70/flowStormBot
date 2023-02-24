@@ -489,7 +489,8 @@ var createBot = (botUI, settings) => {
 				// bot.inAudio(status)
 				return;
 			} else {
-				bot.outAudio(status)
+				bot.outAudio(status);
+				settings.sound = !settings.sound
 			}
 		}
 	}
@@ -511,9 +512,10 @@ var createBot = (botUI, settings) => {
 	}
 
 	const run = (minimize = false) => {
-		const { status = undefined } = botState;
+		const status = getStatus();
 		console.log(status);
 		let pauseOnListening = false;
+		bot.setOutAudio(settings.sound, status);
 		switch (status) {
 			case 'SLEEPING':
 				if (!minimize) {

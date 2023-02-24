@@ -81,6 +81,7 @@ const defaults: Settings = {
     sectionActive: 0,
     sections: ["SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK", "LOGIN", "INPUTSELECT"],
     interactionMode: "SOP",
+    sound: true,
 };
 
 const fullScreenWidgetWidth = '100vw';
@@ -280,14 +281,20 @@ class BotUI  {
         BotUI.isMicrophoneEnabled = BotUI.settings.inputAudio;
         if (BotUI.settings.interactionMode !== "SOP" && BotUI.settings.interactionMode != "GUIDE") {
             if (BotUI.isChatEnabled) {
-                BotUI.chatInputMuteElement.classList.add('icon--light');
-            } else {
                 BotUI.chatInputMuteElement.classList.remove('icon--light');
+            } else {
+                BotUI.chatInputMuteElement.classList.add('icon--light');
             }
             if (BotUI.isMicrophoneEnabled) {
                 BotUI.chatInputMicElement.classList.add('icon--light');
             } else {
                 BotUI.chatInputMicElement.classList.remove('icon--light');
+            }
+        }else{
+            if (BotUI.settings.sound) {
+                BotUI.chatInputMuteElement.classList.remove('icon--light');
+            } else {
+                BotUI.chatInputMuteElement.classList.add('icon--light');
             }
         }
         BotUI.backgroundElement = BotUI.element.querySelector('[data-background]');
@@ -340,15 +347,19 @@ class BotUI  {
         }
 
         BotUI.chatInputMuteElement.onclick = (e) => {
-            BotUI.isChatEnabled = !BotUI.isChatEnabled;
-            if (!BotUI.isChatEnabled) {
-                BotUI.chatInputMuteElement.classList.add('icon--light');
-                BotUI.changeClasses(BotUI.settings.volumeIcon, BotUI.settings.muteIcon, BotUI.chatInputMuteElement);
-            } else {
+            BotUI.settings.sound = !BotUI.settings.sound;
+            if (BotUI.settings.sound) {
+                console.log("haha");
                 BotUI.chatInputMuteElement.classList.remove('icon--light');
-                BotUI.changeClasses(BotUI.settings.muteIcon, BotUI.settings.volumeIcon, BotUI.chatInputMuteElement);
+                BotUI.chatInputMuteElement.classList.remove("icon--content--volume-mute");
+                BotUI.chatInputMuteElement.classList.add("icon--content--volume");
+            } else {
+                console.log("hah");
+                BotUI.chatInputMuteElement.classList.add('icon--light');
+                BotUI.chatInputMuteElement.classList.add("icon--content--volume-mute");
+                BotUI.chatInputMuteElement.classList.remove("icon--content--volume");
             }
-            BotUI.getChatMute(BotUI.isChatEnabled, this.chatMuteCallback);
+            BotUI.getChatMute(BotUI.settings.sound, this.chatMuteCallback);
         }
 
         // BotUI.chatInputMicrophoneElement.onclick = (e) => {
@@ -357,9 +368,9 @@ class BotUI  {
         //     BotUI.getChatMicrophone(BotUI.isMicrophoneEnabled, this.chatMicrophoneCallback);
         // }
 
-        BotUI.chatInputMenuElement.onclick = (e) => {
-            BotUI.changeClasses('settings--visible', 'settings--hidden', BotUI.chatInputSettingsElement);
-        }
+        // BotUI.chatInputMenuElement.onclick = (e) => {
+        //     BotUI.changeClasses('settings--visible', 'settings--hidden', BotUI.chatInputSettingsElement);
+        // }
         this.setTextInputEnabled(BotUI.settings.textInputEnabled);
 
         injectCss();
@@ -389,6 +400,18 @@ class BotUI  {
 
         BotUI.chatTextInputElement.oninput = (e) => {
             this.chatTextInputElementCallback(e);
+        }
+
+        if (BotUI.settings.sound) {
+            console.log("haha");
+            BotUI.chatInputMuteElement.classList.remove('icon--light');
+            BotUI.chatInputMuteElement.classList.remove("icon--content--volume-mute");
+            BotUI.chatInputMuteElement.classList.add("icon--content--volume");
+        } else {
+            console.log("hah");
+            BotUI.chatInputMuteElement.classList.add('icon--light');
+            BotUI.chatInputMuteElement.classList.add("icon--content--volume-mute");
+            BotUI.chatInputMuteElement.classList.remove("icon--content--volume");
         }
 
         if (BotUI.settings.interactionMode == "SOP" || BotUI.settings.interactionMode == "GUIDE") {
@@ -432,8 +455,9 @@ class BotUI  {
                 this.setSection("SOP");
                 this.continueCallback();
             }
-        }
 
+            
+        }
         BotUI.setBackground({});
     }
 
@@ -506,8 +530,6 @@ class BotUI  {
     public setModeCallback(mode: string){}
 
     public setInputMode(mode: string){
-        BotUI.chatInputSettingsElement.classList.add("settings--hidden");
-        BotUI.chatInputSettingsElement.classList.remove("settings--visible");
 
         if(mode === 'text'){
             this.removeOverlay();
@@ -518,7 +540,7 @@ class BotUI  {
             BotUI.soundInput.setAttribute("style", "display:none;");
             BotUI.textInput.setAttribute("style", "display:block;");
             BotUI.chatInputBackElement.classList.add("text-mode");
-            BotUI.controllerWrapper.classList.add("text-mode");
+            // BotUI.controllerWrapper.classList.add("text-mode");
             BotUI.settings.standardQuestionMode = mode;
             BotUI.settings.inputMode = mode;
 

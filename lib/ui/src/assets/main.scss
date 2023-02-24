@@ -364,8 +364,10 @@ $amount: 20;
 				}
 
 				&--volume-mute {
-					right: 10px;
-					top: 10px;
+					right: 15px;
+					top: 50%;
+    				transform: translateY(calc(-50% + 2px));
+					z-index: 1;
 				}
 
 				&--speaking-head {
@@ -386,8 +388,10 @@ $amount: 20;
 				}
 
 				&--keyboard {
-					right: 10px;
-					bottom: 10px;
+					right: 45px;
+					top: 50%;
+    				transform: translateY(calc(-50% + 2px));
+					z-index: 1;
 				}
 
 				&--play {

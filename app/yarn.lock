@@ -907,13 +907,13 @@
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
   integrity sha512-5a6wqoJV/xEdbRNKVo6I4hO3VjyDq//8q2f9I6PBAvMesJHFauXDorcNCsr9RzvsZnaWi5NYCcfyqP1QeFHFbw==
 
-"@flowstorm/bot-service@../lib/service/dist/flowstorm-bot-service-0.7.7.tgz":
-  version "0.7.7"
-  resolved "../lib/service/dist/flowstorm-bot-service-0.7.7.tgz#514d367f36aedfffd05fc55129ca56dd2f434233"
+"@flowstorm/bot-service@../lib/service/dist/flowstorm-bot-service-0.7.9.tgz":
+  version "0.7.9"
+  resolved "../lib/service/dist/flowstorm-bot-service-0.7.9.tgz#93d03c149973e356a53a474b2c15be9aaff0ff54"
 
-"@flowstorm/bot-ui@../lib/ui/dist/flowstorm-bot-ui-0.3.6.tgz":
-  version "0.3.6"
-  resolved "../lib/ui/dist/flowstorm-bot-ui-0.3.6.tgz#398ae2a9f43cf2c67b0f7a2a3a0cff3b90e593a8"
+"@flowstorm/bot-ui@../lib/ui/dist/flowstorm-bot-ui-0.4.1.tgz":
+  version "0.4.1"
+  resolved "../lib/ui/dist/flowstorm-bot-ui-0.4.1.tgz#c58b5e7856a2a1684c77226a894a99cd8b515be1"
 
 "@gar/promisify@^1.0.1":
   version "1.1.3"

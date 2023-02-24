@@ -36,10 +36,8 @@ export const sopBaseStructureTemplate = `
                         </button>
                     </div>
                     <div data-chat-ask class="ask-section">
-                        <span data-chat-input-settings class="settings-sop settings--hidden">
-                            <span data-chat-input-keyboard class="icon icon-sop--keyboard"></span>
-                            <span data-chat-input-mute class="icon icon-sop--volume-mute"></span>
-                        </span>
+                        <span data-chat-input-keyboard class="icon icon-sop--keyboard"></span>
+                        <span data-chat-input-mute class="icon icon-sop--volume-mute"></span>
     
                         <div data-sound-input-wrap>
                             <span data-chat-input-mic class="icon icon--largest icon-sop--mic"></span>
@@ -53,9 +51,6 @@ export const sopBaseStructureTemplate = `
                             <span data-chat-input-arrow class="icon icon-sop--arrow-up icon-sop--arrow-up--hidden"></span>
                         
                         </div>
-                        <div data-chat-input-controllers class="data-chat-input-controllers">
-                            <span data-chat-input-menu class="icon icon-sop--menu"></span>
-                        </div>    
     
                         <span data-chat-input-back class="icon icon-sop--back"></span>
     
