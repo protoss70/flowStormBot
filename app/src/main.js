@@ -55,7 +55,8 @@ const botUIDefaultSettings = {
 	animationSpeed: 500,
 	backgroundSimpleAnimation: true,
 	collapsed: true,
-	interactionMode: "GUIDE"
+	interactionMode: "GUIDE",
+	sound: true,
 };
 
 const clientDefaultSetting = {
