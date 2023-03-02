@@ -1,6 +1,6 @@
 {
   "name": "@flowstorm/client",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "main": "client-bot.js",
   "author": "PromethistAI",
   "license": "MIT",
@@ -15,7 +15,7 @@
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.13.12",
     "@flowstorm/bot-service": "../lib/service/dist/flowstorm-bot-service-0.7.9.tgz",
-    "@flowstorm/bot-ui": "../lib/ui/dist/flowstorm-bot-ui-0.4.4.tgz",
+    "@flowstorm/bot-ui": "../lib/ui/dist/flowstorm-bot-ui-0.4.5.tgz",
     "@sentry/browser": "^5.24.2",
     "@sentry/tracing": "^5.24.2",
     "@webpack-cli/serve": "^2.0.1",

@@ -1565,7 +1565,7 @@ canvas{
 	margin-bottom: 0.8em !important;
 	margin-left: 0 !important;
 	margin-right: 0 !important;
-	min-height: 100px;
+	height: 100%;
 	font-size: 24px;
 	font-weight: bold;
 	left: 50%;
@@ -1576,6 +1576,7 @@ canvas{
 	}
 
 	&> img{
+		min-height: 100px;
 		max-height: 300px;
 	}
 }
