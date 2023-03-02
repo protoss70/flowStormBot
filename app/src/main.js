@@ -23,8 +23,9 @@ import './assets/main.scss';
 const scrollSpeed = 120; // pixels per second
 const scrollDelay = 3; // seconds before the scrolling starts
 
+const defaultURL = "5f7db5f1e662e830b20dbe7c"
 const environment = '';
-let botKey = environment === '' || environment === '-preview' ? '5f7db5f1e662e830b20dbe7c' : '606c52c6d750aa1b1537e5d6';
+let botKey = environment === '' || environment === '-preview' ? defaultURL : '606c52c6d750aa1b1537e5d6';
 let studioUrl = environment === 'local' ? 'http://localhost:8089' :  `https://studio${environment}.flowstorm.ai`
 let defaultCoreUrl = environment === 'local' ? 'http://localhost:8080' :  `https://core${environment}.flowstorm.ai`
 
@@ -105,10 +106,13 @@ export const initFSClientBot = (initParams = {}) => {
 	    const urlParamsObject = {};
 	    [...(urlParams.entries())].forEach( (urlParamPair) => urlParamsObject[urlParamPair[0]]=urlParamPair[1])
 		const urlBotKey = urlParams.get('key');
-		if (window.location.pathname.length === 25) {
+		console.log("here", settings.botKey);
+		if (window.location.pathname.length === 25 && settings.botKey === defaultURL) {
 			botKey = window.location.pathname.substring(1);
+			console.log("bur");
 		} else if (urlBotKey !== null && urlBotKey.length === 24) {
 			botKey = urlBotKey;
+			console.log("burda");
 		}
 		const url = new URL(window.location.href);
 		const intMode = url.searchParams.get("m");
@@ -133,20 +137,22 @@ export const initFSClientBot = (initParams = {}) => {
 		createBot(botUI, settings);
 		initBot();
 		bot.stateHandler = stateHandler;
-		bot.getUser().then((user) => {
-			console.log("User: ", user);
-			if (user === null){
-				botUI.setSection("LOGIN");
-			}else{
-				const userInputChoice = user.inputMode;
-				if (userInputChoice === undefined){
-					botUI.setSection("INPUTSELECT");
+		if (settings.interactionMode === "SOP"){
+			bot.getUser().then((user) => {
+				console.log("User: ", user);
+				if (user === null){
+					botUI.setSection("LOGIN");
 				}else{
-					console.log(userInputChoice);
-					botUI.setInputMode(userInputChoice.stringValue);
-				}	
-			} 
-		});
+					const userInputChoice = user.inputMode;
+					if (userInputChoice === undefined){
+						botUI.setSection("INPUTSELECT");
+					}else{
+						console.log(userInputChoice);
+						botUI.setInputMode(userInputChoice.stringValue);
+					}	
+				} 
+			});
+		}
 		if (!bot.getInAudio){
 			botUI.setInputMode("text");
 		}
@@ -390,6 +396,7 @@ var createBot = (botUI, settings) => {
 
 	defaultCallback.handleCommand = (command, code, t) => {
         const payload = JSON.parse(code);
+		console.log(payload);
 	    switch(command) {
 			case '#expression':
 				botUI.sendRTCData({'Expression': { 'Name': payload['name']}});
@@ -421,7 +428,7 @@ var createBot = (botUI, settings) => {
 			case "#actions":
 				buttonInput = true;
 				const oldMode = botUI.getInputMode();
-				console.log(payload);
+				console.log("Button Payload",payload);
 				payload.tiles.forEach(button => {
 					const settings = {
 						oldMode: oldMode,
@@ -446,9 +453,14 @@ var createBot = (botUI, settings) => {
 				handleFile(oldMode, payload.index.toLowerCase(), query);
 				break;
 			case "#suggestions":
-				console.log("here", payload.suggestions);
-				const opts = payload.suggestions.filter(op => op !== 'yes');
-				botUI.setSuggestion(opts);
+				console.log("Suggestions: ", payload.suggestions);
+				botUI.setSuggestion(payload.suggestions);
+				break;
+			case "#media":
+				console.log(payload.videos);
+				payload.videos.forEach(vid => {
+					botUI.setMedia({sound: settings.sound, src: vid});
+				});
 				break;
 			default:
 
@@ -643,8 +655,11 @@ var createBot = (botUI, settings) => {
 	}
 
 	botUI.chatBackCallback = (inputValue) => {
-		botUI.previousSection();
-		bot.setInAudio(botUI.getInputMode() === "voice" ? true : false);
+		if (settings.interactionMode === "SOP"){
+			botUI.previousSection();
+			bot.setInAudio(botUI.getInputMode() === "voice" ? true : false);
+
+		}
 	}
 
 	botUI.suggestionsCallback = (e) => {

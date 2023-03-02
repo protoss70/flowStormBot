@@ -9,23 +9,22 @@
 	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-	<div id="upvTest"><h1>UPV TEST</h1></div>
-	<style>
-		#upvTest{
-			display: flex;
-			width: 100vw;
-			height: 100vh;
-			justify-content: center;
-			align-items: center;
-			font-size: 3vw;
-			font-family: 'Roboto Mono', monospace;
-		}
-	</style>
+	<div id="upvBotKey">
+		<label for="botId">Enter the id of your application from the Flowstorm website</label>
+		<div>
+			<input type="text" name="botId" id="botId" placeholder="ID...">
+			<button onclick="changeBotKey()">Apply</button>
+		</div>
+	</div>
+	<div id="upvTest">
+		<h1>UPV TEST</h1>
+	</div>
+	
 	<div id="botContainer">
 		<div id="botDiv"></div>
 	</div>
 	<script>
-		initFSClientBot({
+		const clientParams = {
 			allowUrlParams: true,
 			collapsable: false,
 			fullScreen: false,
@@ -40,7 +39,52 @@
 			widgetSize: { width: '380px', height: '80vh' },
 			interactionMode: "GUIDE",
 			sound: true,
-		})
+		};
+
+		initFSClientBot({
+			...clientParams,
+		});
+
+		if (window.location.pathname.length === 25) {
+			document.getElementById("botId").value = window.location.pathname.substring(1);
+		}
+		function changeBotKey(){
+			console.log("jere");
+			document.getElementById("botDiv").remove();
+			const newDiv = document.createElement("div");
+			newDiv.id = "botDiv"
+			document.getElementById("botContainer").appendChild(newDiv);
+			initFSClientBot({
+				...clientParams,
+				botKey: document.getElementById("botId").value,
+			})
+		}
+
 	</script>
+
+<style>
+	#upvBotKey{
+		padding: 3% 10%;
+	}
+
+	button:hover{
+		cursor: pointer;
+	}
+
+	#botId{
+		padding: 4px 2px;
+		width: 180px;
+	}
+
+	#upvTest{
+		display: flex;
+		width:100vw;
+		height: 70vh;
+		justify-content: center;
+		align-items: center;
+		font-size: 3vw;
+		font-family: 'Roboto Mono', monospace;
+	}
+</style>
 </body>
 </html>

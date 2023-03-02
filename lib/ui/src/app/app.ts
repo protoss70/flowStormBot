@@ -349,12 +349,10 @@ class BotUI  {
         BotUI.chatInputMuteElement.onclick = (e) => {
             BotUI.settings.sound = !BotUI.settings.sound;
             if (BotUI.settings.sound) {
-                console.log("haha");
                 BotUI.chatInputMuteElement.classList.remove('icon--light');
                 BotUI.chatInputMuteElement.classList.remove("icon--content--volume-mute");
                 BotUI.chatInputMuteElement.classList.add("icon--content--volume");
             } else {
-                console.log("hah");
                 BotUI.chatInputMuteElement.classList.add('icon--light');
                 BotUI.chatInputMuteElement.classList.add("icon--content--volume-mute");
                 BotUI.chatInputMuteElement.classList.remove("icon--content--volume");
@@ -942,6 +940,27 @@ class BotUI  {
             document.querySelector("[data-suggestions-container].data-suggestions-container").appendChild(btn);
         });
         BotUI.scrollToLastMessage(messageElement);
+    }
+
+    public setMedia = (settings:any = {}) => {
+        const messageElement = BotUI.messagesElement;
+        const mediaPlayer = document.createElement('video');
+        const source = document.createElement('source');
+        source.src = settings.src;
+        mediaPlayer.appendChild(source);
+        mediaPlayer.setAttribute('controls','');
+        mediaPlayer.classList.add("chat-message");
+        if (!settings.sound){
+            mediaPlayer.classList.add('bot-muted-video');
+            window.onload = function () {
+                const mediaList = document.getElementsByClassName("bot-muted-video");
+                for (let index = 0; index < mediaList.length; index++) {
+                    const element = mediaList[index] as HTMLVideoElement;
+                    element.muted = true
+                }
+            }
+        }
+        messageElement.appendChild(mediaPlayer);
     }
 
     public setButton = (settings: any = {}, callback: Function = ()=>{}) => {
