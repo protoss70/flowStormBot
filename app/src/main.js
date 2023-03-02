@@ -106,13 +106,10 @@ export const initFSClientBot = (initParams = {}) => {
 	    const urlParamsObject = {};
 	    [...(urlParams.entries())].forEach( (urlParamPair) => urlParamsObject[urlParamPair[0]]=urlParamPair[1])
 		const urlBotKey = urlParams.get('key');
-		console.log("here", settings.botKey);
 		if (window.location.pathname.length === 25 && settings.botKey === defaultURL) {
 			botKey = window.location.pathname.substring(1);
-			console.log("bur");
 		} else if (urlBotKey !== null && urlBotKey.length === 24) {
 			botKey = urlBotKey;
-			console.log("burda");
 		}
 		const url = new URL(window.location.href);
 		const intMode = url.searchParams.get("m");
