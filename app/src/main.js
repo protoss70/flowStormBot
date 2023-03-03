@@ -134,6 +134,13 @@ export const initFSClientBot = (initParams = {}) => {
 		createBot(botUI, settings);
 		initBot();
 		bot.stateHandler = stateHandler;
+		bot.setInCallback = () => {
+			if(settings.inputAudio)	{
+				document.querySelector("[data-chat-input-keyboard]").classList.add("icon-sop--keyboard-active");
+			}else{
+				document.querySelector("[data-chat-input-keyboard]").classList.remove("icon-sop--keyboard-active");
+			}
+		}
 		if (settings.interactionMode === "SOP"){
 			bot.getUser().then((user) => {
 				console.log("User: ", user);
@@ -149,9 +156,8 @@ export const initFSClientBot = (initParams = {}) => {
 					}	
 				} 
 			});
-		}
-		if (!bot.getInAudio){
-			botUI.setInputMode("text");
+		}else if (settings.interactionMode === "GUIDE" || settings.interactionMode === "SOP"){
+			bot.setInAudio(false, getStatus());
 		}
 	} else {
 		let { elementId = null } = settings;
@@ -439,10 +445,10 @@ var createBot = (botUI, settings) => {
 						if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
 							bot.handleOnTextInput(`#${button.action}`, false, {buttonInput: true});
 						}
-						bot.setInAudio(botUI.getInputMode() === "voice" ? true : false);
+						bot.setInAudio(settings.inputAudio, getStatus());
 						buttonInput = false;
 					});
-					bot.setInAudio(false);
+					bot.setInAudio(false, getStatus());
 				});
 				break;
 			case "#pdf":
@@ -535,7 +541,7 @@ var createBot = (botUI, settings) => {
 				break;
 			case 'LISTENING':
 				if (settings.interactionMode !== "SOP"){
-					bot.setInAudio(false);
+					bot.setInAudio(false, getStatus());
 					pauseOnListening = !pauseOnListening;
 					changePlayIcon(pauseOnListening, botUI);
 				}
@@ -553,7 +559,7 @@ var createBot = (botUI, settings) => {
 				bot.resume()
 				if (settings.avatarURL) {
 				    botUI.sendRTCData({'Pause': "false"});
-					bot.setInAudio(botUI.getInputMode() === "voice" ? true : false);
+					bot.setInAudio(botUI.getInputMode() === "voice" ? true : false, getStatus());
 					botUI.resume(botUI.getInputMode, buttonInput);
 				}
 				break;
@@ -654,7 +660,7 @@ var createBot = (botUI, settings) => {
 	botUI.chatBackCallback = (inputValue) => {
 		if (settings.interactionMode === "SOP"){
 			botUI.previousSection();
-			bot.setInAudio(botUI.getInputMode() === "voice" ? true : false);
+			bot.setInAudio(botUI.getInputMode() === "voice" ? true : false, getStatus());
 
 		}
 	}
@@ -666,14 +672,13 @@ var createBot = (botUI, settings) => {
 
 	botUI.setModeCallback = (mode) => {
 		if (mode === "voice"){
-			bot.setInAudio(true);
+			bot.setInAudio(true, getStatus());
 			if(getStatus() === "LISTENING"){
 				bot.inAudio("LISTENING");
 				botUI.addOverlay();
 			}
 		}else if(mode === "sop"){
-			bot.setInAudio(false);
-			bot.closeAudioStream('handleTextInput', false);
+			bot.setInAudio(false, getStatus());
 		}
 	}
 
@@ -716,14 +721,29 @@ var createBot = (botUI, settings) => {
 	}
 
 	botUI.chatKeyboardCallback = (inputValue) => {
-		var mode = botUI.getInputMode();
-		mode = mode === "text" ? "voice" : "text";
-		botUI.setInputMode(mode);
-		bot.setInAudio(mode === "voice" ? true : false);
-		bot.updateUser({"inputMode": mode});
-		if (mode === "voice" && getState() === "LISTENING"){
-			botUI.addOverlay();
+		settings.inputAudio = !settings.inputAudio;
+		bot.setInAudio(settings.inputAudio, getStatus());
+		if(settings.inputAudio)	{
+			document.querySelector("[data-chat-input-keyboard]").classList.add("icon-sop--keyboard-active");
+		}else{
+			document.querySelector("[data-chat-input-keyboard]").classList.remove("icon-sop--keyboard-active");
 		}
+		//Only changes the section to voice.
+		if (false){
+			var mode = botUI.getInputMode();
+			mode = mode === "text" ? "voice" : "text";
+			botUI.setInputMode(mode);
+			bot.setInAudio(mode === "voice" ? true : false, getStatus());
+			bot.updateUser({"inputMode": mode});
+			bot.setInAudio(mode === "voice", getStatus());
+			if (mode === "voice" && getState() === "LISTENING"){
+				botUI.addOverlay();
+			}
+		}
+	}
+
+	botUI.getSettings = () => {
+		return settings;
 	}
 
 	botUI.chatStopCallback = (inputValue) => stop();

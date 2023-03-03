@@ -1138,7 +1138,14 @@ class BotUI  {
 
     public chatBackCallback = (...value) => {}
 
-    public chatKeyboardCallback = (...value) => {}
+    public chatKeyboardCallback = (...value) => {
+        BotUI.settings.inputAudio = !BotUI.settings.inputAudio;
+        if(BotUI.settings.inputAudio)	{
+			document.querySelector("[data-chat-input-keyboard]").classList.add("icon-sop--keyboard-active");
+		}else{
+			document.querySelector("[data-chat-input-keyboard]").classList.remove("icon-sop--keyboard-active");
+		}
+    }
 
     public chatSopNextCallback = (...value) => {}
 
@@ -1161,32 +1168,32 @@ class BotUI  {
     }
 
     public setUserMessageBackgroundColor = (color: string) => {
-        const backgroundColor = isNil(color) || !is(String, color) ? BotUI.settings.userMessageBackgroundColor : color;
+        const backgroundColor = isNil(color) || !is(String, color) ? this.getSettings().userMessageBackgroundColor : color;
         BotUI.element.style.setProperty('--bot-ui-message-background-user', backgroundColor);
     }
 
     public setBotMessageBackgroundColor = (color: string) => {
-        const backgroundColor = isNil(color) || !is(String, color) ? BotUI.settings.botMessageBackgroundColor : color;
+        const backgroundColor = isNil(color) || !is(String, color) ? this.getSettings().botMessageBackgroundColor : color;
         BotUI.element.style.setProperty('--bot-ui-message-background-bot', backgroundColor);
     }
 
     public setUserMessageTextColor = (color: string) => {
-        const textColor = isNil(color) || !is(String, color) ? BotUI.settings.userMessageTextColor : color;
+        const textColor = isNil(color) || !is(String, color) ? this.getSettings().userMessageTextColor : color;
         BotUI.element.style.setProperty('--bot-ui-message-color-user', textColor);
     }
 
     public setBotMessageTextColor = (color: string) => {
-        const textColor = isNil(color) || !is(String, color) ? BotUI.settings.botMessageTextColor : color;
+        const textColor = isNil(color) || !is(String, color) ? this.getSettings().botMessageTextColor : color;
         BotUI.element.style.setProperty('--bot-ui-message-color-bot', textColor);
     }
 
     public setUserMessageTextOutlineColor = (color: string) => {
-        const textOutlineColor = isNil(color) || !is(String, color) ? BotUI.settings.userMessageTextOutlineColor : color;
+        const textOutlineColor = isNil(color) || !is(String, color) ? this.getSettings().userMessageTextOutlineColor : color;
         BotUI.element.style.setProperty('--bot-ui-message-color-outline-user', textOutlineColor);
     }
 
     public setBotMessageTextOutlineColor = (color: string) => {
-        const textOutlineColor = isNil(color) || !is(String, color) ? BotUI.settings.botMessageTextOutlineColor : color;
+        const textOutlineColor = isNil(color) || !is(String, color) ? this.getSettings().botMessageTextOutlineColor : color;
         BotUI.element.style.setProperty('--bot-ui-message-color-outline-bot', textOutlineColor);
     }
 
@@ -1380,6 +1387,10 @@ class BotUI  {
         const jsonMessage = JSON.stringify(message);
         console.log('Sending message: ' + jsonMessage);
         BotUI.avatarWs.send(jsonMessage);
+    }
+
+    public getSettings = () => {
+        return BotUI.settings;
     }
 
     public sendRTCData = (descriptor) => {

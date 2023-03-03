@@ -388,10 +388,30 @@ $amount: 20;
 				}
 
 				&--keyboard {
-					right: 45px;
+					right: 52px;
 					top: 50%;
     				transform: translateY(calc(-50% + 2px));
 					z-index: 1;
+
+					&::before{
+						padding: 6px;
+						padding-left: 7px;
+					}
+
+					&-active::before{
+						background-color: rgba(232, 50, 50, 1);
+						border-radius: 50%;
+						color: white;
+						animation: bgColor 0.4s infinite alternate ease-in-out;
+					}
+					@keyframes bgColor {
+						0% {
+							background-color: rgba(232, 50, 50, 1);
+						}
+						100% {
+							background-color: rgba(232, 50, 50, 0.6);
+						}
+					}
 				}
 
 				&--play {

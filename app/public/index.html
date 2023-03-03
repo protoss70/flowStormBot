@@ -17,7 +17,7 @@
 		</div>
 	</div>
 	<div id="upvTest">
-		<h1>UPV TEST</h1>
+		<h1 id="title">UPV TEST</h1>
 	</div>
 	
 	<div id="botContainer">
@@ -58,6 +58,12 @@
 				...clientParams,
 				botKey: document.getElementById("botId").value,
 			})
+		}
+
+		var url = new URL(window.location.href);
+		var title = url.searchParams.get("title");
+		if (title){
+			document.getElementById("title").textContent = title;
 		}
 
 	</script>
