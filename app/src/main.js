@@ -36,6 +36,7 @@ let termsId = undefined
 const converter = new Converter();
 var botInitializer = new BotInitializer();
 var buttonInput = false;
+var pushToTalk = true;
 
 const audios = {};
 
@@ -139,7 +140,16 @@ export const initFSClientBot = (initParams = {}) => {
 				document.querySelector("[data-chat-input-keyboard]").classList.add("icon-sop--keyboard-active");
 			}else{
 				document.querySelector("[data-chat-input-keyboard]").classList.remove("icon-sop--keyboard-active");
+				botUI.removeOverlay();
 			}
+		}
+		bot.audioInputCallback = () => {
+			if (pushToTalk){
+				pushToTalk = false;
+				settings.inputAudio = false;
+				bot.setInAudio(settings.inputAudio);
+				botUI.removeSuggestions();
+			}	
 		}
 		if (settings.interactionMode === "SOP"){
 			bot.getUser().then((user) => {
@@ -721,12 +731,11 @@ var createBot = (botUI, settings) => {
 	}
 
 	botUI.chatKeyboardCallback = (inputValue) => {
-		settings.inputAudio = !settings.inputAudio;
-		bot.setInAudio(settings.inputAudio, getStatus());
-		if(settings.inputAudio)	{
-			document.querySelector("[data-chat-input-keyboard]").classList.add("icon-sop--keyboard-active");
-		}else{
-			document.querySelector("[data-chat-input-keyboard]").classList.remove("icon-sop--keyboard-active");
+		if (getStatus() === "LISTENING"){
+			settings.inputAudio = !settings.inputAudio;
+			pushToTalk = settings.inputAudio;
+			bot.setInAudio(settings.inputAudio, getStatus());
+			botUI.addOverlay();
 		}
 		//Only changes the section to voice.
 		if (false){
