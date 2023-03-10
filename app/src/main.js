@@ -36,7 +36,7 @@ let termsId = undefined
 const converter = new Converter();
 var botInitializer = new BotInitializer();
 var buttonInput = false;
-var pushToTalk = true;
+var talkMode = "PUSH";
 
 const audios = {};
 
@@ -107,9 +107,13 @@ export const initFSClientBot = (initParams = {}) => {
 	    const urlParamsObject = {};
 	    [...(urlParams.entries())].forEach( (urlParamPair) => urlParamsObject[urlParamPair[0]]=urlParamPair[1])
 		const urlBotKey = urlParams.get('key');
+		const botKeyStorage = localStorage.getItem("bot-app-active");
 		if (window.location.pathname.length === 25 && settings.botKey === defaultURL) {
 			botKey = window.location.pathname.substring(1);
-		} else if (urlBotKey !== null && urlBotKey.length === 24) {
+		}else if (botKeyStorage){
+			botKey = botKeyStorage;
+		} 
+		else if (urlBotKey !== null && urlBotKey.length === 24) {
 			botKey = urlBotKey;
 		}
 		const url = new URL(window.location.href);
@@ -143,13 +147,16 @@ export const initFSClientBot = (initParams = {}) => {
 				botUI.removeOverlay();
 			}
 		}
+
 		bot.audioInputCallback = () => {
-			if (pushToTalk){
-				pushToTalk = false;
-				settings.inputAudio = false;
-				bot.setInAudio(settings.inputAudio);
-				botUI.removeSuggestions();
-			}	
+			if (talkMode === "PUSH"){
+				if (settings.inputAudio){
+					settings.inputAudio = false;
+					bot.setInAudio(settings.inputAudio, getStatus());
+					botUI.removeSuggestions();
+					botUI.removeOverlay();
+				}
+			}
 		}
 		if (settings.interactionMode === "SOP"){
 			bot.getUser().then((user) => {
@@ -376,6 +383,7 @@ var createBot = (botUI, settings) => {
 		}else if(files.predictions.length === 0){
 			//NO PDF FILES FOUND
 			defaultCallback.addMessage("received", `No solutions were found.`, null, null);
+			bot.audioInputCallback();
 			bot.handleOnTextInput(`continue`, false, {sopInput: true});
 		}else{
 			//SUCCESS
@@ -455,15 +463,17 @@ var createBot = (botUI, settings) => {
 						if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
 							bot.handleOnTextInput(`#${button.action}`, false, {buttonInput: true});
 						}
-						bot.setInAudio(settings.inputAudio, getStatus());
+						// bot.setInAudio(settings.inputAudio, getStatus());
 						buttonInput = false;
 					});
-					bot.setInAudio(false, getStatus());
+					// bot.setInAudio(false, getStatus());
+					bot.audioInputCallback();
 				});
 				break;
 			case "#pdf":
 				const query = botUI.getLastUserMessage().children[0].textContent;
 				handleFile(oldMode, payload.index.toLowerCase(), query);
+				bot.audioInputCallback();
 				break;
 			case "#suggestions":
 				console.log("Suggestions: ", payload.suggestions);
@@ -515,8 +525,8 @@ var createBot = (botUI, settings) => {
 				// bot.inAudio(status)
 				return;
 			} else {
-				bot.outAudio(status);
 				settings.sound = !settings.sound
+				bot.setOutAudio(settings.sound, status);
 			}
 		}
 	}
@@ -733,9 +743,8 @@ var createBot = (botUI, settings) => {
 	botUI.chatKeyboardCallback = (inputValue) => {
 		if (getStatus() === "LISTENING"){
 			settings.inputAudio = !settings.inputAudio;
-			pushToTalk = settings.inputAudio;
 			bot.setInAudio(settings.inputAudio, getStatus());
-			botUI.addOverlay();
+			if (settings.inputAudio) botUI.addOverlay();
 		}
 		//Only changes the section to voice.
 		if (false){

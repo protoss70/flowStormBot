@@ -15,6 +15,13 @@
 			<input type="text" name="botId" id="botId" placeholder="ID...">
 			<button onclick="changeBotKey()">Apply</button>
 		</div>
+		<br>
+		<div id="parentHistory" class="hidden-index">
+			<div>ID History</div>
+			<ul id="oldItemsList">
+			</ul>
+			<button onclick="clearHistory()">clear history</button>
+		</div>
 	</div>
 	<div id="upvTest">
 		<h1 id="title">UPV TEST</h1>
@@ -46,24 +53,84 @@
 		});
 
 		if (window.location.pathname.length === 25) {
-			document.getElementById("botId").value = window.location.pathname.substring(1);
+			const elem = document.getElementById("botId");
+			elem.value = window.location.pathname.substring(1);
 		}
+
+		window.addEventListener("load", () => {
+			const elem = document.getElementById("botId");
+			const storageItem = localStorage.getItem("bot-app-active");
+			if (elem.value.length === 0 && storageItem){
+				elem.value = storageItem;
+			}
+			var oldList = localStorage.getItem("bot-app-ids");
+			if (oldList && JSON.parse(oldList).length > 1){
+				document.getElementById("parentHistory").classList.remove('hidden-index');
+				oldList = JSON.parse(oldList);
+				for (let index = 1; index < oldList.length; index++) {
+					const element = oldList[oldList.length - index - 1];
+					addLinkElement(element);
+				}
+			}
+		});
+
+		function clearHistory(){
+			console.log("here");
+			localStorage.removeItem('bot-app-ids');
+			window.location.reload();
+		}
+
 		function changeBotKey(){
-			console.log("jere");
-			document.getElementById("botDiv").remove();
-			const newDiv = document.createElement("div");
-			newDiv.id = "botDiv"
-			document.getElementById("botContainer").appendChild(newDiv);
-			initFSClientBot({
-				...clientParams,
-				botKey: document.getElementById("botId").value,
-			})
+			const endpoint = document.getElementById("botId").value;
+			if (!endpoint) return;
+
+			var oldList = localStorage.getItem("bot-app-ids");
+	
+			if (oldList){
+				oldList = JSON.parse(oldList);
+				console.log(oldList);
+				var pass = true;
+				for (let index = 0; index < oldList.length; index++) {
+					if (oldList[index] === endpoint){
+						pass = false;
+						oldList.splice(index, 1);
+						oldList.push(endpoint);
+						break;
+					}
+				}
+				if (pass){
+					oldList.push(endpoint);
+					if (oldList.length > 5){
+						oldList.shift();
+					}
+				}
+			}else{
+				oldList = [endpoint];
+			}
+
+			localStorage.setItem("bot-app-ids", JSON.stringify(oldList));
+			localStorage.setItem("bot-app-active", endpoint);
+			window.location.reload();
 		}
 
 		var url = new URL(window.location.href);
 		var title = url.searchParams.get("title");
 		if (title){
 			document.getElementById("title").textContent = title;
+		}
+
+		function addLinkElement(text){
+			const el = document.createElement("li");
+			const inner = document.createElement("span");
+			inner.onclick = (e) => {
+				const val = e.target.textContent;
+				document.getElementById("botId").value = val;
+				changeBotKey();
+			}
+			el.append(inner);
+			inner.textContent = text;
+			inner.classList.add("idItems");
+			document.getElementById("oldItemsList").append(el);
 		}
 
 	</script>
@@ -91,6 +158,20 @@
 		font-size: 3vw;
 		font-family: 'Roboto Mono', monospace;
 	}
+
+	.idItems{
+		color: rgb(0,0,238);
+		text-decoration: underline;
+	}
+
+	.idItems:hover{
+		cursor: pointer;
+	}
+
+	.hidden-index{
+		display: none !important;
+	}
+
 </style>
 </body>
 </html>
