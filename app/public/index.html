@@ -9,7 +9,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-	<div id="upvBotKey">
+	<div id="upvBotKey" class="hidden">
 		<label for="botId">Enter the id of your application from the Flowstorm website</label>
 		<div>
 			<input type="text" name="botId" id="botId" placeholder="ID...">
@@ -55,6 +55,12 @@
 		if (window.location.pathname.length === 25) {
 			const elem = document.getElementById("botId");
 			elem.value = window.location.pathname.substring(1);
+			localStorage.setItem("bot-app-active", elem.value);
+			localStorage.removeItem("bot-app-ids");
+		}
+		else{
+			document.getElementById("upvBotKey").classList.remove("hidden");
+			console.log("baba");
 		}
 
 		window.addEventListener("load", () => {
@@ -138,6 +144,12 @@
 <style>
 	#upvBotKey{
 		padding: 3% 10%;
+		position: absolute;
+		
+	}
+
+	#upvBotKey.hidden{
+		display: none;
 	}
 
 	button:hover{
@@ -152,7 +164,7 @@
 	#upvTest{
 		display: flex;
 		width:100vw;
-		height: 70vh;
+		height: 100vh;
 		justify-content: center;
 		align-items: center;
 		font-size: 3vw;
