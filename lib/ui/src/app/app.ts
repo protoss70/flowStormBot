@@ -401,12 +401,10 @@ class BotUI  {
         }
 
         if (BotUI.settings.sound) {
-            console.log("haha");
             BotUI.chatInputMuteElement.classList.remove('icon--light');
             BotUI.chatInputMuteElement.classList.remove("icon--content--volume-mute");
             BotUI.chatInputMuteElement.classList.add("icon--content--volume");
         } else {
-            console.log("hah");
             BotUI.chatInputMuteElement.classList.add('icon--light');
             BotUI.chatInputMuteElement.classList.add("icon--content--volume-mute");
             BotUI.chatInputMuteElement.classList.remove("icon--content--volume");
@@ -893,7 +891,6 @@ class BotUI  {
     private pdfButton = async (settings: any) => {
         this.toggleLoader(true);
         const url = await settings.pdf.url();
-        console.log("here", url);
         this.toggleLoader(false);
         const pdfUrl = url + "#toolbar=0";
         BotUI.pdfViewer.remove();

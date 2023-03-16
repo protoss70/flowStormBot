@@ -374,7 +374,7 @@ var createBot = (botUI, settings) => {
 	async function handleFile(oldMode, index, query){
 		console.log(index, query);
 		botUI.toggleLoader(true);
-		const files = (await bot.getFiles(query, ["kuka_new"], [8431766985439058164], 10)).data;
+		const files = (await bot.getFiles(query, "http://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
 		botUI.toggleLoader(false);
 		console.log(files);
 		if (files === undefined){
@@ -471,7 +471,7 @@ var createBot = (botUI, settings) => {
 					bot.audioInputCallback();
 				});
 				break;
-			case "#pdf":
+			case "#pdf" || '#search':
 				const query = botUI.getLastUserMessage().children[0].textContent;
 				handleFile(oldMode, payload.index.toLowerCase(), query);
 				bot.audioInputCallback();

@@ -7,6 +7,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+	
 </head>
 <body>
 	<div id="upvBotKey" class="hidden">
@@ -60,7 +61,6 @@
 		}
 		else{
 			document.getElementById("upvBotKey").classList.remove("hidden");
-			console.log("baba");
 		}
 
 		window.addEventListener("load", () => {
@@ -81,7 +81,6 @@
 		});
 
 		function clearHistory(){
-			console.log("here");
 			localStorage.removeItem('bot-app-ids');
 			window.location.reload();
 		}
@@ -94,7 +93,6 @@
 	
 			if (oldList){
 				oldList = JSON.parse(oldList);
-				console.log(oldList);
 				var pass = true;
 				for (let index = 0; index < oldList.length; index++) {
 					if (oldList[index] === endpoint){
