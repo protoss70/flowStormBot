@@ -374,7 +374,7 @@ var createBot = (botUI, settings) => {
 	async function handleFile(oldMode, index, query){
 		console.log(index, query);
 		botUI.toggleLoader(true);
-		const files = (await bot.getFiles(query, "http://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
+		const files = (await bot.getFiles(query)).data;
 		botUI.toggleLoader(false);
 		console.log(files);
 		if (files === undefined){
