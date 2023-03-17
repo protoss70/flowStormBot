@@ -40,6 +40,8 @@ import {
     wsConnection,
 } from './utils';
 
+console.log(window.innerWidth);
+
 const defaults: Settings = {
     animationSpeed: 500,
     backgroundAdvancedAnimationParticlesCount: 20,
@@ -62,8 +64,8 @@ const defaults: Settings = {
     guiMode: GUIMode.KIOSK,
     imageAverageColorOpacity: 0.5,
     widgetSize: {
-        height: '500px',
-        width: '800px',
+        height: '600px',
+        width: '400px',
     },
     userMessageBackgroundColor: 'rgba(255, 255, 255, .3)',
     userMessageTextColor: '#ffffff',

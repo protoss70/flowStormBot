@@ -12,16 +12,12 @@
 			const botUI = new BotUI('stage', {
 			    guiMode: 'chat', // 'kiosk' or 'chat'
 			    fullScreen: false,
-                widgetSize: {
-			        width: '400px',
-			        height: '600px',
-                },
                 imageAverageColorOpacity: 0.5,
                 backgroundImageBlur: 5,
                 animationSpeed: 500,
                 backgroundAdvancedAnimationParticlesCount: 0,
                 backgroundSimpleAnimation: false,
-				collapsable: false,
+				collapsable: true,
 				collapsed: false,
                 interactionMode: "GUIDE",
                 sound: false,
@@ -32,8 +28,6 @@
             botUI.setBotText("Bot said something more interesting ...");
             botUI.setImage('https://upload.wikimedia.org/wikipedia/tr/7/77/Lukepromo2321.jpg');
             botUI.setBotText("Bot said something more interesting and very long like it is very very interesting so that you wanna know what happening...");
-            botUI.setMedia({sound:false, src:"https://core.flowstorm.ai/file/assets/spaces/63f8db8aa1284d1dfc26873e"});
-            botUI.setButton({background: "https://core.flowstorm.ai/file/assets/spaces/6400949ea1284d1dfc3f731d", action:"pic1", active: true, groupName: "annen"})
             // botUI.setUserText("You said");
             botUI.chatInputCallback = ((inputValue) => {
                console.log(`Do something with input value - ${inputValue}`);

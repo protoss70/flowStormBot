@@ -78,8 +78,8 @@ To init BotUI you have to create `new BotUI(<ID of element>, <settings>)`.
   guiMode: GUIMode.KIOSK,
   imageAverageColorOpacity: 0.5,
   widgetSize: {
-    height: '500px',
-    width: '800px',
+    height: '600px',
+    width: '400px',
   },
   userMessageBackgroundColor: 'rgba(255, 255, 255, .3)',
   userMessageTextColor: '#ffffff',

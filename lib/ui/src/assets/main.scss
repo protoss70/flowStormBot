@@ -75,6 +75,32 @@ $amount: 20;
 	}
 }
 
+[data-with-chat-input]:not([data-collapsable='collapsed']){
+	max-height: 80vh;
+	max-width: 90vw;
+	min-height: 60vh;
+	min-width: 30vh;
+}
+
+@media (max-width: 1500px){
+	[data-messages]{
+		font-size: 1.2rem;
+	}
+}
+
+@media (max-width: 1000px){
+	[data-messages]{
+		font-size: 1.3rem;
+	}
+}
+
+@media (max-width: 650px){
+	[data-messages]{
+		font-size: 1.4rem;
+	}
+}
+
+
 .bot {
 	background-color: transparent;
 	overflow: hidden;
@@ -1246,7 +1272,6 @@ $amount: 20;
 
 }
   
-
 [data-messages]{
 	&.hidden{
 		display: none !important;
