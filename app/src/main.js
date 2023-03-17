@@ -42,8 +42,6 @@ const audios = {};
 
 const regex = /https:\/\/core(-([0-9]+|preview)){0,1}.flowstorm.ai\/file\/tts\/[0-9a-f]+\.wav/g
 
-console.log("new version");
-
 const botUIDefaultSettings = {
 	guiMode: 'chat',
 	fullScreen: false,
@@ -156,11 +154,16 @@ export const initFSClientBot = (initParams = {}) => {
 				if (settings.inputAudio){
 					settings.inputAudio = false;
 					bot.setInAudio(settings.inputAudio, getStatus());
-					botUI.removeSuggestions();
+					// botUI.removeSuggestions();
 					botUI.removeOverlay();
 				}
 			}
 		}
+
+		addEventListener("audioend", (event) => {
+			console.log("voice input ended");
+		});
+
 		if (settings.interactionMode === "SOP"){
 			bot.getUser().then((user) => {
 				console.log("User: ", user);
@@ -452,7 +455,6 @@ var createBot = (botUI, settings) => {
 			case "#actions":
 				buttonInput = true;
 				const oldMode = botUI.getInputMode();
-				console.log("Button Payload",payload);
 				payload.tiles.forEach(button => {
 					const settings = {
 						oldMode: oldMode,
@@ -479,11 +481,9 @@ var createBot = (botUI, settings) => {
 				bot.audioInputCallback();
 				break;
 			case "#suggestions":
-				console.log("Suggestions: ", payload.suggestions);
 				botUI.setSuggestion(payload.suggestions);
 				break;
 			case "#media":
-				console.log(payload.videos);
 				payload.videos.forEach(vid => {
 					botUI.setMedia({sound: settings.sound, src: vid});
 				});
