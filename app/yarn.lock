@@ -911,9 +911,9 @@
   version "1.5.2"
   resolved "../lib/service/dist/flowstorm-bot-service-1.5.2.tgz#9099d87bfe568a975c96f839c4c094dff9cb01a8"
 
-"@flowstorm/bot-ui@../lib/ui/dist/flowstorm-bot-ui-1.3.6.tgz":
-  version "1.3.6"
-  resolved "../lib/ui/dist/flowstorm-bot-ui-1.3.6.tgz#1c8f98b4867ba01b659d5da15fabfa7886bba0fd"
+"@flowstorm/bot-ui@../lib/ui/dist/flowstorm-bot-ui-1.4.3.tgz":
+  version "1.4.3"
+  resolved "../lib/ui/dist/flowstorm-bot-ui-1.4.3.tgz#44275fa492f7cb39c657bf68945f81fb2fdd4b10"
 
 "@gar/promisify@^1.0.1":
   version "1.1.3"
