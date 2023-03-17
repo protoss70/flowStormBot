@@ -42,6 +42,8 @@ const audios = {};
 
 const regex = /https:\/\/core(-([0-9]+|preview)){0,1}.flowstorm.ai\/file\/tts\/[0-9a-f]+\.wav/g
 
+console.log("new version");
+
 const botUIDefaultSettings = {
 	guiMode: 'chat',
 	fullScreen: false,

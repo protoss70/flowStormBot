@@ -82,23 +82,32 @@ $amount: 20;
 	min-width: 30vh;
 }
 
-@media (max-width: 1500px){
+@media (min-width: 100px){
 	[data-messages]{
-		font-size: 1.2rem;
+		font-size: 1.5rem;
 	}
 }
 
-@media (max-width: 1000px){
+@media (min-width: 650px){
 	[data-messages]{
 		font-size: 1.3rem;
 	}
 }
 
-@media (max-width: 650px){
+@media (min-width: 1000px){
 	[data-messages]{
-		font-size: 1.4rem;
+		font-size: 1.2rem;
 	}
 }
+
+@media (min-width: 1500px){
+	[data-messages]{
+		font-size: 1rem;
+	}
+}
+
+
+
 
 
 .bot {
