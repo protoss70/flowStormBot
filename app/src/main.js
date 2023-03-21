@@ -108,12 +108,12 @@ export const initFSClientBot = (initParams = {}) => {
 	    [...(urlParams.entries())].forEach( (urlParamPair) => urlParamsObject[urlParamPair[0]]=urlParamPair[1])
 		const urlBotKey = urlParams.get('key');
 		const botKeyStorage = localStorage.getItem("bot-app-active");
-		if (botKeyStorage){
-			botKey = botKeyStorage;
-		} 
-		else if (window.location.pathname.length === 25 && settings.botKey === defaultURL) {
+		if (window.location.pathname.length === 25 && settings.botKey === defaultURL) {
 			botKey = window.location.pathname.substring(1);
 		}
+		else if (botKeyStorage){
+			botKey = botKeyStorage;
+		} 
 		else if (urlBotKey !== null && urlBotKey.length === 24) {
 			botKey = urlBotKey;
 		}
@@ -159,10 +159,6 @@ export const initFSClientBot = (initParams = {}) => {
 				}
 			}
 		}
-
-		addEventListener("audioend", (event) => {
-			console.log("voice input ended");
-		});
 
 		if (settings.interactionMode === "SOP"){
 			bot.getUser().then((user) => {
