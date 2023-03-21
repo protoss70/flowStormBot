@@ -375,7 +375,7 @@ var createBot = (botUI, settings) => {
 	async function handleFile(oldMode, index, query){
 		console.log(index, query);
 		botUI.toggleLoader(true);
-		const files = (await bot.getFiles(query)).data;
+		const files = (await bot.getFiles(query, url="http://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
 		botUI.toggleLoader(false);
 		console.log(files);
 		if (files === undefined){
@@ -477,7 +477,15 @@ var createBot = (botUI, settings) => {
 				bot.audioInputCallback();
 				break;
 			case "#suggestions":
-				botUI.setSuggestion(payload.suggestions);
+				if (payload.nodes){
+					const suggestionText = [];
+					payload.nodes.forEach(node => {
+						suggestionText.push(node.text);
+					});
+					botUI.setSuggestion(suggestionText);
+				}else{
+					botUI.setSuggestion(payload.suggestions);
+				}
 				break;
 			case "#media":
 				payload.videos.forEach(vid => {

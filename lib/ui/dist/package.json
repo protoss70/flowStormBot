@@ -1,6 +1,6 @@
 {
 	"name": "@flowstorm/bot-ui",
-	"version": "1.5.1",
+	"version": "1.6.1",
 	"main": "app.bundle.js",
 	"author": "PromethistAI",
 	"license": "MIT",
