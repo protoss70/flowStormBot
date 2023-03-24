@@ -373,48 +373,53 @@ var createBot = (botUI, settings) => {
 	}
 
 	async function handleFile(oldMode, index, query){
+		const fileCallback = (response) => {
+			const files = response
+			botUI.toggleLoader(false);
+			console.log(files);
+			if (files === undefined){
+				//SERVER ERROR
+				defaultCallback.addMessage("received", `Sorry, something went wrong!`, null, null);
+				bot.handleOnTextInput(`continue`, false, {sopInput: true});
+			}else if(files.length === 0){
+				//NO PDF FILES FOUND
+				defaultCallback.addMessage("received", `No solutions were found.`, null, null);
+				bot.audioInputCallback();
+				bot.handleOnTextInput(`continue`, false, {sopInput: true});
+			}else{
+				console.log("success");
+				//SUCCESS
+				botUI.continueCallback = () => {
+					bot.handleOnTextInput(`continue`, false, {sopInput: true});
+				}
+		
+				botUI.askAnotherCallback = () => {
+					bot.handleOnTextInput(`ask another`, false, {sopInput: true});
+				}
+				
+				files.predictions.forEach(file => {
+					const page = parseInt(file.name.replace(".pdf", ""));
+					file.text = file.doc_name + ", page: " + page;
+					file.page = page;
+					file.url = async () => {return `https://manual-search-develop.alquist.ai/download/${index}/${page}.pdf`;};
+					const settings = {
+						oldMode: oldMode,
+						groupName: "pdfFiles",
+						disableGroup: false,
+						appSelect: false,
+						solutions: true,
+						text:  file.text,
+						pdf: {...file}
+					}
+					botUI.setButton(settings, () => {});
+					console.log(settings);
+				});
+			}
+		}
+
 		console.log(index, query);
 		botUI.toggleLoader(true);
-		const files = (await bot.getFiles(query, url="http://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
-		botUI.toggleLoader(false);
-		console.log(files);
-		if (files === undefined){
-			//SERVER ERROR
-			defaultCallback.addMessage("received", `Sorry, something went wrong!`, null, null);
-			bot.handleOnTextInput(`continue`, false, {sopInput: true});
-		}else if(files.predictions.length === 0){
-			//NO PDF FILES FOUND
-			defaultCallback.addMessage("received", `No solutions were found.`, null, null);
-			bot.audioInputCallback();
-			bot.handleOnTextInput(`continue`, false, {sopInput: true});
-		}else{
-			//SUCCESS
-			botUI.continueCallback = () => {
-				bot.handleOnTextInput(`continue`, false, {sopInput: true});
-			}
-	
-			botUI.askAnotherCallback = () => {
-				bot.handleOnTextInput(`ask another`, false, {sopInput: true});
-			}
-			
-			files.predictions.forEach(file => {
-				const page = parseInt(file.name.replace(".pdf", ""));
-				file.text = file.doc_name + ", page: " + page;
-				file.page = page;
-				file.url = async () => {return `https://manual-search-develop.alquist.ai/download/${index}/${page}.pdf`;};
-				const settings = {
-					oldMode: oldMode,
-					groupName: "pdfFiles",
-					disableGroup: false,
-					appSelect: false,
-					solutions: true,
-					text:  file.text,
-					pdf: {...file}
-				}
-				botUI.setButton(settings, () => {});
-				console.log(settings);
-			});
-		}
+		await bot.getFiles(query, url="https://upv-search-develop.alquist.ai/v2/models/upv-search/infer", fileCallback);
 	}
 
 	defaultCallback.handleCommand = (command, code, t) => {
