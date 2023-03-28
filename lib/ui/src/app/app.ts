@@ -811,7 +811,7 @@ class BotUI  {
         }
     }
 
-    public setBotText = (text: string = null) => {
+    public setBotText = (text: string = null, nodeId: string = "") => {
         if (BotUI.settings.guiMode === GUIMode.KIOSK) {
             BotUI.botTextKioskElement.setAttribute('data-empty', '');
             window.setTimeout(() => {
@@ -824,7 +824,7 @@ class BotUI  {
             }, BotUI.settings.animationSpeed);
         }
         if (BotUI.settings.guiMode === GUIMode.CHAT && !(isNil(text) || isEmpty(text))) {
-            BotUI.setChatMessage(text, null, null, MessageType.BOT);
+            BotUI.setChatMessage(text, null, null, MessageType.BOT, false, nodeId, this.botMessagesCallback);
         }
     }
 
@@ -840,7 +840,7 @@ class BotUI  {
     public setVideo = (url: string = null, callback: () => any) => {
         BotUI.videoCallback = callback;
         if (BotUI.settings.guiMode === GUIMode.CHAT) {
-            BotUI.setChatMessage(null, null, url, MessageType.BOT);
+            BotUI.setChatMessage(null, null, url, MessageType.BOT, false);
         }
         if (BotUI.settings.guiMode === GUIMode.KIOSK) {
             const cleanImageElement = (full = true) => {
@@ -925,6 +925,14 @@ class BotUI  {
         });
     }
 
+    public removeGoToButtons = () => {
+        const elemList = document.querySelectorAll("[data-messages] > div.goto > [data-suggestions-container]");
+        elemList.forEach(element => {
+            const par = element.parentNode;
+            par.parentNode.removeChild(par);
+        });
+    }
+
     public setSuggestion = (suggestions : string[]) => {
         this.removeSuggestions();
         const messageElement = BotUI.messagesElement;
@@ -939,6 +947,28 @@ class BotUI  {
             document.querySelector("[data-suggestions-container].data-suggestions-container").appendChild(btn);
         });
         BotUI.scrollToLastMessage(messageElement);
+    }
+
+    public setGoToButton = (target: Node, id: string) => {
+        const suggestions = ["cancel", "Go back to this point"]
+        this.removeGoToButtons();
+        const messageElement = BotUI.messagesElement;
+        const suggestionContainer = getContentAsHtml(sopSuggestionContainer);
+        suggestionContainer.classList.add("goto");
+        messageElement.insertBefore(suggestionContainer, target.nextSibling);
+        suggestions.forEach(sug => {
+            let btn = document.createElement("button");
+            btn.innerText = sug;
+            btn.setAttribute("data-suggestions-button", "");
+            btn.classList.add("data-suggestions-button");
+            if (sug === "cancel"){
+                btn.onclick = this.removeGoToButtons;
+            }else{
+                btn.setAttribute("id", id);
+                btn.onclick = () => {this.goToPositive(id)}
+            }
+            document.querySelector("[data-suggestions-container].data-suggestions-container").appendChild(btn);
+        });
     }
 
     public setMedia = (settings:any = {}) => {
@@ -1064,7 +1094,7 @@ class BotUI  {
             }
         }
         if (BotUI.settings.guiMode === GUIMode.CHAT && !(isNil(url) || isEmpty(url))) {
-            BotUI.setChatMessage(null, url, null, MessageType.BOT);
+            BotUI.setChatMessage(null, url, null, MessageType.BOT, false);
         }
     }
 
@@ -1109,6 +1139,9 @@ class BotUI  {
             BotUI.botPcmElement.classList.remove('bu-invisible');
         }
     }
+
+    
+
     public chatInputCallback = (...value) => {}
 
     public inputModeCallback = (...value) => {}
@@ -1118,6 +1151,10 @@ class BotUI  {
     public chatMicrophoneCallback = (...value) => {}
 
     public askAnotherCallback = (...value) => {}
+
+    public botMessagesCallback = (e) => {
+		this.setGoToButton(e.target.parentNode, e.target.parentNode.id);
+    }
 
     public continueCallback = (...value) => {}
 
@@ -1157,6 +1194,8 @@ class BotUI  {
     public collapsableTriggerCallback = (collapsed) => {}
 
     public suggestionsCallback = (...value) => {}
+
+    public goToPositive = (id) => {}
 
     private static videoCallback: () => any = () => {};
 
@@ -1486,7 +1525,7 @@ class BotUI  {
         }
     }
 
-    private static setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false) => {
+    private static setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}) => {
         const messageElement = BotUI.messagesElement;
         const messageTemplate = getContentAsHtml(chatMessageStructureTemplate);
         const messageTemplateElement = messageTemplate.querySelector('div.chat-message');
@@ -1497,11 +1536,17 @@ class BotUI  {
             if (replace && messageElement.lastChild !== null && messageType !== MessageType.BOT) {
                 messageElement.removeChild(messageElement.lastChild);
             } else if (messageType && messageType === type) {
-                (messageElement.lastChild as Element).classList.remove('chat-message-last')
+                (messageElement.lastChild as Element).classList.remove('chat-message-last');
             }
         }
 
         messageTemplateTextElement.innerHTML = text;
+        if (type === MessageType.BOT){
+            messageTemplateElement.setAttribute("id", id)
+            messageTemplateElement.addEventListener("click", (e) => {
+                clickCallback(e)
+            })
+        }
         messageTemplateElement.setAttribute('data-message-type', type);
         messageTemplateElement.classList.add('chat-message-' + type);
         messageTemplateElement.classList.add('chat-message-last');

@@ -288,7 +288,7 @@ var createBot = (botUI, settings) => {
 		return status;
 	}
 
-	defaultCallback.addMessage = (type, text, image, background, signal) => {
+	defaultCallback.addMessage = (type, text, image, background, nodeId,signal) => {
 		if (type === 'sent') {
 			if (text !== null) {
 				botUI.setUserText(text);
@@ -303,7 +303,7 @@ var createBot = (botUI, settings) => {
 			}
 			const playButton = botElement.querySelector('[data-play]')
 			if (playButton !== null) { playButton.remove(); }
-			botUI.setBotText(text);
+			botUI.setBotText(text, nodeId);
 			window.setTimeout(() => {
 				const windowHeight =
 					BotUI.orientation === 'portrait' ? window.innerHeight / 2 : window.innerHeight;
@@ -373,53 +373,47 @@ var createBot = (botUI, settings) => {
 	}
 
 	async function handleFile(oldMode, index, query){
-		const fileCallback = (response) => {
-			const files = response
-			botUI.toggleLoader(false);
-			console.log(files);
-			if (files === undefined){
-				//SERVER ERROR
-				defaultCallback.addMessage("received", `Sorry, something went wrong!`, null, null);
-				bot.handleOnTextInput(`continue`, false, {sopInput: true});
-			}else if(files.length === 0){
-				//NO PDF FILES FOUND
-				defaultCallback.addMessage("received", `No solutions were found.`, null, null);
-				bot.audioInputCallback();
-				bot.handleOnTextInput(`continue`, false, {sopInput: true});
-			}else{
-				console.log("success");
-				//SUCCESS
-				botUI.continueCallback = () => {
-					bot.handleOnTextInput(`continue`, false, {sopInput: true});
-				}
-		
-				botUI.askAnotherCallback = () => {
-					bot.handleOnTextInput(`ask another`, false, {sopInput: true});
-				}
-				
-				files.predictions.forEach(file => {
-					const page = parseInt(file.name.replace(".pdf", ""));
-					file.text = file.doc_name + ", page: " + page;
-					file.page = page;
-					file.url = async () => {return `https://manual-search-develop.alquist.ai/download/${index}/${page}.pdf`;};
-					const settings = {
-						oldMode: oldMode,
-						groupName: "pdfFiles",
-						disableGroup: false,
-						appSelect: false,
-						solutions: true,
-						text:  file.text,
-						pdf: {...file}
-					}
-					botUI.setButton(settings, () => {});
-					console.log(settings);
-				});
-			}
-		}
-
 		console.log(index, query);
 		botUI.toggleLoader(true);
-		await bot.getFiles(query, url="https://upv-search-develop.alquist.ai/v2/models/upv-search/infer", fileCallback);
+		console.log("here");
+		const files = (await bot.getFiles(query, url="https://manual-search-develop.alquist.ai/retrieve")).data;
+		botUI.toggleLoader(false);
+		console.log(files);
+		if (files === undefined){
+			//SERVER ERROR
+			bot.handleOnTextInput(`ERROR`, false, {sopInput: true});
+		}else if(files.predictions.length === 0){
+			//NO PDF FILES FOUND
+			bot.handleOnTextInput(`NO_SOLUTION`, false, {sopInput: true});
+			bot.audioInputCallback();
+		}else{
+			//SUCCESS
+			botUI.continueCallback = () => {
+				bot.handleOnTextInput(`CONTINUE`, false, {sopInput: true});
+			}
+	
+			botUI.askAnotherCallback = () => {
+				bot.handleOnTextInput(`ask another`, false, {sopInput: true});
+			}
+			
+			files.predictions.forEach(file => {
+				const page = parseInt(file.name.replace(".pdf", ""));
+				file.text = file.doc_name + ", page: " + page;
+				file.page = page;
+				file.url = async () => {return `https://manual-search-develop.alquist.ai/download/${index}/${page}.pdf`;};
+				const settings = {
+					oldMode: oldMode,
+					groupName: "pdfFiles",
+					disableGroup: false,
+					appSelect: false,
+					solutions: true,
+					text:  file.text,
+					pdf: {...file}
+				}
+				botUI.setButton(settings, () => {});
+				console.log(settings);
+			});
+		}
 	}
 
 	defaultCallback.handleCommand = (command, code, t) => {
@@ -476,7 +470,9 @@ var createBot = (botUI, settings) => {
 					bot.audioInputCallback();
 				});
 				break;
-			case "#pdf" || '#search':
+			case '#search':
+			case "#pdf":
+				console.log("here");
 				const query = botUI.getLastUserMessage().children[0].textContent;
 				handleFile(oldMode, payload.index.toLowerCase(), query);
 				bot.audioInputCallback();
@@ -653,6 +649,11 @@ var createBot = (botUI, settings) => {
 		}
 	}
 
+	botUI.botMessagesCallback = (e) => {
+		console.log(e.target);
+		botUI.setGoToButton(e.target.parentNode, e.target.parentNode.id);
+	}
+
 	botUI.chatInputCallback = ((inputValue) => {
 		const status = getStatus();
 		if (status === "SLEEPING") {
@@ -699,6 +700,17 @@ var createBot = (botUI, settings) => {
 
 	botUI.suggestionsCallback = (e) => {
 		bot.handleOnTextInput(e.target.innerHTML, false);
+		botUI.removeSuggestions();
+	}
+
+	botUI.goToPositive = (id) => {
+		function sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
+		}
+		console.log("anneni sikerim: ", id);
+		bot.handleOnTextInput("#go_to", false);
+		sleep(1000);
+		bot.handleOnTextInput(id, false, {sopInput: true});
 		botUI.removeSuggestions();
 	}
 
