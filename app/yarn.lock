@@ -907,9 +907,9 @@
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
   integrity sha512-5a6wqoJV/xEdbRNKVo6I4hO3VjyDq//8q2f9I6PBAvMesJHFauXDorcNCsr9RzvsZnaWi5NYCcfyqP1QeFHFbw==
 
-"@flowstorm/bot-service@../lib/service/dist/flowstorm-bot-service-2.1.0.tgz":
-  version "2.1.0"
-  resolved "../lib/service/dist/flowstorm-bot-service-2.1.0.tgz#99310a056b1e6703f8a887f4b612840c7c0e18d3"
+"@flowstorm/bot-service@../lib/service/dist/flowstorm-bot-service-2.1.1.tgz":
+  version "2.1.1"
+  resolved "../lib/service/dist/flowstorm-bot-service-2.1.1.tgz#429ec45267c865b74cf1dc3c759ecf405aa95fe2"
 
 "@flowstorm/bot-ui@../lib/ui/dist/flowstorm-bot-ui-2.0.2.tgz":
   version "2.0.2"
