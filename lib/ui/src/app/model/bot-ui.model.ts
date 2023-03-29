@@ -18,6 +18,7 @@ export interface Settings {
     upSop?: string;
     downSop?: string;
     guiMode: GUIMode,
+    goTo: Boolean,
     imageAverageColorOpacity?: number;
     userMessageBackgroundColor?: string;
     userMessageTextColor?: string;

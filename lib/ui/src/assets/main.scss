@@ -42,10 +42,6 @@
 	--bot-ui-chat-pcm-height: 80px;
 }
 
-body {
-	margin: 0;
-}
-
 
 $base-color: #5e5e5e;
 $particleSizeLandscape: 100vw;
@@ -349,8 +345,9 @@ $amount: 20;
 			.icon-sop {
 				cursor: pointer;
 				position: absolute;
-				width: 20px;
-				height: 20px;
+				width: 30px;
+				height: 30px;
+				padding: 5px;
 				text-align: center;
 				color: #000000;
 
@@ -428,12 +425,7 @@ $amount: 20;
     				transform: translateY(calc(-50% + 2px));
 					z-index: 1;
 
-					&::before{
-						padding: 6px;
-						padding-left: 7px;
-					}
-
-					&-active::before{
+					&-active{
 						background-color: rgba(232, 50, 50, 1);
 						border-radius: 50%;
 						color: white;
@@ -642,7 +634,7 @@ $amount: 20;
 			max-width: min(500px, 95%);
 			position: relative;
 			overflow-wrap: break-word;
-			padding: .5rem;
+			padding: .55rem;
 			border-radius: .7rem;
 			margin: .2rem .7rem 0 .7rem;
 
@@ -661,6 +653,31 @@ $amount: 20;
 
 				}
 			}
+
+			&:hover > .icon-sop--undo{
+				opacity: 0.5;
+			}
+
+			& > .icon-sop--undo{
+				opacity: 0;
+				position: absolute;
+				top: -5px;
+				right: -17px;
+				&::before{
+					font-size: 16px;
+				}
+
+				&:hover{
+					opacity: 1;
+					cursor: pointer;
+				}
+
+				&.latest-message{
+					opacity: 0 !important;
+					display: none;
+				}
+			}
+
 
 			&[data-message-type='bot'] {
 				color: var(--bot-ui-message-color-bot);

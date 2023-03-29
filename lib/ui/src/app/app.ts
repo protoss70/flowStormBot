@@ -44,6 +44,7 @@ console.log(window.innerWidth);
 
 const defaults: Settings = {
     animationSpeed: 500,
+    goTo: true,
     backgroundAdvancedAnimationParticlesCount: 20,
     backgroundColor: '#927263',
     backgroundImage: null,
@@ -114,6 +115,7 @@ const icons = ['mic',
     'back',
     'downSop',
     'upSop',
+    'undo',
     ];
 const avatarTextOverlapRatio = 1 / 4;
 const micActiveClass = "icon-sop--mic--active";
@@ -807,7 +809,7 @@ class BotUI  {
             }, BotUI.settings.animationSpeed);
         }
         if (BotUI.settings.guiMode === GUIMode.CHAT && !(isNil(text) || isEmpty(text))) {
-            BotUI.setChatMessage(text, null, null, MessageType.USER, true);
+            this.setChatMessage(text, null, null, MessageType.USER, true);
         }
     }
 
@@ -824,7 +826,7 @@ class BotUI  {
             }, BotUI.settings.animationSpeed);
         }
         if (BotUI.settings.guiMode === GUIMode.CHAT && !(isNil(text) || isEmpty(text))) {
-            BotUI.setChatMessage(text, null, null, MessageType.BOT, false, nodeId, this.botMessagesCallback);
+            this.setChatMessage(text, null, null, MessageType.BOT, false, nodeId, this.botMessagesCallback);
         }
     }
 
@@ -840,7 +842,7 @@ class BotUI  {
     public setVideo = (url: string = null, callback: () => any) => {
         BotUI.videoCallback = callback;
         if (BotUI.settings.guiMode === GUIMode.CHAT) {
-            BotUI.setChatMessage(null, null, url, MessageType.BOT, false);
+            this.setChatMessage(null, null, url, MessageType.BOT, false);
         }
         if (BotUI.settings.guiMode === GUIMode.KIOSK) {
             const cleanImageElement = (full = true) => {
@@ -925,14 +927,6 @@ class BotUI  {
         });
     }
 
-    public removeGoToButtons = () => {
-        const elemList = document.querySelectorAll("[data-messages] > div.goto > [data-suggestions-container]");
-        elemList.forEach(element => {
-            const par = element.parentNode;
-            par.parentNode.removeChild(par);
-        });
-    }
-
     public setSuggestion = (suggestions : string[]) => {
         this.removeSuggestions();
         const messageElement = BotUI.messagesElement;
@@ -947,28 +941,6 @@ class BotUI  {
             document.querySelector("[data-suggestions-container].data-suggestions-container").appendChild(btn);
         });
         BotUI.scrollToLastMessage(messageElement);
-    }
-
-    public setGoToButton = (target: Node, id: string) => {
-        const suggestions = ["cancel", "Go back to this point"]
-        this.removeGoToButtons();
-        const messageElement = BotUI.messagesElement;
-        const suggestionContainer = getContentAsHtml(sopSuggestionContainer);
-        suggestionContainer.classList.add("goto");
-        messageElement.insertBefore(suggestionContainer, target.nextSibling);
-        suggestions.forEach(sug => {
-            let btn = document.createElement("button");
-            btn.innerText = sug;
-            btn.setAttribute("data-suggestions-button", "");
-            btn.classList.add("data-suggestions-button");
-            if (sug === "cancel"){
-                btn.onclick = this.removeGoToButtons;
-            }else{
-                btn.setAttribute("id", id);
-                btn.onclick = () => {this.goToPositive(id)}
-            }
-            document.querySelector("[data-suggestions-container].data-suggestions-container").appendChild(btn);
-        });
     }
 
     public setMedia = (settings:any = {}) => {
@@ -1094,7 +1066,7 @@ class BotUI  {
             }
         }
         if (BotUI.settings.guiMode === GUIMode.CHAT && !(isNil(url) || isEmpty(url))) {
-            BotUI.setChatMessage(null, url, null, MessageType.BOT, false);
+            this.setChatMessage(null, url, null, MessageType.BOT, false);
         }
     }
 
@@ -1152,9 +1124,7 @@ class BotUI  {
 
     public askAnotherCallback = (...value) => {}
 
-    public botMessagesCallback = (e) => {
-		this.setGoToButton(e.target.parentNode, e.target.parentNode.id);
-    }
+    public botMessagesCallback = (e) => {}
 
     public continueCallback = (...value) => {}
 
@@ -1525,7 +1495,7 @@ class BotUI  {
         }
     }
 
-    private static setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}) => {
+    public setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}) => {
         const messageElement = BotUI.messagesElement;
         const messageTemplate = getContentAsHtml(chatMessageStructureTemplate);
         const messageTemplateElement = messageTemplate.querySelector('div.chat-message');
@@ -1541,12 +1511,6 @@ class BotUI  {
         }
 
         messageTemplateTextElement.innerHTML = text;
-        if (type === MessageType.BOT){
-            messageTemplateElement.setAttribute("id", id)
-            messageTemplateElement.addEventListener("click", (e) => {
-                clickCallback(e)
-            })
-        }
         messageTemplateElement.setAttribute('data-message-type', type);
         messageTemplateElement.classList.add('chat-message-' + type);
         messageTemplateElement.classList.add('chat-message-last');
@@ -1582,6 +1546,23 @@ class BotUI  {
                 messageTemplateElement.appendChild(video);
             }
         }
+        if (type === MessageType.BOT && this.getSettings().goTo){
+            const oldElems = document.getElementsByClassName("latest-message");
+            for (let index = 0; index < oldElems.length; index++) {
+                const element = oldElems[index];
+                element.classList.remove("latest-message")
+            }
+            const hoverIcon = document.createElement("span");
+            hoverIcon.innerHTML = " ";
+            ["icon-sop", "icon-sop--undo", "icon--content--undo", "latest-message"].forEach(_class => {
+                hoverIcon.classList.add(_class);
+            });
+            hoverIcon.addEventListener("click", () => {
+                clickCallback(id)
+            })
+            messageTemplate.children[0].appendChild(hoverIcon);
+        }
+        
         messageElement.appendChild(messageTemplate.children[0]);
         messageElement.scrollTop = messageElement.scrollHeight;
         BotUI.scrollToLastMessage(messageElement);

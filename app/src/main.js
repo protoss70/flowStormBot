@@ -59,6 +59,7 @@ const botUIDefaultSettings = {
 	collapsed: true,
 	interactionMode: "GUIDE",
 	sound: true,
+	goTo: true,
 };
 
 const clientDefaultSetting = {
@@ -288,7 +289,7 @@ var createBot = (botUI, settings) => {
 		return status;
 	}
 
-	defaultCallback.addMessage = (type, text, image, background, nodeId,signal) => {
+	defaultCallback.addMessage = (type, text, image, background, nodeId, signal) => {
 		if (type === 'sent') {
 			if (text !== null) {
 				botUI.setUserText(text);
@@ -303,6 +304,7 @@ var createBot = (botUI, settings) => {
 			}
 			const playButton = botElement.querySelector('[data-play]')
 			if (playButton !== null) { playButton.remove(); }
+			console.log("node id: ", nodeId);
 			botUI.setBotText(text, nodeId);
 			window.setTimeout(() => {
 				const windowHeight =
@@ -376,7 +378,7 @@ var createBot = (botUI, settings) => {
 		console.log(index, query);
 		botUI.toggleLoader(true);
 		console.log("here");
-		const files = (await bot.getFiles(query, url="https://manual-search-develop.alquist.ai/retrieve")).data;
+		const files = (await bot.getFiles(query, url="https://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
 		botUI.toggleLoader(false);
 		console.log(files);
 		if (files === undefined){
@@ -501,7 +503,22 @@ var createBot = (botUI, settings) => {
 	defaultCallback.getAttributes = () => {
 	    const attributes = botInitializer.getAttributes();
 	    botInitializer.resetAttributes();
-		return attributes;
+		const newAttributes = getAttributesCallback(attributes);
+		console.log(newAttributes);
+		return newAttributes;
+	}
+
+	const attributeList = {}
+	function getAttributesCallback(attributes){
+		Object.keys(attributeList).forEach(atr => {
+			console.log(atr);
+			attributes[atr] = attributeList[atr] 
+		});
+		return attributes
+	}
+
+	function setAttribute(atr, value){
+		attributeList[atr] = value
 	}
 
 	defaultCallback.getUUID = () => uuidv4();
@@ -650,8 +667,9 @@ var createBot = (botUI, settings) => {
 	}
 
 	botUI.botMessagesCallback = (e) => {
-		console.log(e.target);
-		botUI.setGoToButton(e.target.parentNode, e.target.parentNode.id);
+		console.log(e);
+		setAttribute("nodeId", e);
+		bot.handleOnTextInput(`#go_to`, false, {sopInput: true});
 	}
 
 	botUI.chatInputCallback = ((inputValue) => {

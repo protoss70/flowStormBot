@@ -36,23 +36,24 @@ export const sopBaseStructureTemplate = `
                         </button>
                     </div>
                     <div data-chat-ask class="ask-section">
-                        <span data-chat-input-keyboard class="icon icon-sop--keyboard"></span>
-                        <span data-chat-input-mute class="icon icon-sop--volume-mute"></span>
+                        <span data-chat-input-keyboard class="icon-sop icon-sop--keyboard"></span>
+                        <span data-chat-input-mute class="icon-sop icon-sop--volume-mute"></span>
+                        <span class="icon-sop icon-sop--undo"></span>
     
                         <div data-sound-input-wrap>
-                            <span data-chat-input-mic class="icon icon--largest icon-sop--mic"></span>
+                            <span data-chat-input-mic class="icon-sop icon--largest icon-sop--mic"></span>
                         </div>
                         <div data-text-input-wrap>
     
                             <input type="text" id="chatWindowTextInput" placeholder="Type text..." autocomplete="off" class="sop-text-input"/>
                             <span data-chat-input-controls class="controls--visible">
-                                <span data-chat-input-stop class="icon icon-sop--stop icon--hidden"></span>
+                                <span data-chat-input-stop class="icon-sop icon-sop--stop icon--hidden"></span>
                             </span>
-                            <span data-chat-input-arrow class="icon icon-sop--arrow-up icon-sop--arrow-up--hidden"></span>
+                            <span data-chat-input-arrow class="icon-sop icon-sop--arrow-up icon-sop--arrow-up--hidden"></span>
                         
                         </div>
     
-                        <span data-chat-input-back class="icon icon-sop--back"></span>
+                        <span data-chat-input-back class="icon-sop icon-sop--back"></span>
     
                     </div>
                 </div>
