@@ -304,7 +304,6 @@ var createBot = (botUI, settings) => {
 			}
 			const playButton = botElement.querySelector('[data-play]')
 			if (playButton !== null) { playButton.remove(); }
-			console.log("node id: ", nodeId);
 			botUI.setBotText(text, nodeId);
 			window.setTimeout(() => {
 				const windowHeight =
@@ -374,10 +373,11 @@ var createBot = (botUI, settings) => {
         if (bot.sessionEnded) { initBot(); }
 	}
 
+	var exitButtonMode =  () => {}
+
 	async function handleFile(oldMode, index, query){
 		console.log(index, query);
 		botUI.toggleLoader(true);
-		console.log("here");
 		const files = (await bot.getFiles(query, url="https://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
 		botUI.toggleLoader(false);
 		console.log(files);
@@ -461,6 +461,11 @@ var createBot = (botUI, settings) => {
 						solutions: payload.solutions,
 						...button,
 					}
+
+					exitButtonMode = () => {
+						botUI.disableButtonGroup(settings, () => {}, "buttons")
+					}
+
 					botUI.setButton(settings, () => {
 						if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
 							bot.handleOnTextInput(`#${button.action}`, false, {buttonInput: true});
@@ -474,7 +479,6 @@ var createBot = (botUI, settings) => {
 				break;
 			case '#search':
 			case "#pdf":
-				console.log("here");
 				const query = botUI.getLastUserMessage().children[0].textContent;
 				handleFile(oldMode, payload.index.toLowerCase(), query);
 				bot.audioInputCallback();
@@ -504,14 +508,12 @@ var createBot = (botUI, settings) => {
 	    const attributes = botInitializer.getAttributes();
 	    botInitializer.resetAttributes();
 		const newAttributes = getAttributesCallback(attributes);
-		console.log(newAttributes);
 		return newAttributes;
 	}
 
 	const attributeList = {}
 	function getAttributesCallback(attributes){
 		Object.keys(attributeList).forEach(atr => {
-			console.log(atr);
 			attributes[atr] = attributeList[atr] 
 		});
 		return attributes
@@ -667,8 +669,12 @@ var createBot = (botUI, settings) => {
 	}
 
 	botUI.botMessagesCallback = (e) => {
+		if (botUI.getInputMode() === "button"){
+			exitButtonMode();
+		}
 		console.log(e);
 		setAttribute("nodeId", e);
+		botUI.removeSuggestions();
 		bot.handleOnTextInput(`#go_to`, false, {sopInput: true});
 	}
 
@@ -718,17 +724,6 @@ var createBot = (botUI, settings) => {
 
 	botUI.suggestionsCallback = (e) => {
 		bot.handleOnTextInput(e.target.innerHTML, false);
-		botUI.removeSuggestions();
-	}
-
-	botUI.goToPositive = (id) => {
-		function sleep(ms) {
-			return new Promise(resolve => setTimeout(resolve, ms));
-		}
-		console.log("anneni sikerim: ", id);
-		bot.handleOnTextInput("#go_to", false);
-		sleep(1000);
-		bot.handleOnTextInput(id, false, {sopInput: true});
 		botUI.removeSuggestions();
 	}
 

@@ -964,17 +964,40 @@ class BotUI  {
         messageElement.appendChild(mediaPlayer);
     }
 
+    public disableButtonGroup = (settings, callback, selector) => {
+        const messageElement = BotUI.messagesElement;
+        BotUI.inputTakers.classList.remove("hidden");
+        if (callback){
+            callback();
+        }
+
+        if (settings.solutions){
+            if (settings.pdf){
+                this.pdfButton(settings)
+            }else{
+                this.oldMessagesSection(settings.groupName.replace(/\s+/g, ''));
+            }
+
+        }
+
+        if (settings.appSelect){
+            messageElement.textContent = "";
+            this.appSelectToggle(true, selector);
+        }
+        if (settings.disableGroup){
+            document.querySelectorAll(`[data-button-group=${selector}]`).forEach(elem => {
+                elem.setAttribute('disabled', '');
+            });
+        }
+        this.setInputMode(settings.oldMode);
+    };
+
     public setButton = (settings: any = {}, callback: Function = ()=>{}) => {
         console.log(settings);
         const messageElement = BotUI.messagesElement;
         this.setInputMode("button");
         const button = document.createElement('button');
-        var selector;
-        if (settings.title && settings.title !== ""){
-            selector = settings.title;
-        }else{
-            selector = settings.action;
-        }
+        const selector = "buttons"
 
         if(settings.background){
             const newImg = new Image();
@@ -990,34 +1013,9 @@ class BotUI  {
         
         button.classList.add("inputButton", "chat-message", "chat-message-bot");
         button.setAttribute("data-message-type", "bot");
-        button.setAttribute("data-button-group", settings.groupName.replace(/\s+/g, ''));
+        button.setAttribute("data-button-group", selector);
 
-        button.onclick = () => {
-            BotUI.inputTakers.classList.remove("hidden");
-            if (callback !== null){
-                callback();
-            }
-
-            if (settings.solutions){
-                if (settings.pdf){
-                    this.pdfButton(settings)
-                }else{
-                    this.oldMessagesSection(settings.groupName.replace(/\s+/g, ''));
-                }
-
-            }
-
-            if (settings.appSelect){
-                messageElement.textContent = "";
-                this.appSelectToggle(true, selector);
-            }
-            if (settings.disableGroup){
-                document.querySelectorAll(`[data-button-group=${selector.replace(/\s+/g, '')}]`).forEach(elem => {
-                    elem.setAttribute('disabled', '');
-                });
-            }
-            this.setInputMode(settings.oldMode);
-        };
+        button.onclick = () => {this.disableButtonGroup(settings, callback, selector)};
 
         messageElement.appendChild(button);
         messageElement.scrollTop = messageElement.scrollHeight;
