@@ -8,7 +8,8 @@ import isEmpty from 'ramda/es/isEmpty';
 import merge from 'ramda/es/merge';
 import times from 'ramda/es/times';
 
-import {sopSuggestionContainer} from "./templates/sop-suggestion-structure.template"
+import {sopSuggestionContainer} from "./templates/sop-suggestion-structure.template";
+import { sopSnippetContainer } from './templates/sop-snippet-structure.template';
 
 import '../assets/main.scss';
 import '../assets/screencapture.png';
@@ -710,6 +711,34 @@ class BotUI  {
                 this.nextSection();
                 break;
         }
+    }
+
+    public setSnippet(url, title, secondary=""){
+        const snippetContainer = document.createElement("div");
+        snippetContainer.setAttribute('data-snippet-container', "");
+        snippetContainer.classList.add("data-snippet-container");
+
+        // Create the title element and set its text content
+        const titleElement = document.createElement("h3");
+        titleElement.textContent = title;
+
+        // Create the context element and set its text content
+        const contextElement = document.createElement("span");
+        contextElement.textContent = secondary;
+
+        // Add a click event listener to the snippet container element
+        snippetContainer.addEventListener("click", () => {
+            window.open(url);
+        });
+
+        // Append the title and context elements to the snippet container element
+        snippetContainer.appendChild(titleElement);
+        snippetContainer.appendChild(contextElement);
+
+        const messageElement = BotUI.messagesElement;
+        messageElement.appendChild(snippetContainer);
+
+        BotUI.scrollToLastMessage(messageElement);
     }
 
     private setupDataChannel = (label) => {

@@ -1652,6 +1652,25 @@ canvas{
 	}
 }
 
+[data-snippet-container].data-snippet-container{
+	background-color: rgba(255, 255, 255, 0.3);
+	color: white;
+	width: 90%;
+	border-radius: 5px;
+	margin: 0.2rem 0.7rem 0 0.7rem;
+	padding: 10px 8px;
+
+	&:hover{
+		cursor: pointer;
+		background-color: rgba(255, 255, 255, 0.5);
+	}
+
+	& > h3{
+		margin: 0;
+		text-decoration: underline;
+	}
+}
+
 [data-suggestions-container].data-suggestions-container{
 	display: flex;
 	position: relative;
@@ -1674,7 +1693,6 @@ canvas{
 	&::-webkit-scrollbar-track {
 		background: #f1f1f1; 
 		border-radius: 5px;
-		visibility: hidden;
 	}
 	
 	/* Handle */

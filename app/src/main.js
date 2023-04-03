@@ -376,15 +376,34 @@ var createBot = (botUI, settings) => {
 	var exitButtonMode =  () => {}
 
 	async function handleFile(oldMode, index, query){
+		function titleAndContext(tags, content){
+			var secondary;
+			if (tags.h2.length === 0 && tags.h3.length === 0){
+				if (content.length > 30){
+					secondary = content.slice(0, 30);
+				}else{
+					secondary = content
+				}
+			}else{
+				if (tags.h2.length > 0){
+					secondary = tags.h2.replaceAll(" |", ",");
+				}else{
+					secondary = tags.h3.replaceAll(" |", ",");
+				}
+			}
+			return [tags.h1.replaceAll(" |", ","), secondary];
+		}
+
 		console.log(index, query);
 		botUI.toggleLoader(true);
-		const files = (await bot.getFiles(query, url="https://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
+		const results = (await bot.getFiles(query, url="https://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
 		botUI.toggleLoader(false);
-		console.log(files);
-		if (files === undefined){
+		console.log(results);
+		if (results === undefined){
 			//SERVER ERROR
 			bot.handleOnTextInput(`ERROR`, false, {sopInput: true});
-		}else if(files.predictions.length === 0){
+			bot.audioInputCallback();
+		}else if(results.result.length === 0){
 			//NO PDF FILES FOUND
 			bot.handleOnTextInput(`NO_SOLUTION`, false, {sopInput: true});
 			bot.audioInputCallback();
@@ -392,28 +411,17 @@ var createBot = (botUI, settings) => {
 			//SUCCESS
 			botUI.continueCallback = () => {
 				bot.handleOnTextInput(`CONTINUE`, false, {sopInput: true});
+				bot.audioInputCallback();
 			}
 	
 			botUI.askAnotherCallback = () => {
 				bot.handleOnTextInput(`ask another`, false, {sopInput: true});
+				bot.audioInputCallback();
 			}
 			
-			files.predictions.forEach(file => {
-				const page = parseInt(file.name.replace(".pdf", ""));
-				file.text = file.doc_name + ", page: " + page;
-				file.page = page;
-				file.url = async () => {return `https://manual-search-develop.alquist.ai/download/${index}/${page}.pdf`;};
-				const settings = {
-					oldMode: oldMode,
-					groupName: "pdfFiles",
-					disableGroup: false,
-					appSelect: false,
-					solutions: true,
-					text:  file.text,
-					pdf: {...file}
-				}
-				botUI.setButton(settings, () => {});
-				console.log(settings);
+			results.result.forEach(result => {
+				const [title, secondary] =  titleAndContext(result.meta, result.content);
+				botUI.setSnippet(result.meta.pagelink, title, secondary);
 			});
 		}
 	}
