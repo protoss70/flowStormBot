@@ -1,6 +1,6 @@
 {
 	"name": "@flowstorm/client",
-	"version": "2.2.7",
+	"version": "2.2.8",
 	"main": "client-bot.js",
 	"author": "PromethistAI",
 	"license": "MIT",
