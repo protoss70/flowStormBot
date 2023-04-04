@@ -117,6 +117,7 @@ const icons = ['mic',
     'downSop',
     'upSop',
     'undo',
+    'restart',
     ];
 const avatarTextOverlapRatio = 1 / 4;
 const micActiveClass = "icon-sop--mic--active";
@@ -171,7 +172,8 @@ class BotUI  {
     private static loadingSpinner: HTMLElement;
     private static botLogin: HTMLElement;
     private static botLoginPopup: HTMLElement;
-
+    private static restartElement: HTMLElement;
+    
     private static isChatEnabled: boolean = true;
     private static isMicrophoneEnabled: boolean = true;
 
@@ -248,6 +250,8 @@ class BotUI  {
         BotUI.loadingSpinner = BotUI.element.querySelector("[loader]");
         BotUI.botLogin = BotUI.element.querySelector("[bot-login]");
         BotUI.botLoginPopup = BotUI.element.querySelector("[bot-loginPopup]");
+        BotUI.restartElement = BotUI.element.querySelector('[data-chat-input-restart]');
+
 
         if (BotUI.settings.collapsable) {
             BotUI.setCollapsableUIHeight();
@@ -365,6 +369,10 @@ class BotUI  {
             BotUI.getChatMute(BotUI.settings.sound, this.chatMuteCallback);
         }
 
+        BotUI.restartElement.onclick = () => {
+            this.chatRestartCallback();
+        }
+
         // BotUI.chatInputMicrophoneElement.onclick = (e) => {
         //     BotUI.isMicrophoneEnabled = !BotUI.isMicrophoneEnabled;// isNil(sessionStorage.getItem(chatMicrophoneStorageKey));
         //     BotUI._setMicrophone();
@@ -439,9 +447,9 @@ class BotUI  {
                 this.chatSopNextCallback()
             }
 
-            BotUI.chatInputBackElement.onclick = (e) => {
-                this.chatBackCallback(e);
-            }
+            // BotUI.chatInputBackElement.onclick = (e) => {
+            //     this.chatBackCallback(e);
+            // }
 
             BotUI.askAnother.onclick = (e) => {
                 this.oldMessagesSection("pdfFiles");
@@ -540,7 +548,7 @@ class BotUI  {
             BotUI.chatInputKeyboardElement.classList.remove(BotUI.settings.keyboardIcon);
             BotUI.soundInput.setAttribute("style", "display:none;");
             BotUI.textInput.setAttribute("style", "display:block;");
-            BotUI.chatInputBackElement.classList.add("text-mode");
+            // BotUI.chatInputBackElement.classList.add("text-mode");
             // BotUI.controllerWrapper.classList.add("text-mode");
             BotUI.settings.standardQuestionMode = mode;
             BotUI.settings.inputMode = mode;
@@ -801,6 +809,18 @@ class BotUI  {
     }
 
     public setScreen = (screenType: ScreenTypeEnum = ScreenTypeEnum.PLAYER) => {
+    }
+
+    public toggleRestart(_open: Boolean){
+        if (!_open){
+            BotUI.restartElement.classList.add("hidden");
+            BotUI.chatInputKeyboardElement.classList.remove("hidden");
+            BotUI.chatInputMuteElement.classList.remove("hidden");
+        }else{
+            BotUI.restartElement.classList.remove("hidden");
+            BotUI.chatInputKeyboardElement.classList.add("hidden");
+            BotUI.chatInputMuteElement.classList.add("hidden");
+        }
     }
 
     public setOrientation = (orientation: OrientationEnum = BotUI.orientation) => {
@@ -1150,6 +1170,8 @@ class BotUI  {
     public chatArrowCallback = (...value) => {}
 
     public chatMicrophoneCallback = (...value) => {}
+    
+    public chatRestartCallback = (...value) => {}
 
     public askAnotherCallback = (...value) => {}
 

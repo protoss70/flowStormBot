@@ -281,7 +281,10 @@ var createBot = (botUI, settings) => {
 		changePlayIcon(newState.status === 'SLEEPING' || newState.status === 'PAUSED' || !newState.status, botUI);
 		botUI.disableStop(newState.status === 'SLEEPING')
 		if (newState.status === 'SLEEPING'){
+			botUI.toggleRestart(true);
 			botUI.setMicIcon(false);
+		}else if(newState.status !== undefined){
+			botUI.toggleRestart(false);
 		}
 	}
 
@@ -478,10 +481,8 @@ var createBot = (botUI, settings) => {
 						if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
 							bot.handleOnTextInput(`#${button.action}`, false, {buttonInput: true});
 						}
-						// bot.setInAudio(settings.inputAudio, getStatus());
 						buttonInput = false;
 					});
-					// bot.setInAudio(false, getStatus());
 					bot.audioInputCallback();
 				});
 				break;
@@ -703,6 +704,11 @@ var createBot = (botUI, settings) => {
 	botUI.chatPlayCallback = (inputValue) => {
 		paused = !paused;
 		run();
+	}
+
+	botUI.chatRestartCallback = () => {
+		run();
+		bot.audioInputCallback();
 	}
 
 	botUI.sectionChangeCallback = (section) => {

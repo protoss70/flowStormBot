@@ -33,6 +33,7 @@
             botUI.setSuggestion(["Yes", "No", "These are the suggestion buttons and they help clients see their options"]);
             botUI.setSnippet("https://www.youtube.com", "1. Video Place", "Watching videos, liking, sharing, live feed, some text to fill the blank and test the flexibility")
             botUI.setSnippet("https://www.facebook.com", "2. Social Platform", "Having social interactions");
+            botUI.toggleRestart(true);
             // botUI.setUserText("You said");
             botUI.chatInputCallback = ((inputValue) => {
                console.log(`Do something with input value - ${inputValue}`);

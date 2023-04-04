@@ -38,7 +38,7 @@ export const sopBaseStructureTemplate = `
                     <div data-chat-ask class="ask-section">
                         <span data-chat-input-keyboard class="icon-sop icon-sop--keyboard"></span>
                         <span data-chat-input-mute class="icon-sop icon-sop--volume-mute"></span>
-                        <span class="icon-sop icon-sop--undo"></span>
+                        <span data-chat-input-restart class="icon-sop icon-sop--restart hidden"></span>
     
                         <div data-sound-input-wrap>
                             <span data-chat-input-mic class="icon-sop icon--largest icon-sop--mic"></span>
@@ -50,10 +50,7 @@ export const sopBaseStructureTemplate = `
                                 <span data-chat-input-stop class="icon-sop icon-sop--stop icon--hidden"></span>
                             </span>
                             <span data-chat-input-arrow class="icon-sop icon-sop--arrow-up icon-sop--arrow-up--hidden"></span>
-                        
                         </div>
-    
-                        <span data-chat-input-back class="icon-sop icon-sop--back"></span>
     
                     </div>
                 </div>

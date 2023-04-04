@@ -232,8 +232,7 @@ $amount: 20;
 			.sop-text-input {
 				padding: 0 var(--bot-ui-sop-chat-input-height) 0 var(--bot-ui-sop-chat-padding-left);
 			    position: absolute;
-                width: 88% !important;
-                right: 5px;
+                width: 100% !important;
                 top: calc(50% - 18px);
             }
 
@@ -351,6 +350,10 @@ $amount: 20;
 				text-align: center;
 				color: #000000;
 
+				&.hidden{
+					display: none;
+				}
+
 				&--minus {
 					right: 22.6%;
 					bottom: 10px;
@@ -396,7 +399,14 @@ $amount: 20;
 				}
 
 				&--volume-mute {
-					right: 15px;
+					right: 8px;
+					top: 50%;
+    				transform: translateY(calc(-50% + 2px));
+					z-index: 1;
+				}
+
+				&--restart{
+					right: 8px;
 					top: 50%;
     				transform: translateY(calc(-50% + 2px));
 					z-index: 1;
@@ -420,7 +430,7 @@ $amount: 20;
 				}
 
 				&--keyboard {
-					right: 52px;
+					right: 40px;
 					top: 50%;
     				transform: translateY(calc(-50% + 2px));
 					z-index: 1;
@@ -429,7 +439,7 @@ $amount: 20;
 						background-color: rgba(232, 50, 50, 1);
 						border-radius: 50%;
 						color: white;
-						animation: bgColor 0.4s infinite alternate ease-in-out;
+						animation: bgColor 0.6s infinite alternate ease-in-out;
 					}
 					@keyframes bgColor {
 						0% {
