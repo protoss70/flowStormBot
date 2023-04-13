@@ -396,12 +396,10 @@ var createBot = (botUI, settings) => {
 			}
 			return [tags.h1.replaceAll(" |", ","), secondary];
 		}
-
-		console.log(index, query);
 		botUI.toggleLoader(true);
 		const results = (await bot.getFiles(query, url="https://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
 		botUI.toggleLoader(false);
-		console.log(results);
+		console.log("search results: ", results);
 		if (results === undefined){
 			//SERVER ERROR
 			bot.handleOnTextInput(`ERROR`, false, {sopInput: true});

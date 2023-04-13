@@ -41,8 +41,6 @@ import {
     wsConnection,
 } from './utils';
 
-console.log(window.innerWidth);
-
 const defaults: Settings = {
     animationSpeed: 500,
     goTo: true,
