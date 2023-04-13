@@ -44,6 +44,7 @@ import {
 const defaults: Settings = {
     animationSpeed: 500,
     goTo: true,
+    feedback: true,
     backgroundAdvancedAnimationParticlesCount: 20,
     backgroundColor: '#927263',
     backgroundImage: null,
@@ -116,6 +117,7 @@ const icons = ['mic',
     'upSop',
     'undo',
     'restart',
+    'feedback',
     ];
 const avatarTextOverlapRatio = 1 / 4;
 const micActiveClass = "icon-sop--mic--active";
@@ -1168,6 +1170,8 @@ class BotUI  {
     public chatArrowCallback = (...value) => {}
 
     public chatMicrophoneCallback = (...value) => {}
+
+    public feedbackCallback = (...value) => {}
     
     public chatRestartCallback = (...value) => {}
 
@@ -1596,6 +1600,7 @@ class BotUI  {
             }
         }
         if (type === MessageType.BOT && this.getSettings().goTo){
+            // Create go to icon
             const oldElems = document.getElementsByClassName("latest-message");
             for (let index = 0; index < oldElems.length; index++) {
                 const element = oldElems[index];
@@ -1611,6 +1616,20 @@ class BotUI  {
             })
             messageTemplate.children[0].appendChild(hoverIcon);
         }
+
+        // if (type === MessageType.BOT && this.getSettings().feedback){
+        //     //Create feedback icon
+        //     const feedbackIcon = document.createElement("span");
+        //     feedbackIcon.innerHTML = " ";
+        //     ["icon-sop", "icon-sop--feedback", "icon--content--feedback"].forEach(_class => {
+        //         feedbackIcon.classList.add(_class);
+        //     });
+
+        //     feedbackIcon.addEventListener("click", () => {
+        //         this.feedbackCallback(id);
+        //     })
+        //     messageTemplate.children[0].appendChild(feedbackIcon);
+        // }
         
         messageElement.appendChild(messageTemplate.children[0]);
         messageElement.scrollTop = messageElement.scrollHeight;

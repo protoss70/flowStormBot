@@ -155,7 +155,6 @@ export const initFSClientBot = (initParams = {}) => {
 				if (settings.inputAudio){
 					settings.inputAudio = false;
 					bot.setInAudio(settings.inputAudio, getStatus());
-					// botUI.removeSuggestions();
 					botUI.removeOverlay();
 				}
 			}
@@ -422,7 +421,7 @@ var createBot = (botUI, settings) => {
 			
 			results.result.forEach(result => {
 				const [title, secondary] =  titleAndContext(result.meta, result.content);
-				botUI.setSnippet(result.meta.pagelink, title, secondary);
+				botUI.setSnippet(result.meta.pagelink, title, "");
 			});
 		}
 	}
@@ -591,6 +590,7 @@ var createBot = (botUI, settings) => {
 				if (!minimize) {
 					botUI.setMicIcon(true);
 				    startBot();
+					
 				}
 				break;
 			case 'LISTENING':
