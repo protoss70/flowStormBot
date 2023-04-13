@@ -25,9 +25,6 @@ export const sopBaseStructureTemplate = `
             <div loader class="loader hidden">
                 <span loader-text class="loader-text">Loading PDF Files...</span>
             </div>
-            <div object-container id="object-container">
-                <object pdf-viewer class="hidden" id="pdf-viewer" type="application/pdf"></object>
-            </div>
         <div data-chat-input class="chat-input">
             <div class="chat-input-wrapper">
                 <div data-input-takers> 
@@ -55,12 +52,6 @@ export const sopBaseStructureTemplate = `
                             <span data-chat-input-arrow class="icon-sop icon-sop--arrow-up icon-sop--arrow-up--hidden"></span>
                         </div>
     
-                    </div>
-                </div>
-                <div data-chat-pdf class="pdf-section pdf-section--hidden">
-                    <div data-solutions-inputs> 
-                        <button data-pdf-question-another>Ask Another Question</button>
-                        <button data-pdf-question-continue>Continue</button>
                     </div>
                 </div>
             </div>

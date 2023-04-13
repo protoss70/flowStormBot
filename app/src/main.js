@@ -427,15 +427,6 @@ var createBot = (botUI, settings) => {
 			bot.audioInputCallback();
 		}else{
 			//SUCCESS
-			botUI.continueCallback = () => {
-				bot.handleOnTextInput(`CONTINUE`, false, {sopInput: true});
-				bot.audioInputCallback();
-			}
-	
-			botUI.askAnotherCallback = () => {
-				bot.handleOnTextInput(`ask another`, false, {sopInput: true});
-				bot.audioInputCallback();
-			}
 			
 			results.result.forEach(result => {
 				const {title, secondary} =  titleAndContext(result.meta.backup, result.meta.backup.cnt);

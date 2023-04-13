@@ -162,13 +162,10 @@ class BotUI  {
     private static questionSOPButton: HTMLElement;
     private static downSOPButton: HTMLElement;
     private static sopName: HTMLElement;
-    private static pdfSelect: HTMLElement;
     private static inputTakers: HTMLElement;
     private static askAnother: HTMLElement;
     private static continue: HTMLElement;
     private static solutionsControllers: HTMLElement;
-    private static pdfViewer: HTMLObjectElement;
-    private static pdfViewerContainer: HTMLElement;
     private static loadingSpinner: HTMLElement;
     private static botLogin: HTMLElement;
     private static botLoginPopup: HTMLElement;
@@ -241,13 +238,10 @@ class BotUI  {
         BotUI.questionSOPButton = BotUI.element.querySelector('[data-sop-question]');
         BotUI.downSOPButton = BotUI.element.querySelector('[data-sop-next]');
         BotUI.sopName = BotUI.element.querySelector('[data-sop-header]');
-        BotUI.pdfSelect = BotUI.element.querySelector('[data-chat-pdf]');
         BotUI.inputTakers = BotUI.element.querySelector('[data-input-takers]');
         BotUI.askAnother = BotUI.element.querySelector('[data-pdf-question-another]');
         BotUI.continue = BotUI.element.querySelector('[data-pdf-question-continue]');
         BotUI.solutionsControllers = BotUI.element.querySelector('[data-solutions-inputs]');
-        BotUI.pdfViewer = BotUI.element.querySelector("[pdf-viewer]");
-        BotUI.pdfViewerContainer = BotUI.element.querySelector("[object-container]");
         BotUI.loadingSpinner = BotUI.element.querySelector("[loader]");
         BotUI.botLogin = BotUI.element.querySelector("[bot-login]");
         BotUI.botLoginPopup = BotUI.element.querySelector("[bot-loginPopup]");
@@ -454,24 +448,6 @@ class BotUI  {
                 this.chatSopNextCallback()
             }
 
-            // BotUI.chatInputBackElement.onclick = (e) => {
-            //     this.chatBackCallback(e);
-            // }
-
-            BotUI.askAnother.onclick = (e) => {
-                this.oldMessagesSection("pdfFiles");
-                this.setSection("QUESTION");
-                BotUI.inputTakers.classList.remove("hidden");
-                this.askAnotherCallback();
-            }
-
-            BotUI.continue.onclick = (e) => {
-                this.oldMessagesSection("pdfFiles");
-                BotUI.inputTakers.classList.remove("hidden");
-                this.setSection("SOP");
-                this.continueCallback();
-            }
-
             BotUI.closeElement.onclick = (e) => {
                 this.closeElementCallback();
             }
@@ -615,11 +591,8 @@ class BotUI  {
     }
 
     private removeAllProperties(){
-        BotUI.pdfViewerContainer.classList.add("hidden");
-        BotUI.pdfSelect.classList.add("pdf-section--hidden");
         BotUI.sopSection.classList.add("sop-section--hidden");
         BotUI.questionSection.classList.add("ask-section--hidden");
-        BotUI.solutionsControllers.classList.add("pdf-section--hidden");
         BotUI.messagesElement.classList.remove("hidden");
         BotUI.chatElement.classList.remove("chat-input--hidden");
         BotUI.botLogin.classList.add("hidden");
@@ -703,23 +676,9 @@ class BotUI  {
                 BotUI.questionSection.classList.remove("ask-section--hidden");
                 this.setInputMode(BotUI.settings.standardQuestionMode);
                 break;
-            case "SOLUTIONS":
-                this.inputButtonsHeightSet();
-                BotUI.pdfSelect.classList.remove("pdf-section--hidden");
-                BotUI.solutionsControllers.classList.remove("pdf-section--hidden");
-                BotUI.askAnother.onclick = (e) => {
-                    this.setSection("QUESTION");
-                    BotUI.inputTakers.classList.remove("hidden");
-                    this.oldMessagesSection("pdfFiles");
-                    this.askAnotherCallback();
-                }
-                BotUI.askAnother.innerText = "Ask Another Question";
-                break;
             case "PDF":
                 this.inputButtonsHeightSet();
                 BotUI.messagesElement.classList.add("hidden");
-                BotUI.pdfSelect.classList.remove("pdf-section--hidden");
-                BotUI.pdfViewerContainer.classList.remove("hidden");
                 BotUI.solutionsControllers.classList.remove("pdf-section--hidden");
                 BotUI.askAnother.onclick = (e) => {
                     this.setSection("SOLUTIONS");
@@ -958,19 +917,6 @@ class BotUI  {
         }
     }
 
-    private pdfButton = async (settings: any) => {
-        this.toggleLoader(true);
-        const url = await settings.pdf.url();
-        this.toggleLoader(false);
-        const pdfUrl = url + "#toolbar=0";
-        BotUI.pdfViewer.remove();
-        BotUI.pdfViewer = document.createElement("object");
-        BotUI.pdfViewer.data = pdfUrl;
-        BotUI.pdfViewer.type = "application/pdf";
-        BotUI.pdfViewerContainer.appendChild(BotUI.pdfViewer);
-        this.setSection("PDF");
-    }
-
     public appSelectToggle = (active: boolean, text: string = "") => {
         if (active){
             BotUI.sopName.classList.remove("hidden");
@@ -1180,11 +1126,7 @@ class BotUI  {
     
     public chatRestartCallback = (...value) => {}
 
-    public askAnotherCallback = (...value) => {}
-
     public botMessagesCallback = (e) => {}
-
-    public continueCallback = (...value) => {}
 
     public chatMuteCallback = (...value) => {}
 
