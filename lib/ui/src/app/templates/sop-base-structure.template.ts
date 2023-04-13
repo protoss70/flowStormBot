@@ -1,6 +1,9 @@
 export const sopBaseStructureTemplate = `
     <div data-wrapper class="bot bot-wrapper">
-        <h3 data-sop-header class="hidden">sop Name</h3>
+        <div data-sop-header>
+            <h3 data-sop-title>UPV</h3>
+            <div data-sop-close class="icon-sop icon-sop--close"></div>
+        </div>
         <div class="column column-image">
             <div data-image class="image"></div>
             </div>

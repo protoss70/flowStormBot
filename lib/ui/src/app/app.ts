@@ -9,7 +9,6 @@ import merge from 'ramda/es/merge';
 import times from 'ramda/es/times';
 
 import {sopSuggestionContainer} from "./templates/sop-suggestion-structure.template";
-import { sopSnippetContainer } from './templates/sop-snippet-structure.template';
 
 import '../assets/main.scss';
 import '../assets/screencapture.png';
@@ -118,6 +117,7 @@ const icons = ['mic',
     'undo',
     'restart',
     'feedback',
+    'close',
     ];
 const avatarTextOverlapRatio = 1 / 4;
 const micActiveClass = "icon-sop--mic--active";
@@ -173,6 +173,7 @@ class BotUI  {
     private static botLogin: HTMLElement;
     private static botLoginPopup: HTMLElement;
     private static restartElement: HTMLElement;
+    private static closeElement: HTMLElement;
     
     private static isChatEnabled: boolean = true;
     private static isMicrophoneEnabled: boolean = true;
@@ -251,7 +252,13 @@ class BotUI  {
         BotUI.botLogin = BotUI.element.querySelector("[bot-login]");
         BotUI.botLoginPopup = BotUI.element.querySelector("[bot-loginPopup]");
         BotUI.restartElement = BotUI.element.querySelector('[data-chat-input-restart]');
+        BotUI.closeElement = BotUI.element.querySelector('[data-sop-close]');
 
+        if (!BotUI.settings.collapsed) {
+            BotUI.collapsableTriggerElement.classList.add("hidden");
+        }else{
+            BotUI.collapsableTriggerElement.classList.remove("hidden");
+        }
 
         if (BotUI.settings.collapsable) {
             BotUI.setCollapsableUIHeight();
@@ -465,6 +472,9 @@ class BotUI  {
                 this.continueCallback();
             }
 
+            BotUI.closeElement.onclick = (e) => {
+                this.closeElementCallback();
+            }
             
         }
         BotUI.setBackground({});
@@ -594,6 +604,11 @@ class BotUI  {
         BotUI.settings.collapsed = !BotUI.settings.collapsed;
         BotUI.setCollapsableUIHeight();
         this.collapsableTriggerCallback(BotUI.settings.collapsed);
+        if (!BotUI.settings.collapsed) {
+            BotUI.collapsableTriggerElement.classList.add("hidden");
+        }else{
+            BotUI.collapsableTriggerElement.classList.remove("hidden");
+        }
         const rect: DOMRect = BotUI.element.getBoundingClientRect();
         const orientation: OrientationEnum = (rect.width > rect.height) ? OrientationEnum.LANDSCAPE : OrientationEnum.PORTRAIT;
         this.setOrientation(orientation);
@@ -731,7 +746,7 @@ class BotUI  {
         titleElement.textContent = title;
 
         // Create the context element and set its text content
-        const contextElement = document.createElement("span");
+        const contextElement = document.createElement("div");
         contextElement.textContent = secondary;
 
         // Add a click event listener to the snippet container element
@@ -1015,6 +1030,10 @@ class BotUI  {
         messageElement.appendChild(mediaPlayer);
     }
 
+    public setTitle(title: string) {
+        this.appSelectToggle(true, title);
+    }
+
     public disableButtonGroup = (settings, callback, selector) => {
         const messageElement = BotUI.messagesElement;
         BotUI.inputTakers.classList.remove("hidden");
@@ -1022,19 +1041,6 @@ class BotUI  {
             callback();
         }
 
-        if (settings.solutions){
-            if (settings.pdf){
-                this.pdfButton(settings)
-            }else{
-                this.oldMessagesSection(settings.groupName.replace(/\s+/g, ''));
-            }
-
-        }
-
-        if (settings.appSelect){
-            messageElement.textContent = "";
-            this.appSelectToggle(true, selector);
-        }
         if (settings.disableGroup){
             document.querySelectorAll(`[data-button-group=${selector}]`).forEach(elem => {
                 elem.setAttribute('disabled', '');
@@ -1071,11 +1077,6 @@ class BotUI  {
         messageElement.appendChild(button);
         messageElement.scrollTop = messageElement.scrollHeight;
         BotUI.scrollToLastMessage(messageElement);
-
-        if (settings.solutions){
-            this.newMessageSection(settings.groupName.replace(/\s+/g, ''));
-            this.setSection("SOLUTIONS");
-        }
     }
 
     public setImage = (url: string = null) => {
@@ -1171,6 +1172,10 @@ class BotUI  {
 
     public chatMicrophoneCallback = (...value) => {}
 
+    public closeElementCallback = () => {
+        this.changeCollapsedMode();
+    };
+
     public feedbackCallback = (...value) => {}
     
     public chatRestartCallback = (...value) => {}
@@ -1227,6 +1232,7 @@ class BotUI  {
         BotUI._setMicrophone();
         BotUI.getChatMicrophone(BotUI.isMicrophoneEnabled, this.chatMicrophoneCallback);
     }
+
 
     public setUserMessageBackgroundColor = (color: string) => {
         const backgroundColor = isNil(color) || !is(String, color) ? this.getSettings().userMessageBackgroundColor : color;

@@ -379,21 +379,39 @@ var createBot = (botUI, settings) => {
 
 	async function handleFile(oldMode, index, query){
 		function titleAndContext(tags, content){
-			var secondary;
-			if (tags.h2.length === 0 && tags.h3.length === 0){
-				if (content.length > 30){
-					secondary = content.slice(0, 30);
-				}else{
-					secondary = content
-				}
+			console.log("titleAndContext", tags, {content})
+			const h1 = tags.h1_b = tags.h1_b.split(" |");
+			const h2 = tags.h2_b = tags.h2_b.split(" |");
+			const h3 = tags.h3_b = tags.h3_b.split(" |");
+			// remove "" elements from arrays
+			h1.forEach((e, i) => { if (e === "") h1.splice(i, 1); });
+			h2.forEach((e, i) => { if (e === "") h2.splice(i, 1); });
+			h3.forEach((e, i) => { if (e === "") h3.splice(i, 1); });
+
+			let title;
+			let secondary;
+			if (h1.length > 1){
+				title = h1[0];
+			}else if (h2.length > 0){
+				title = h2[0];
+				h2.shift();
+			}else if (h3.length > 0){
+				title = h3[0];
+				h3.shift();
 			}else{
-				if (tags.h2.length > 0){
-					secondary = tags.h2.replaceAll(" |", ",");
-				}else{
-					secondary = tags.h3.replaceAll(" |", ",");
-				}
+				title = content.slice(0, 10);
+				secondary = content.slice(10, 20);
+				return {title, secondary};
 			}
-			return [tags.h1.replaceAll(" |", ","), secondary];
+
+			if (h2.length > 0){
+				secondary = h2.join("\n");
+			}else if(h3.length > 0){
+				secondary = h3.join("\n");
+			}else{
+				secondary = content.slice(0, 20);
+			}
+			return {title, secondary};
 		}
 		botUI.toggleLoader(true);
 		const results = (await bot.getFiles(query, url="https://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
@@ -420,8 +438,8 @@ var createBot = (botUI, settings) => {
 			}
 			
 			results.result.forEach(result => {
-				const [title, secondary] =  titleAndContext(result.meta, result.content);
-				botUI.setSnippet(result.meta.pagelink, title, "");
+				const {title, secondary} =  titleAndContext(result.meta.backup, result.meta.backup.cnt);
+				botUI.setSnippet(result.meta.pagelink, title, secondary);
 			});
 		}
 	}
