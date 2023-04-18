@@ -944,6 +944,28 @@ class BotUI  {
         const messageElement = BotUI.messagesElement;
         const suggestionContainer = getContentAsHtml(sopSuggestionContainer);
         messageElement.appendChild(suggestionContainer);
+        var mouseHover = false;
+        function scrollFunction(e){
+            console.log("hovering");
+            if (mouseHover){
+                console.log("hover true");
+                e.preventDefault();
+                const scrollAmount = 20 * (e.deltaY/Math.abs(e.deltaY));
+                suggestionContainer.children[0].scrollLeft += scrollAmount;
+            }
+        }
+        
+        suggestionContainer.addEventListener("mouseover", function(){
+            console.log("mouse in");
+            mouseHover = true;
+        })
+
+        suggestionContainer.addEventListener("mouseout", function(){
+            mouseHover = false;
+            console.log("mouse out");
+        });
+
+        suggestionContainer.addEventListener("wheel", (e) =>  {scrollFunction(e)});
         suggestions.forEach(sug => {
             let btn = document.createElement("button");
             btn.innerText = sug;

@@ -1752,8 +1752,8 @@ canvas{
 	justify-content: start;
 	width: 90%;
 	height: 45px;
-	overflow-x: auto;
-	overflow-y: hidden;
+	overflow-x: scroll;
+	white-space: nowrap;
 	margin: 0.2rem 0.7rem 0 0.7rem;
 	padding: 3px 0;
 
