@@ -21,6 +21,7 @@
 				collapsed: false,
                 interactionMode: "GUIDE",
                 sound: false,
+                title: "Bot UI",
             });
 			botUI.setScreen();
 			botUI.setBackgroundColor('#927263');
@@ -30,21 +31,21 @@
             botUI.setImage('https://upload.wikimedia.org/wikipedia/tr/7/77/Lukepromo2321.jpg');
             botUI.setBotText("Bot said something more interesting and very long like it is very very interesting so that you wanna know what happening...");
             botUI.setBotText("Bot said something more interesting and very long like it is very very interesting so that you wanna know what happening...");
-            botUI.setSnippet("https://www.youtube.com", "Video Place", `Allen Carr was a prominent self-help author who wrote several books on quitting smoking, alcohol, and other addictive habits. Here is a list of some of his most famous books ranked by sales and fame:
+//             botUI.setSnippet("https://www.youtube.com", "Video Place", `Allen Carr was a prominent self-help author who wrote several books on quitting smoking, alcohol, and other addictive habits. Here is a list of some of his most famous books ranked by sales and fame:
 
-"The Easy Way to Stop Smoking" - This is Allen Carr's most famous book and has sold over 20 million copies worldwide. It is a best-seller in several countries and has helped many smokers quit smoking.
+// "The Easy Way to Stop Smoking" - This is Allen Carr's most famous book and has sold over 20 million copies worldwide. It is a best-seller in several countries and has helped many smokers quit smoking.
 
-"The Easy Way to Control Alcohol" - This book is also a best-seller and has helped many people to quit drinking alcohol. It has sold over 2 million copies worldwide.
+// "The Easy Way to Control Alcohol" - This book is also a best-seller and has helped many people to quit drinking alcohol. It has sold over 2 million copies worldwide.
 
-"Allen Carr's Easyweigh to Lose Weight" - This book has sold over 1 million copies worldwide and is a popular self-help book for those looking to lose weight.
+// "Allen Carr's Easyweigh to Lose Weight" - This book has sold over 1 million copies worldwide and is a popular self-help book for those looking to lose weight.
 
-"The Easy Way to Quit Gambling" - This book has helped many people to overcome their gambling addiction and has sold over 500,000 copies worldwide.
+// "The Easy Way to Quit Gambling" - This book has helped many people to overcome their gambling addiction and has sold over 500,000 copies worldwide.
 
-"The Only Way to Stop Smoking Permanently" - This book has sold over 1 million copies worldwide and is a popular choice for those looking to quit smoking permanently.
+// "The Only Way to Stop Smoking Permanently" - This book has sold over 1 million copies worldwide and is a popular choice for those looking to quit smoking permanently.
 
-It's worth noting that Allen Carr has written several other books, but these are his most famous and popular ones.`)
-            botUI.setSnippet("https://www.facebook.com", "Social Platform", "");
-            botUI.setSuggestion(["Yes", "No", "These are the suggestion buttons and they help clients see their options"]);
+// It's worth noting that Allen Carr has written several other books, but these are his most famous and popular ones.`)
+//             botUI.setSnippet("https://www.facebook.com", "Social Platform", "");
+            botUI.setSuggestion(["Yes", "No", "These suggestion lengths are getting out of hand!","These are the suggestions", "These are the suggestion buttons and they help clients"], true);
             botUI.toggleRestart(true);
             // botUI.setUserText("You said");
             botUI.chatInputCallback = ((inputValue) => {

@@ -19,6 +19,7 @@ export interface Settings {
     downSop?: string;
     guiMode: GUIMode,
     goTo: Boolean,
+    title: string,
     feedback: Boolean,
     imageAverageColorOpacity?: number;
     userMessageBackgroundColor?: string;

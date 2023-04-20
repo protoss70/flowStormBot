@@ -43,6 +43,7 @@ import {
 const defaults: Settings = {
     animationSpeed: 500,
     goTo: true,
+    title: "",
     feedback: true,
     backgroundAdvancedAnimationParticlesCount: 20,
     backgroundColor: '#927263',
@@ -171,6 +172,7 @@ class BotUI  {
     private static botLoginPopup: HTMLElement;
     private static restartElement: HTMLElement;
     private static closeElement: HTMLElement;
+    private static sopHeader: HTMLElement;
     
     private static isChatEnabled: boolean = true;
     private static isMicrophoneEnabled: boolean = true;
@@ -237,7 +239,8 @@ class BotUI  {
         BotUI.questionSection = BotUI.element.querySelector('[data-chat-ask]');
         BotUI.questionSOPButton = BotUI.element.querySelector('[data-sop-question]');
         BotUI.downSOPButton = BotUI.element.querySelector('[data-sop-next]');
-        BotUI.sopName = BotUI.element.querySelector('[data-sop-header]');
+        BotUI.sopHeader = BotUI.element.querySelector('[data-sop-header]');
+        BotUI.sopName = BotUI.element.querySelector('[data-sop-title]');
         BotUI.inputTakers = BotUI.element.querySelector('[data-input-takers]');
         BotUI.askAnother = BotUI.element.querySelector('[data-pdf-question-another]');
         BotUI.continue = BotUI.element.querySelector('[data-pdf-question-continue]');
@@ -273,7 +276,7 @@ class BotUI  {
                 }
             );
         }
-
+        this.setTitle(BotUI.settings.title);
         if (BotUI.settings.interactionMode === "SOP"){
             BotUI.settings.sections = ["SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK", "LOGIN", "INPUTSELECT"];
         }else if (BotUI.settings.interactionMode === "GUIDE"){
@@ -939,10 +942,13 @@ class BotUI  {
         });
     }
 
-    public setSuggestion = (suggestions : string[]) => {
+    public setSuggestion = (suggestions : string[], listView: boolean = false) => {
         this.removeSuggestions();
         const messageElement = BotUI.messagesElement;
         const suggestionContainer = getContentAsHtml(sopSuggestionContainer);
+        if (listView){
+            suggestionContainer.children[0].classList.add("list-view");
+        }
         messageElement.appendChild(suggestionContainer);
         var mouseHover = false;
         function scrollFunction(e){
@@ -950,30 +956,36 @@ class BotUI  {
             if (mouseHover){
                 console.log("hover true");
                 e.preventDefault();
-                const scrollAmount = 20 * (e.deltaY/Math.abs(e.deltaY));
+                const scrollAmount = 30 * (e.deltaY/Math.abs(e.deltaY));
                 suggestionContainer.children[0].scrollLeft += scrollAmount;
             }
         }
-        
-        suggestionContainer.addEventListener("mouseover", function(){
-            console.log("mouse in");
-            mouseHover = true;
-        })
 
-        suggestionContainer.addEventListener("mouseout", function(){
-            mouseHover = false;
-            console.log("mouse out");
-        });
-
-        suggestionContainer.addEventListener("wheel", (e) =>  {scrollFunction(e)});
+        if (!listView){
+            suggestionContainer.addEventListener("mouseover", function(){
+                console.log("mouse in");
+                mouseHover = true;
+            })
+    
+            suggestionContainer.addEventListener("mouseout", function(){
+                mouseHover = false;
+                console.log("mouse out");
+            });
+    
+            suggestionContainer.addEventListener("wheel", (e) =>  {scrollFunction(e)});
+        }
         suggestions.forEach(sug => {
             let btn = document.createElement("button");
             btn.innerText = sug;
             btn.setAttribute("data-suggestions-button", "");
             btn.classList.add("data-suggestions-button");
+            if (listView){
+                btn.classList.add("list-view");
+            }
             btn.onclick = this.suggestionsCallback;
             document.querySelector("[data-suggestions-container].data-suggestions-container").appendChild(btn);
         });
+        
         BotUI.scrollToLastMessage(messageElement);
     }
 
@@ -1047,7 +1059,7 @@ class BotUI  {
         BotUI.scrollToLastMessage(messageElement);
     }
 
-    public setImage = (url: string = null) => {
+    public setImage = (url: string = null, nodeId: string="") => {
         if (BotUI.settings.guiMode === GUIMode.KIOSK) {
             const cleanImageElement = (full = true) => {
                 BotUI.imageKioskElement.innerHTML = '';
@@ -1084,7 +1096,7 @@ class BotUI  {
             }
         }
         if (BotUI.settings.guiMode === GUIMode.CHAT && !(isNil(url) || isEmpty(url))) {
-            this.setChatMessage(null, url, null, MessageType.BOT, false);
+            this.setChatMessage(null, url, null, MessageType.BOT, false, nodeId,this.botMessagesCallback);
         }
     }
 

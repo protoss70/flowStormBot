@@ -1752,10 +1752,17 @@ canvas{
 	justify-content: start;
 	width: 90%;
 	height: 45px;
-	overflow-x: scroll;
+	overflow-x: auto;
 	white-space: nowrap;
 	margin: 0.2rem 0.7rem 0 0.7rem;
 	padding: 3px 0;
+
+	&.list-view{
+		flex-wrap: wrap;
+		height: auto;
+		overflow-x: hidden;
+
+	}
 
 		/* width */
 	&::-webkit-scrollbar {
@@ -1790,6 +1797,12 @@ canvas{
 		border: none;
 		border-radius: 5px;
 		padding: 0.55rem;
+
+		&.list-view{
+			height: auto;
+			list-style:circle;
+			white-space: normal;
+		}
 
 		&:hover{
 			cursor: pointer;

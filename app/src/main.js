@@ -324,7 +324,7 @@ var createBot = (botUI, settings) => {
 			}, BotUI.settings.animationSpeed + 5);
 		}
 		if (image !== undefined && image !== null) {
-			botUI.setImage(image);
+			botUI.setImage(image, nodeId);
 		}
 		if (background !== undefined && background !== null && background !== botBackground) {
 			botBackground = background;
@@ -504,9 +504,9 @@ var createBot = (botUI, settings) => {
 					payload.nodes.forEach(node => {
 						suggestionText.push(node.text);
 					});
-					botUI.setSuggestion(suggestionText);
+					botUI.setSuggestion(suggestionText, true);
 				}else{
-					botUI.setSuggestion(payload.suggestions);
+					botUI.setSuggestion(payload.suggestions, true);
 				}
 				break;
 			case "#media":
@@ -535,6 +535,7 @@ var createBot = (botUI, settings) => {
 	}
 
 	function setAttribute(atr, value){
+		console.log(atr, value);
 		attributeList[atr] = value
 	}
 
@@ -689,6 +690,7 @@ var createBot = (botUI, settings) => {
 			exitButtonMode();
 		}
 		console.log(e);
+		console.log("go to");
 		setAttribute("nodeId", e);
 		botUI.removeSuggestions();
 		bot.handleOnTextInput(`#go_to`, false, {sopInput: true});
