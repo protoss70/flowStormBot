@@ -954,7 +954,6 @@ class BotUI  {
         function scrollFunction(e){
             console.log("hovering");
             if (mouseHover){
-                console.log("hover true");
                 e.preventDefault();
                 const scrollAmount = 30 * (e.deltaY/Math.abs(e.deltaY));
                 suggestionContainer.children[0].scrollLeft += scrollAmount;
@@ -963,13 +962,11 @@ class BotUI  {
 
         if (!listView){
             suggestionContainer.addEventListener("mouseover", function(){
-                console.log("mouse in");
                 mouseHover = true;
             })
     
             suggestionContainer.addEventListener("mouseout", function(){
                 mouseHover = false;
-                console.log("mouse out");
             });
     
             suggestionContainer.addEventListener("wheel", (e) =>  {scrollFunction(e)});
@@ -1530,6 +1527,18 @@ class BotUI  {
         }
     }
 
+    private chatMessageHeightLimit(elem: HTMLElement){
+        const limit = 40;
+        const height = elem.offsetHeight;
+        const vh = (height / window.innerHeight) * 100;
+        if (vh > limit) {
+            const div = document.createElement("div");
+            div.classList.add("chat-message--limit");
+            elem.appendChild(div);
+            div.appendChild(elem.children[0]);
+        }
+    }
+
     public setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}) => {
         const messageElement = BotUI.messagesElement;
         const messageTemplate = getContentAsHtml(chatMessageStructureTemplate);
@@ -1598,22 +1607,9 @@ class BotUI  {
             })
             messageTemplate.children[0].appendChild(hoverIcon);
         }
-
-        // if (type === MessageType.BOT && this.getSettings().feedback){
-        //     //Create feedback icon
-        //     const feedbackIcon = document.createElement("span");
-        //     feedbackIcon.innerHTML = " ";
-        //     ["icon-sop", "icon-sop--feedback", "icon--content--feedback"].forEach(_class => {
-        //         feedbackIcon.classList.add(_class);
-        //     });
-
-        //     feedbackIcon.addEventListener("click", () => {
-        //         this.feedbackCallback(id);
-        //     })
-        //     messageTemplate.children[0].appendChild(feedbackIcon);
-        // }
         
         messageElement.appendChild(messageTemplate.children[0]);
+        this.chatMessageHeightLimit(messageElement.children[messageElement.children.length - 1] as HTMLElement);
         messageElement.scrollTop = messageElement.scrollHeight;
         BotUI.scrollToLastMessage(messageElement);
     }

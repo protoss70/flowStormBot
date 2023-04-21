@@ -40,6 +40,7 @@
 	--chat-padding-amount: 4;
 	--bot-ui-avatar-text-overlap: 0px;
 	--bot-ui-chat-pcm-height: 80px;
+	--message-height-limit: 40;
 }
 
 
@@ -638,6 +639,8 @@ $amount: 20;
 	}
 }
 
+
+
 [data-gui-mode="chat"] {
 
 	&:not([data-with-chat-input]) {
@@ -702,6 +705,12 @@ $amount: 20;
 			padding: .55rem;
 			border-radius: .7rem;
 			margin: .2rem .7rem 0 .7rem;
+
+			& > div.chat-message--limit{
+				overflow-y: auto;
+				max-height: 40vh;
+				padding-right: 10px;
+			}
 
 			&.chat-message-last {
 				margin-bottom: 1rem;
@@ -1791,6 +1800,7 @@ canvas{
 
 	& > button{
 		height: 100%;
+		
 		white-space: nowrap;
 		background-color: rgba(255, 255, 255, 0.3);
 		color: white;

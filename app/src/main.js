@@ -291,7 +291,8 @@ var createBot = (botUI, settings) => {
 		return status;
 	}
 
-	defaultCallback.addMessage = (type, text, image, background, nodeId, signal) => {
+	defaultCallback.addMessage = (type, text, image, background, nodeId, dialogueNodeId) => {
+		console.log("dialogue node id: ", dialogueNodeId);
 		if (type === 'sent') {
 			if (text !== null) {
 				botUI.setUserText(text);
