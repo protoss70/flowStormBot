@@ -96,6 +96,7 @@ const sopHeight = '110px';
 const chatPadding = '4';
 const sopPadding = '6';
 const disabledHeight = '0px';
+let addressBarHeight = 100;
 const avatarMaxHeightRatio = {
     [GUIMode.CHAT]: 2 / 3,
     [GUIMode.KIOSK]: 1,
@@ -284,6 +285,25 @@ class BotUI  {
         }
 
         this.setSection(BotUI.settings.sections[0]);
+
+        if(this.isMobileDevice()){
+            let addressBarHeight = 100;
+            function calculateAddressBarHeight() {
+                const windowHeight = window.innerHeight;
+                const viewportHeight = document.documentElement.clientHeight;
+                const newAddressHeight = windowHeight - viewportHeight;
+                if (newAddressHeight > 0){
+                    console.log("changing address bar height");
+                    addressBarHeight = newAddressHeight;
+                    BotUI.botWrapperElement.style.removeProperty('height');
+                }else{
+                    console.log(`Browser address bar height: ${addressBarHeight}px`);
+                    BotUI.botWrapperElement.style.height = `calc(100vh - ${addressBarHeight}px)`;
+                }
+            }
+            calculateAddressBarHeight();
+            window.addEventListener('resize', calculateAddressBarHeight);
+        }
 
         if (BotUI.settings.guiMode === GUIMode.KIOSK) {
             BotUI.messagesElement.innerHTML = kioskMessageStructureTemplate;
@@ -516,6 +536,10 @@ class BotUI  {
             this.setSection(nextSect);
         }
     }
+
+    public isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    };
 
     public previousSection(){
         if (BotUI.settings.sectionActive >= 0){
