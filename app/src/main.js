@@ -701,7 +701,11 @@ var createBot = (botUI, settings) => {
 		const status = getStatus();
 		if (status === "SLEEPING") {
 		} else {
-			sendText(inputValue);
+
+			botUI.setUserText(inputValue);
+			bot.handleOnTextInput(`#search`, false, {sopInput: true});
+			
+			// sendText(inputValue);
 		}
 	});
 
