@@ -366,7 +366,7 @@ class BotUI  {
         });
 
         BotUI.chatInputElement.onkeyup = (e) => {
-            if (e.keyCode === 13) {
+            if (e.key === "Enter") {
                 BotUI.getInputValue((BotUI.chatInputElement as HTMLInputElement).value, this.chatInputCallback);
                 (BotUI.chatInputElement as HTMLInputElement).value = '';
                 BotUI.changeClasses("icon--arrow-up--visible", "icon--arrow-up--hidden", BotUI.chatInputArrowElement);
