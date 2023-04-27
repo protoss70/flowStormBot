@@ -505,9 +505,9 @@ var createBot = (botUI, settings) => {
 					payload.nodes.forEach(node => {
 						suggestionText.push(node.text);
 					});
-					botUI.setSuggestion(suggestionText);
+					botUI.setSuggestion(suggestionText, true);
 				}else{
-					botUI.setSuggestion(payload.suggestions);
+					botUI.setSuggestion(payload.suggestions, true);
 				}
 				break;
 			case "#media":
