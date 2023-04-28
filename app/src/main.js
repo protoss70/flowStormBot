@@ -83,6 +83,7 @@ let modal;
 let botState = {};
 let paused = true;
 let textInputEnabled = false;
+let dialogueIDs = [];
 
 export const initFSClientBot = (initParams = {}) => {
 	Sentry.init({
@@ -437,7 +438,9 @@ var createBot = (botUI, settings) => {
 	}
 
 	defaultCallback.handleCommand = (command, code, t) => {
+		console.log(code);
         const payload = JSON.parse(code);
+		console.log(command);
 		console.log(payload);
 	    switch(command) {
 			case '#expression':
@@ -514,6 +517,18 @@ var createBot = (botUI, settings) => {
 				payload.videos.forEach(vid => {
 					botUI.setMedia({sound: settings.sound, src: vid});
 				});
+				break;
+			case "#options":
+				console.log("pay: ", payload);
+				dialogueIDs.push(payload.dialogueID);
+				console.log("==========================", dialogueIDs, "==========================");
+				botUI.setDialogueID(payload.dialogueID);
+				break;
+			case "#exitDialogue":
+				console.log("exit dia");
+				dialogueIDs.pop();
+				console.log("==========================", dialogueIDs, "==========================");
+				botUI.setDialogueID(dialogueIDs[dialogueIDs.length - 1]);
 				break;
 			default:
 
@@ -686,13 +701,15 @@ var createBot = (botUI, settings) => {
 		}
 	}
 
-	botUI.botMessagesCallback = (e) => {
+	botUI.botMessagesCallback = (nodeID, dialogueID) => {
 		if (botUI.getInputMode() === "button"){
 			exitButtonMode();
 		}
-		console.log(e);
+		console.log(nodeID);
 		console.log("go to");
-		setAttribute("nodeId", e);
+		console.log("-----------------------------------------------", dialogueID);
+		setAttribute("nodeId", nodeID);
+		setAttribute("dialogueID", dialogueID);
 		botUI.removeSuggestions();
 		bot.handleOnTextInput(`#go_to`, false, {sopInput: true});
 	}

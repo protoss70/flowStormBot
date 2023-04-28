@@ -129,6 +129,7 @@ class BotUI  {
     private static element: HTMLElement;
     private static settings: Settings;
     private static orientation: OrientationEnum;
+    public dialogueID: string = "";
 
     private static rootElement: HTMLElement;
     private static avatarElement: HTMLElement;
@@ -266,6 +267,8 @@ class BotUI  {
         } else {
             BotUI.collapsableTriggerElement.parentNode.removeChild(BotUI.collapsableTriggerElement);
         }
+
+        
 
         if (!BotUI.settings.customIcons) {
             icons.forEach(icon => {
@@ -496,6 +499,10 @@ class BotUI  {
                 BotUI.chatInputMuteElement.classList.remove('icon--light');
             }
         }
+    }
+
+    public setDialogueID(id: string){
+        this.dialogueID = id;
     }
 
     public setControls = (visible: boolean) => {
@@ -878,7 +885,7 @@ class BotUI  {
             }, BotUI.settings.animationSpeed);
         }
         if (BotUI.settings.guiMode === GUIMode.CHAT && !(isNil(text) || isEmpty(text))) {
-            this.setChatMessage(text, null, null, MessageType.BOT, false, nodeId, this.botMessagesCallback);
+            this.setChatMessage(text, null, null, MessageType.BOT, false, nodeId, this.botMessagesCallback, this.dialogueID);
         }
     }
 
@@ -976,7 +983,6 @@ class BotUI  {
         messageElement.appendChild(suggestionContainer);
         var mouseHover = false;
         function scrollFunction(e){
-            console.log("hovering");
             if (mouseHover){
                 e.preventDefault();
                 const scrollAmount = 30 * (e.deltaY/Math.abs(e.deltaY));
@@ -1117,7 +1123,7 @@ class BotUI  {
             }
         }
         if (BotUI.settings.guiMode === GUIMode.CHAT && !(isNil(url) || isEmpty(url))) {
-            this.setChatMessage(null, url, null, MessageType.BOT, false, nodeId,this.botMessagesCallback);
+            this.setChatMessage(null, url, null, MessageType.BOT, false, nodeId, this.botMessagesCallback, this.dialogueID);
         }
     }
 
@@ -1563,7 +1569,7 @@ class BotUI  {
         }
     }
 
-    public setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}) => {
+    public setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}, dialogueID = "") => {
         const messageElement = BotUI.messagesElement;
         const messageTemplate = getContentAsHtml(chatMessageStructureTemplate);
         const messageTemplateElement = messageTemplate.querySelector('div.chat-message');
@@ -1627,7 +1633,7 @@ class BotUI  {
                 hoverIcon.classList.add(_class);
             });
             hoverIcon.addEventListener("click", () => {
-                clickCallback(id)
+                clickCallback(id, dialogueID);
             })
             messageTemplate.children[0].appendChild(hoverIcon);
         }
