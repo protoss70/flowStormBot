@@ -138,6 +138,7 @@ export const initFSClientBot = (initParams = {}) => {
 		}
 	}
 	const botUI = initUI(settings);
+
 	if (botUI) {
 		createBot(botUI, settings);
 		initBot();
@@ -251,8 +252,16 @@ const checkBotUIOverlays = (element) => {
 			modal.style.display = 'block';
 		}
 		if (playButton) {
-			playButton.style.display = 'block';
+			// playButton.style.display = 'block';
 		}
+	}
+}
+
+const setDialogueIDs = (newDialogueIDs, botUI) => {
+	console.log(dialogueIDs, )
+	dialogueIDs = newDialogueIDs;
+	if (botUI){
+		botUI.dialogueChangeCallback(dialogueIDs);
 	}
 }
 
@@ -272,6 +281,7 @@ var createBot = (botUI, settings) => {
 	const defaultCallback = {};
 
 	defaultCallback.setStatus = (newState) => {
+		const oldState = botState;
 		botState = newState;
 		if (newState.status === 'LISTENING') {
 			botUI.setOutputAudio(1);
@@ -280,11 +290,15 @@ var createBot = (botUI, settings) => {
 		}
 		changePlayIcon(newState.status === 'SLEEPING' || newState.status === 'PAUSED' || !newState.status, botUI);
 		botUI.disableStop(newState.status === 'SLEEPING')
+
 		if (newState.status === 'SLEEPING'){
-			botUI.toggleRestart(true);
 			botUI.setMicIcon(false);
-		}else if(newState.status !== undefined){
-			botUI.toggleRestart(false);
+			botUI.showAllGoToButtons();
+			setDialogueIDs([], botUI);
+			console.log("===========================================dialog zerod: ", dialogueIDs, 'background-color: yellow');
+		}else if(newState.status === undefined){
+			setDialogueIDs([], botUI);
+			console.log("===========================================dialog zerod2: ", dialogueIDs, 'background-color: yellow');
 		}
 	}
 
@@ -292,8 +306,7 @@ var createBot = (botUI, settings) => {
 		return status;
 	}
 
-	defaultCallback.addMessage = (type, text, image, background, nodeId, dialogueNodeId) => {
-		console.log("dialogue node id: ", dialogueNodeId);
+	defaultCallback.addMessage = (type, text, image, background, nodeId) => {
 		if (type === 'sent') {
 			if (text !== null) {
 				botUI.setUserText(text);
@@ -381,7 +394,6 @@ var createBot = (botUI, settings) => {
 
 	async function handleFile(oldMode, index, query){
 		function titleAndContext(tags, content){
-			console.log("titleAndContext", tags, {content})
 			const h1 = tags.h1_b = tags.h1_b.split(" |");
 			const h2 = tags.h2_b = tags.h2_b.split(" |");
 			const h3 = tags.h3_b = tags.h3_b.split(" |");
@@ -418,7 +430,6 @@ var createBot = (botUI, settings) => {
 		botUI.toggleLoader(true);
 		const results = (await bot.getFiles(query, url="https://upv-search-develop.alquist.ai/v2/models/upv-search/infer")).data;
 		botUI.toggleLoader(false);
-		console.log("search results: ", results);
 		if (results === undefined){
 			//SERVER ERROR
 			bot.handleOnTextInput(`ERROR`, false, {sopInput: true});
@@ -438,10 +449,7 @@ var createBot = (botUI, settings) => {
 	}
 
 	defaultCallback.handleCommand = (command, code, t) => {
-		console.log(code);
         const payload = JSON.parse(code);
-		console.log(command);
-		console.log(payload);
 	    switch(command) {
 			case '#expression':
 				botUI.sendRTCData({'Expression': { 'Name': payload['name']}});
@@ -508,9 +516,9 @@ var createBot = (botUI, settings) => {
 					payload.nodes.forEach(node => {
 						suggestionText.push(node.text);
 					});
-					botUI.setSuggestion(suggestionText, true);
+					botUI.setSuggestion(suggestionText, !botUI.isMobileDevice());
 				}else{
-					botUI.setSuggestion(payload.suggestions, true);
+					botUI.setSuggestion(payload.suggestions, !botUI.isMobileDevice());
 				}
 				break;
 			case "#media":
@@ -519,15 +527,13 @@ var createBot = (botUI, settings) => {
 				});
 				break;
 			case "#options":
-				console.log("pay: ", payload);
-				dialogueIDs.push(payload.dialogueID);
-				console.log("==========================", dialogueIDs, "==========================");
+				setDialogueIDs([...dialogueIDs, payload.dialogueID], botUI);
+				console.log("===========================================dialogue ID: ", dialogueIDs);
 				botUI.setDialogueID(payload.dialogueID);
 				break;
 			case "#exitDialogue":
-				console.log("exit dia");
-				dialogueIDs.pop();
-				console.log("==========================", dialogueIDs, "==========================");
+				setDialogueIDs(dialogueIDs.slice(0, -1), botUI)
+				console.log("===========================================dialogue ID rem: ", dialogueIDs);
 				botUI.setDialogueID(dialogueIDs[dialogueIDs.length - 1]);
 				break;
 			default:
@@ -705,13 +711,12 @@ var createBot = (botUI, settings) => {
 		if (botUI.getInputMode() === "button"){
 			exitButtonMode();
 		}
-		console.log(nodeID);
-		console.log("go to");
-		console.log("-----------------------------------------------", dialogueID);
-		setAttribute("nodeId", nodeID);
-		setAttribute("dialogueID", dialogueID);
-		botUI.removeSuggestions();
-		bot.handleOnTextInput(`#go_to`, false, {sopInput: true});
+		if (dialogueIDs.includes(dialogueID)){
+			setAttribute("nodeId", nodeID);
+			setAttribute("dialogueID", dialogueID);
+			botUI.removeSuggestions();
+			bot.handleOnTextInput(`#go_to`, false, {sopInput: true});
+		}
 	}
 
 	botUI.chatInputCallback = ((inputValue) => {
@@ -726,6 +731,11 @@ var createBot = (botUI, settings) => {
 		}
 	});
 
+	botUI.collapseCallback = (collapsed) => {
+		paused = !paused
+		run();
+	}
+
 	botUI.chatMicrophoneCallback = (inputValue) => changeAudio("Input");
 
 	botUI.chatMuteCallback = (inputValue) => changeAudio("Output");
@@ -738,8 +748,14 @@ var createBot = (botUI, settings) => {
 	}
 
 	botUI.chatRestartCallback = () => {
-		run();
-		bot.audioInputCallback();
+		const state = getStatus();
+		if (state === "SLEEPING" || state === undefined){
+			run();
+			bot.audioInputCallback();
+		}else{
+			stop();
+			setTimeout(() => {run()}, 750);
+		}
 	}
 
 	botUI.sectionChangeCallback = (section) => {
@@ -1011,7 +1027,7 @@ const addPlayButton = (botUI) => {
             startBot();
             e.target.remove();
         };
-        botElement.querySelector('[data-play]').style.display='block';
+        // botElement.querySelector('[data-play]').style.display='block';
         checkBotUIOverlays(botElement);
     }
 
