@@ -18,6 +18,7 @@
                 backgroundAdvancedAnimationParticlesCount: 0,
                 backgroundSimpleAnimation: false,
 				collapsable: true,
+                textInputEnabled: false,
 				collapsed: false,
                 interactionMode: "GUIDE",
                 sound: false,
@@ -55,9 +56,6 @@
             botUI.chatTextInputElementCallback = ((e) => {
 				console.log(`User typed text ${e.data}`);
 			});
-
-            botUI.setDialogueID("anneni sikiyim");
-            console.log(botUI.dialogueID);
             
         </script>
 	</body>
