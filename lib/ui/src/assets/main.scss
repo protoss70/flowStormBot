@@ -142,12 +142,6 @@ $amount: 20;
 
 @media only screen and (min-width: 650px){
 	[data-messages], [data-suggestions-button]{
-		font-size: 1.3rem;
-	}
-}
-
-@media only screen and (min-width: 800px){
-	[data-messages], [data-suggestions-button]{
 		font-size: 1.2rem;
 	}
 }
