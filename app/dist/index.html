@@ -1,11 +1,12 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bot Development</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet"><link href="client-bot.css" rel="stylesheet"><script src="client-bot.js?43818d093a1b5bbdf369"></script></head><body><div id="upvBotKey" class="hidden"><label for="botId">Enter the id of your application from the Flowstorm website</label><div><input name="botId" id="botId" placeholder="ID..."> <button onclick="changeBotKey()">Apply</button></div><br><div id="parentHistory" class="hidden-index"><div>ID History</div><ul id="oldItemsList"></ul><button onclick="clearHistory()">clear history</button></div><br><div><div id="iconSetter"><label for="mic">Mic Icon</label> <input type="checkbox" name="mic" id="mic"> <label for="mute">Mute Icon</label> <input type="checkbox" name="mic" id="mute"> <label for="restart">Restart Icon</label> <input type="checkbox" name="mic" id="restart"></div></div></div><div id="upvTest"><h1 id="title">UPV TEST</h1></div><div id="botContainer"><div id="botDiv"></div></div><script>const defaultIconSetup = {mic: true, mute: true, restart: true}
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bot Development</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet"><link href="client-bot.css" rel="stylesheet"><script src="client-bot.js?2f0973b415144afd03f6"></script></head><body style="font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"><div id="upvBotKey" class="hidden"><label for="botId">Enter the id of your application from the Flowstorm website</label><div><input name="botId" id="botId" placeholder="ID..."> <button onclick="changeBotKey()">Apply</button></div><br><div id="parentHistory" class="hidden-index"><div>ID History</div><ul id="oldItemsList"></ul><button onclick="clearHistory()">clear history</button></div><br><div><label for="textInput">Enable Text Input</label> <input type="checkbox" name="textInput" id="textInput"><div id="iconSetter"><label for="mic">Mic Icon</label> <input type="checkbox" name="mic" id="mic"> <label for="mute">Mute Icon</label> <input type="checkbox" name="mic" id="mute"> <label for="restart">Restart Icon</label> <input type="checkbox" name="mic" id="restart"></div></div></div><div id="upvTest"><h1 id="title">UPV TEST</h1></div><div id="botContainer"><div id="botDiv"></div></div><script>const defaultIconSetup = {mic: true, mute: true, restart: true};
+		const textInputEnabled = false;
 		const clientParams = {
 			allowUrlParams: true,
 			collapsable: false,
 			fullScreen: false,
 			guiMode: 'chat',
 			backgroundColor: '#6737ff',
-			textInputEnabled: false,
+			textInputEnabled: textInputEnabled,
 			domain: '.flowstorm.ai',
 			mode: 'voice',
 			elementId: "botDiv",
@@ -33,10 +34,7 @@
 		document.getElementById("mic").checked = defaultIconSetup.mic;
 		document.getElementById("mute").checked = defaultIconSetup.mute;
 		document.getElementById("restart").checked = defaultIconSetup.restart;
-
-		document.getElementById("mic").onchange = (e) => {
-			
-		}
+		document.getElementById("textInput").checked = textInputEnabled;
 
 		window.addEventListener("load", () => {
 			const elem = document.getElementById("botId");
