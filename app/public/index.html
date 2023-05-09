@@ -10,7 +10,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 	
 </head>
-<body>
+<body style="font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">
 	<div id="upvBotKey" class="hidden">
 		<label for="botId">Enter the id of your application from the Flowstorm website</label>
 		<div>
@@ -26,6 +26,8 @@
 		</div>
 		<br>
 		<div>
+			<label for="textInput">Enable Text Input</label>
+			<input type="checkbox" name="textInput" id="textInput">
 			<div id="iconSetter">
 				<label for="mic">Mic Icon</label>
 				<input type="checkbox" name="mic" id="mic">
@@ -44,14 +46,15 @@
 		<div id="botDiv"></div>
 	</div>
 	<script>
-		const defaultIconSetup = {mic: true, mute: true, restart: true}
+		const defaultIconSetup = {mic: true, mute: true, restart: true};
+		const textInputEnabled = false;
 		const clientParams = {
 			allowUrlParams: true,
 			collapsable: false,
 			fullScreen: false,
 			guiMode: 'chat',
 			backgroundColor: '#6737ff',
-			textInputEnabled: false,
+			textInputEnabled: textInputEnabled,
 			domain: '.flowstorm.ai',
 			mode: 'voice',
 			elementId: "botDiv",
@@ -79,10 +82,7 @@
 		document.getElementById("mic").checked = defaultIconSetup.mic;
 		document.getElementById("mute").checked = defaultIconSetup.mute;
 		document.getElementById("restart").checked = defaultIconSetup.restart;
-
-		document.getElementById("mic").onchange = (e) => {
-			
-		}
+		document.getElementById("textInput").checked = textInputEnabled;
 
 		window.addEventListener("load", () => {
 			const elem = document.getElementById("botId");

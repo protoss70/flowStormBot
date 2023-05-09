@@ -168,13 +168,17 @@ export const initFSClientBot = (initParams = {}) => {
 				botUI.setControllIcons({mic: document.getElementById("mic").checked, 
 				mute: document.getElementById("mute").checked, 
 				restart: document.getElementById("restart").checked})
-			
+			}
+
+			function setTextEnabled(){
+				const textInputEnabled = document.getElementById("textInput").checked;
+				botUI.setTextInputEnabled(textInputEnabled);
 			}
 
 			document.getElementById("mute").addEventListener('change', () => {console.log("here");setControlIconsMain()});
 			document.getElementById("mic").addEventListener('change', () => {setControlIconsMain()});
 			document.getElementById("restart").addEventListener('change', () => {setControlIconsMain()});
-				
+			document.getElementById("textInput").addEventListener('change', () => {setTextEnabled()});
 		}
 
 		if (settings.interactionMode === "SOP"){
