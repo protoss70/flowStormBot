@@ -39,6 +39,7 @@ import {
     scrollTo as scrollToAnimated,
     wsConnection,
 } from './utils';
+import { forEach } from 'ramda';
 
 const defaults: Settings = {
     animationSpeed: 500,
@@ -85,6 +86,7 @@ const defaults: Settings = {
     sections: ["SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK", "LOGIN", "INPUTSELECT"],
     interactionMode: "SOP",
     sound: true,
+    controlIcons: {mic: true, mute: true, restart: true},
 };
 
 const fullScreenWidgetWidth = '100vw';
@@ -176,7 +178,8 @@ class BotUI  {
     private static restartElement: HTMLElement;
     private static closeElement: HTMLElement;
     private static sopHeader: HTMLElement;
-    
+    private static controlIconsWrapper: HTMLElement;
+
     private static isChatEnabled: boolean = true;
     private static isMicrophoneEnabled: boolean = true;
 
@@ -253,6 +256,7 @@ class BotUI  {
         BotUI.botLoginPopup = BotUI.element.querySelector("[bot-loginPopup]");
         BotUI.restartElement = BotUI.element.querySelector('[data-chat-input-restart]');
         BotUI.closeElement = BotUI.element.querySelector('[data-sop-close]');
+        BotUI.controlIconsWrapper = BotUI.element.querySelector('[control-icons-wrapper]');
 
         if (!BotUI.settings.collapsed) {
             BotUI.collapsableTriggerElement.classList.add("hidden");
@@ -269,17 +273,12 @@ class BotUI  {
             BotUI.collapsableTriggerElement.parentNode.removeChild(BotUI.collapsableTriggerElement);
         }
 
-        
+        if (BotUI.settings.controlIcons){
+            this.setControllIconStyles();
+        }
 
         if (!BotUI.settings.customIcons) {
-            icons.forEach(icon => {
-                    const suffix = BotUI.settings.interactionMode == 'SOP' || BotUI.settings.interactionMode == "GUIDE" ? '-sop' : '';
-                    const element = document.querySelector('.icon' + suffix + '--' + icon);
-                    if (element !== null){
-                        element.classList.add('icon--content--' + icon)
-                    }
-                }
-            );
+            this.setIcons()
         }
         this.setTitle(BotUI.settings.title);
         if (BotUI.settings.interactionMode === "SOP"){
@@ -500,6 +499,27 @@ class BotUI  {
                 BotUI.chatInputMuteElement.classList.remove('icon--light');
             }
         }
+    }
+
+    public setIcons = () => {
+        icons.forEach(icon => {
+            const suffix = BotUI.settings.interactionMode == 'SOP' || BotUI.settings.interactionMode == "GUIDE" ? '-sop' : '';
+            const element = document.querySelector('.icon' + suffix + '--' + icon);
+            if (element !== null){
+                element.classList.add('icon--content--' + icon)
+            }
+        }
+    );
+    }
+
+    public setControllIcons = (controlIcons: {mic: boolean, mute: boolean, restart: boolean}) => {
+        console.log("here in settign controls");
+        const mic = `<span data-chat-input-keyboard class="icon-sop icon-sop--keyboard"></span>`;
+        const mute = `<span data-chat-input-mute class="icon-sop icon-sop--volume-mute"></span>`;
+        const restart = `<span data-chat-input-restart class="icon-sop icon-sop--restart"></span>`;
+        BotUI.settings.controlIcons = controlIcons;
+
+        this.setControllIconStyles();
     }
 
     public setDialogueID(id: string){
@@ -1029,6 +1049,42 @@ class BotUI  {
 
     public setTitle(title: string) {
         this.appSelectToggle(true, title);
+    }
+
+    public setControllIconStyles() {
+        if (!BotUI.settings.controlIcons.mic){
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-keyboard]").classList.add("hidden");
+        }else{
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-keyboard]").classList.remove("hidden");
+        }
+        if (!BotUI.settings.controlIcons.mute){
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-mute]").classList.add("hidden");
+        }else{
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-mute]").classList.remove("hidden");
+        }
+        if (!BotUI.settings.controlIcons.restart){
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-restart]").classList.add("hidden");
+        }else{
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-restart]").classList.remove("hidden");
+        }
+        const childrenList = BotUI.controlIconsWrapper.querySelectorAll(".icon-sop:not(.hidden)");
+        for (let index = 0; index < childrenList.length; index++) {
+            const element = childrenList[childrenList.length - 1 - index];
+            element.classList.remove("left-icon", "right-icon", "firstIcon", "secondIcon", "thirdIcon");
+            if (index === 0){
+                element.classList.add("right-icon");
+                element.classList.add("firstIcon");
+            }
+            if (index === 1){
+                element.classList.add("secondIcon");
+            }
+            if (index === 2){
+                element.classList.add("thirdIcon");
+            }
+            if (index === childrenList.length - 1){
+                element.classList.add("left-icon");
+            }
+        } 
     }
 
     public disableButtonGroup = (settings, callback, selector) => {

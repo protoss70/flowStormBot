@@ -24,6 +24,17 @@
 			</ul>
 			<button onclick="clearHistory()">clear history</button>
 		</div>
+		<br>
+		<div>
+			<div id="iconSetter">
+				<label for="mic">Mic Icon</label>
+				<input type="checkbox" name="mic" id="mic">
+				<label for="mute">Mute Icon</label>
+				<input type="checkbox" name="mic" id="mute">
+				<label for="restart">Restart Icon</label>
+				<input type="checkbox" name="mic" id="restart">
+			</div>
+		</div>
 	</div>
 	<div id="upvTest">
 		<h1 id="title">UPV TEST</h1>
@@ -33,6 +44,7 @@
 		<div id="botDiv"></div>
 	</div>
 	<script>
+		const defaultIconSetup = {mic: true, mute: true, restart: true}
 		const clientParams = {
 			allowUrlParams: true,
 			collapsable: false,
@@ -46,7 +58,8 @@
 			collapsable: true,
 			interactionMode: "GUIDE",
 			sound: true,
-			title: "UPV TEST"
+			title: "UPV TEST",
+			controlIcons: defaultIconSetup,
 		};
 
 		initFSClientBot({
@@ -61,6 +74,14 @@
 		}
 		else{
 			document.getElementById("upvBotKey").classList.remove("hidden");
+		}
+
+		document.getElementById("mic").checked = defaultIconSetup.mic;
+		document.getElementById("mute").checked = defaultIconSetup.mute;
+		document.getElementById("restart").checked = defaultIconSetup.restart;
+
+		document.getElementById("mic").onchange = (e) => {
+			
 		}
 
 		window.addEventListener("load", () => {
@@ -136,7 +157,7 @@
 			inner.classList.add("idItems");
 			document.getElementById("oldItemsList").append(el);
 		}
-
+		
 	</script>
 
 <style>

@@ -26,8 +26,9 @@ const scrollDelay = 3; // seconds before the scrolling starts
 const defaultURL = "5f7db5f1e662e830b20dbe7c"
 const environment = '';
 let botKey = environment === '' || environment === '-preview' ? defaultURL : '606c52c6d750aa1b1537e5d6';
-let studioUrl = environment === 'local' ? 'http://localhost:8089' :  `https://studio${environment}.flowstorm.ai`
-let defaultCoreUrl = environment === 'local' ? 'http://localhost:8080' :  `https://core${environment}.flowstorm.ai`
+let studioUrl = environment === 'local' ? 'http://localhost:8089' :  `https://studio${environment}.flowstorm.ai`;
+let defaultCoreUrl = environment === 'local' ? 'http://localhost:8080' :  `https://core${environment}.flowstorm.ai`;
+let development = true;
 
 let idToken = undefined
 let accessToken = undefined
@@ -113,10 +114,10 @@ export const initFSClientBot = (initParams = {}) => {
 		if (window.location.pathname.length === 25 && settings.botKey === defaultURL) {
 			botKey = window.location.pathname.substring(1);
 		}
-		else if (botKeyStorage){
+		else if (botKeyStorage && development){
 			botKey = botKeyStorage;
 		} 
-		else if (urlBotKey !== null && urlBotKey.length === 24) {
+		else if (urlBotKey !== null && urlBotKey.length === 24 && development) {
 			botKey = urlBotKey;
 		}
 		const url = new URL(window.location.href);
@@ -160,6 +161,20 @@ export const initFSClientBot = (initParams = {}) => {
 					botUI.removeOverlay();
 				}
 			}
+		}
+		
+		if (development) {
+			function setControlIconsMain(){
+				botUI.setControllIcons({mic: document.getElementById("mic").checked, 
+				mute: document.getElementById("mute").checked, 
+				restart: document.getElementById("restart").checked})
+			
+			}
+
+			document.getElementById("mute").addEventListener('change', () => {console.log("here");setControlIconsMain()});
+			document.getElementById("mic").addEventListener('change', () => {setControlIconsMain()});
+			document.getElementById("restart").addEventListener('change', () => {setControlIconsMain()});
+				
 		}
 
 		if (settings.interactionMode === "SOP"){
@@ -397,7 +412,6 @@ var createBot = (botUI, settings) => {
 			const h1 = tags.h1_b = tags.h1_b.split(" |");
 			const h2 = tags.h2_b = tags.h2_b.split(" |");
 			const h3 = tags.h3_b = tags.h3_b.split(" |");
-			// remove "" elements from arrays
 			h1.forEach((e, i) => { if (e === "") h1.splice(i, 1); });
 			h2.forEach((e, i) => { if (e === "") h2.splice(i, 1); });
 			h3.forEach((e, i) => { if (e === "") h3.splice(i, 1); });

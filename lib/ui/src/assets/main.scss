@@ -162,15 +162,15 @@ $amount: 20;
 		height: 40px !important;
 	}
 
-	[data-chat-input-keyboard].chat-input-disabled{
+	.thirdIcon.chat-input-disabled{
 		right: 95px !important;
 	}
 
-	[data-chat-input-mute].chat-input-disabled{
+	.secondIcon.chat-input-disabled{
 		right: 55px !important;
 	}
 
-	[data-chat-input-restart].chat-input-disabled{
+	.firstIcon.chat-input-disabled{
 		right: 15px !important;
 		font-size: 25px !important;
 	}
@@ -301,6 +301,8 @@ $amount: 20;
                 height: 20px;
                 text-align: center;
                 color: #000000;
+				
+				
 
                 &--minus {
                     right: 22.6%;
@@ -412,6 +414,18 @@ $amount: 20;
 					display: none;
 				}
 
+				&.firstIcon{
+					right: 10px;
+				}
+
+				&.secondIcon{
+					right: 40px;
+				}
+
+				&.thirdIcon{
+					right: 70px;
+				}
+
 				&.chat-input-disabled{
 					background-color: #ffffff;
 
@@ -467,14 +481,12 @@ $amount: 20;
 				}
 
 				&--volume-mute {
-					right: 40px;
 					top: 50%;
     				transform: translateY(calc(-50% + 2px));
 					z-index: 1;
 				}
 
 				&--restart{
-					right: 10px;
 					top: 50%;
     				transform: translateY(calc(-50% + 2px));
 					z-index: 1;
@@ -503,7 +515,6 @@ $amount: 20;
 				}
 
 				&--keyboard {
-					right: 70px;
 					top: 50%;
     				transform: translateY(calc(-50% + 2px));
 					z-index: 1;
