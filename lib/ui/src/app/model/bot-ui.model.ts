@@ -44,7 +44,8 @@ export interface Settings {
     sections?: string[];
     sectionActive?: number;
     sound?: boolean;
-    controlIcons?: {mic: boolean, mute: boolean, restart: boolean}
+    controlIcons?: {mic: boolean, mute: boolean, restart: boolean};
+    showTooltips?: boolean;
 }
 
 export interface Background {

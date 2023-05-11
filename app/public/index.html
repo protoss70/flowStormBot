@@ -11,18 +11,20 @@
 	
 </head>
 <body style="font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">
-	<div id="upvBotKey" class="hidden">
-		<label for="botId">Enter the id of your application from the Flowstorm website</label>
-		<div>
-			<input type="text" name="botId" id="botId" placeholder="ID...">
-			<button onclick="changeBotKey()">Apply</button>
-		</div>
-		<br>
-		<div id="parentHistory" class="hidden-index">
-			<div>ID History</div>
-			<ul id="oldItemsList">
-			</ul>
-			<button onclick="clearHistory()">clear history</button>
+	<div id="upvBotKey">
+		<div id="upvBotKeyWrapper" class="hidden">
+			<label for="botId">Enter the id of your application from the Flowstorm website</label>
+			<div>
+				<input type="text" name="botId" id="botId" placeholder="ID...">
+				<button onclick="changeBotKey()">Apply</button>
+			</div>
+			<br>
+			<div id="parentHistory" class="hidden-index">
+				<div>ID History</div>
+				<ul id="oldItemsList">
+				</ul>
+				<button onclick="clearHistory()">clear history</button>
+			</div>
 		</div>
 		<br>
 		<div>
@@ -76,7 +78,7 @@
 			localStorage.removeItem("bot-app-ids");
 		}
 		else{
-			document.getElementById("upvBotKey").classList.remove("hidden");
+			document.getElementById("upvBotKeyWrapper").classList.remove("hidden");
 		}
 
 		document.getElementById("mic").checked = defaultIconSetup.mic;
@@ -169,6 +171,10 @@
 	}
 
 	#upvBotKey.hidden{
+		display: none;
+	}
+
+	#upvBotKeyWrapper.hidden{
 		display: none;
 	}
 

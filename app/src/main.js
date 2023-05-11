@@ -277,7 +277,7 @@ const checkBotUIOverlays = (element) => {
 }
 
 const setDialogueIDs = (newDialogueIDs, botUI) => {
-	console.log(dialogueIDs, )
+	console.log("DIALOGUE_IDS: ",newDialogueIDs);
 	dialogueIDs = newDialogueIDs;
 	if (botUI){
 		botUI.dialogueChangeCallback(dialogueIDs);
@@ -314,10 +314,8 @@ var createBot = (botUI, settings) => {
 			botUI.setMicIcon(false);
 			botUI.showAllGoToButtons();
 			setDialogueIDs([], botUI);
-			console.log("===========================================dialog zerod: ", dialogueIDs, 'background-color: yellow');
 		}else if(newState.status === undefined){
 			setDialogueIDs([], botUI);
-			console.log("===========================================dialog zerod2: ", dialogueIDs, 'background-color: yellow');
 		}
 	}
 
@@ -546,12 +544,10 @@ var createBot = (botUI, settings) => {
 				break;
 			case "#options":
 				setDialogueIDs([...dialogueIDs, payload.dialogueID], botUI);
-				console.log("===========================================dialogue ID: ", dialogueIDs);
 				botUI.setDialogueID(payload.dialogueID);
 				break;
 			case "#exitDialogue":
 				setDialogueIDs(dialogueIDs.slice(0, -1), botUI)
-				console.log("===========================================dialogue ID rem: ", dialogueIDs);
 				botUI.setDialogueID(dialogueIDs[dialogueIDs.length - 1]);
 				break;
 			default:
