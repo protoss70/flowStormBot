@@ -7,6 +7,7 @@ import is from 'ramda/es/is';
 import isEmpty from 'ramda/es/isEmpty';
 import merge from 'ramda/es/merge';
 import times from 'ramda/es/times';
+import tippy from 'tippy.js';
 
 import {sopSuggestionContainer} from "./templates/sop-suggestion-structure.template";
 
@@ -87,6 +88,7 @@ const defaults: Settings = {
     interactionMode: "SOP",
     sound: true,
     controlIcons: {mic: true, mute: true, restart: true},
+    showTooltips: true,
 };
 
 const fullScreenWidgetWidth = '100vw';
@@ -366,6 +368,9 @@ class BotUI  {
             const rect: DOMRect = BotUI.element.getBoundingClientRect();
             const orientation: OrientationEnum = (rect.width > rect.height) ? OrientationEnum.LANDSCAPE : OrientationEnum.PORTRAIT;
             this.setOrientation(orientation);
+            if (BotUI.settings.showTooltips){
+                this.setTooltips();
+            }
         });
 
         BotUI.chatInputElement.onkeyup = (e) => {
@@ -499,6 +504,36 @@ class BotUI  {
                 BotUI.chatInputMuteElement.classList.remove('icon--light');
             }
         }
+    }
+
+    public setTooltips(){
+
+        tippy(BotUI.restartElement, {
+            content: "Restart App",
+            delay: [500, 0],
+            duration: [100, 0],
+            placement: 'top',
+            theme: 'light',
+            arrow:  false,
+        });
+
+        tippy(BotUI.chatInputKeyboardElement, {
+            content: "Voice Input",
+            delay: [500, 0],
+            duration: [100, 0],
+            placement: 'top',
+            theme: 'light',
+            arrow:  false,
+        });
+
+        tippy(BotUI.chatInputMuteElement, {
+            content: "Mute/Unmute App",
+            delay: [500, 0],
+            duration: [100, 0],
+            placement: 'top',
+            theme: 'light',
+            arrow:  false,
+        });
     }
 
     public setIcons = () => {

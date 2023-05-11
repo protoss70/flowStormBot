@@ -11,6 +11,9 @@
 
 @import "scss/0-base/bootstrap";
 
+@import 'tippy.js/dist/tippy.css';
+@import 'tippy.js/themes/light.css';
+
 
 // TODO move to .bot namespace
 [data-gui-mode] {
