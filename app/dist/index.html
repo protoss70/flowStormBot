@@ -1,5 +1,22 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bot Development</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet"><link href="client-bot.css" rel="stylesheet"><script src="client-bot.js?8a1a4c0441c8d67abe3a"></script></head><body style="font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"><div id="upvBotKey"><div id="upvBotKeyWrapper" class="hidden"><label for="botId">Enter the id of your application from the Flowstorm website</label><div><input name="botId" id="botId" placeholder="ID..."> <button onclick="changeBotKey()">Apply</button></div><br><div id="parentHistory" class="hidden-index"><div>ID History</div><ul id="oldItemsList"></ul><button onclick="clearHistory()">clear history</button></div></div><br><div><label for="textInput">Enable Text Input</label> <input type="checkbox" name="textInput" id="textInput"><div id="iconSetter"><label for="mic">Mic Icon</label> <input type="checkbox" name="mic" id="mic"> <label for="mute">Mute Icon</label> <input type="checkbox" name="mic" id="mute"> <label for="restart">Restart Icon</label> <input type="checkbox" name="mic" id="restart"></div></div></div><div id="upvTest"><h1 id="title">UPV TEST</h1></div><div id="botContainer"><div id="botDiv"></div></div><script>const defaultIconSetup = {mic: true, mute: true, restart: true};
-		const textInputEnabled = false;
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bot Development</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet"><link href="client-bot.css" rel="stylesheet"><script src="client-bot.js?3df79216e0d2b8d78171"></script></head><body style="font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"><div id="upvBotKey"><div id="upvBotKeyWrapper" class="hidden"><label for="botId">Enter the id of your application from the Flowstorm website</label><div><input name="botId" id="botId" placeholder="ID..."> <button onclick="changeBotKey()">Apply</button></div><br><div id="parentHistory" class="hidden-index"><div>ID History</div><ul id="oldItemsList"></ul><button onclick="clearHistory()">clear history</button></div></div><br><div><label for="textInput">Enable Text Input</label> <input type="checkbox" name="textInput" id="textInput"><div id="iconSetter"><label for="mic">Mic Icon</label> <input type="checkbox" name="mic" id="mic"> <label for="mute">Mute Icon</label> <input type="checkbox" name="mic" id="mute"> <label for="restart">Restart Icon</label> <input type="checkbox" name="mic" id="restart"></div></div></div><div id="upvTest"><h1 id="title">UPV TEST</h1></div><div id="botContainer"><div id="botDiv"></div></div><script>var url = new URL(window.location.href);
+		var title = url.searchParams.get("title");
+		if (title){
+			document.getElementById("title").textContent = title;
+		}
+		var inputSettings = url.searchParams.get("settings");
+		let defaultIconSetup = {}
+		let textInputEnabled = false;
+		if (inputSettings && inputSettings.length === 4){
+			console.log(inputSettings);
+			defaultIconSetup = {
+				mic: inputSettings[0] === "1",
+				mute: inputSettings[1] === "1",
+				restart: inputSettings[2] === "1",
+			}
+			textInputEnabled = inputSettings[3] === "1";
+		}else{
+			defaultIconSetup = {mic: true, mute: true, restart: true};
+		}
 		const clientParams = {
 			allowUrlParams: true,
 			collapsable: false,
@@ -88,12 +105,6 @@
 			localStorage.setItem("bot-app-ids", JSON.stringify(oldList));
 			localStorage.setItem("bot-app-active", endpoint);
 			window.location.reload();
-		}
-
-		var url = new URL(window.location.href);
-		var title = url.searchParams.get("title");
-		if (title){
-			document.getElementById("title").textContent = title;
 		}
 
 		function addLinkElement(text){
