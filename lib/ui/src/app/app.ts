@@ -1699,10 +1699,13 @@ class BotUI  {
         const allMessages = messageElement.getElementsByClassName("chat-message-bot");
         for (let index = 0; index < allMessages.length; index++) {
             const message = allMessages[index];
-            if (dialogueIDs.includes(message.getAttribute("dialogueID"))){
-                message.getElementsByClassName("icon--content--undo")[0].classList.remove("no-root-dialogue");
-            }else{
-                message.getElementsByClassName("icon--content--undo")[0].classList.add("no-root-dialogue");
+            const lostGoBackIcons = message.getElementsByClassName("icon--content--undo");
+            if (lostGoBackIcons[0]){
+                if (dialogueIDs.includes(message.getAttribute("dialogueID"))){
+                    lostGoBackIcons[0].classList.remove("no-root-dialogue");
+                }else{
+                    lostGoBackIcons[0].classList.add("no-root-dialogue");
+                }
             }
         }
     }
