@@ -722,15 +722,14 @@ var createBot = (botUI, settings) => {
 	}
 
 	botUI.botMessagesCallback = (nodeID, dialogueID) => {
+		console.log("here");
 		if (botUI.getInputMode() === "button"){
 			exitButtonMode();
 		}
-		if (dialogueIDs.includes(dialogueID)){
-			setAttribute("nodeId", nodeID);
-			setAttribute("dialogueID", dialogueID);
-			botUI.removeSuggestions();
-			bot.handleOnTextInput(`#go_to`, false, {sopInput: true});
-		}
+		setAttribute("nodeId", nodeID);
+		setAttribute("dialogueID", dialogueID);
+		botUI.removeSuggestions();
+		bot.handleOnTextInput(`#go_to`, false, {sopInput: true});
 	}
 
 	botUI.chatInputCallback = ((inputValue) => {
