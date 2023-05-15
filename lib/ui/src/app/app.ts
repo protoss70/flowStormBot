@@ -40,7 +40,7 @@ import {
     scrollTo as scrollToAnimated,
     wsConnection,
 } from './utils';
-import { forEach } from 'ramda';
+import { forEach, type } from 'ramda';
 
 const defaults: Settings = {
     animationSpeed: 500,
@@ -369,7 +369,7 @@ class BotUI  {
             const orientation: OrientationEnum = (rect.width > rect.height) ? OrientationEnum.LANDSCAPE : OrientationEnum.PORTRAIT;
             this.setOrientation(orientation);
             if (BotUI.settings.showTooltips){
-                this.setTooltips();
+                this.setInputIconTooltips();
             }
         });
 
@@ -506,34 +506,21 @@ class BotUI  {
         }
     }
 
-    public setTooltips(){
-
-        tippy(BotUI.restartElement, {
-            content: "Restart App",
+    public setTooltip(element, content){
+        tippy(element, {
+            content: content,
             delay: [500, 0],
             duration: [100, 0],
             placement: 'top',
             theme: 'light',
             arrow:  false,
         });
+    }
 
-        tippy(BotUI.chatInputKeyboardElement, {
-            content: "Voice Input",
-            delay: [500, 0],
-            duration: [100, 0],
-            placement: 'top',
-            theme: 'light',
-            arrow:  false,
-        });
-
-        tippy(BotUI.chatInputMuteElement, {
-            content: "Mute/Unmute App",
-            delay: [500, 0],
-            duration: [100, 0],
-            placement: 'top',
-            theme: 'light',
-            arrow:  false,
-        });
+    public setInputIconTooltips(){
+        this.setTooltip(BotUI.restartElement, "Restart App");
+        this.setTooltip(BotUI.chatInputKeyboardElement, "Voice Input");
+        this.setTooltip(BotUI.chatInputMuteElement, "Mute/Unmute App");
     }
 
     public setIcons = () => {
@@ -1770,7 +1757,14 @@ class BotUI  {
         messageElement.appendChild(messageTemplate.children[0]);
         this.chatMessageHeightLimit(messageElement.children[messageElement.children.length - 1] as HTMLElement);
         messageElement.scrollTop = messageElement.scrollHeight;
-        messageElement.children[messageElement.children.length - 1].setAttribute("dialogueID", dialogueID);
+        if (type === MessageType.BOT && this.getSettings().goTo){
+            messageElement.children[messageElement.children.length - 1].setAttribute("dialogueID", dialogueID);
+            if (BotUI.settings.showTooltips){
+                const undoElement = messageElement.children[messageElement.children.length - 1].getElementsByClassName("icon--content--undo")[0];
+                this.setTooltip(undoElement, "Return Here")
+            }
+        } 
+
         BotUI.scrollToLastMessage(messageElement);
     }
 
