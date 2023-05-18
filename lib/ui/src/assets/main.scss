@@ -854,6 +854,19 @@ $amount: 20;
 
 }
 
+a.bot-text-styles{
+	color: #008cff;
+	text-decoration: underline;
+	&:hover{
+		text-decoration: none;
+	}
+}
+
+p.bot-text-styles{
+	margin: 0;
+}
+
+
 [data-chat-input]{
 	&.chat-input{
 		&--visible{
