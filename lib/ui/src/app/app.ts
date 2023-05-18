@@ -8,6 +8,7 @@ import isEmpty from 'ramda/es/isEmpty';
 import merge from 'ramda/es/merge';
 import times from 'ramda/es/times';
 import tippy from 'tippy.js';
+import showdown from "showdown";
 
 import {sopSuggestionContainer} from "./templates/sop-suggestion-structure.template";
 
@@ -1017,7 +1018,14 @@ class BotUI  {
         function scrollFunction(e){
             if (mouseHover){
                 e.preventDefault();
-                const scrollAmount = 30 * (e.deltaY/Math.abs(e.deltaY));
+                var maxVal;
+                if (Math.abs(e.deltaX) > Math.abs(e.deltaY)){
+                    maxVal = e.deltaX;
+                }else{
+                    maxVal = e.deltaY
+                }
+                const change = maxVal !== 0 ? (maxVal / Math.abs(maxVal)) : 0;
+                const scrollAmount = 30 * change;
                 suggestionContainer.children[0].scrollLeft += scrollAmount;
             }
         }
@@ -1697,6 +1705,29 @@ class BotUI  {
         }
     }
 
+    public convertMd(text: string){
+        // Convert MD to HTML
+        var converter = new showdown.Converter();
+        var html = converter.makeHtml(text);
+        var parser = new DOMParser();
+
+        // Convert string to HTMLElement
+        var doc = parser.parseFromString(html, 'text/html');
+        const allLinks = (doc.body as HTMLElement).querySelectorAll("a, p");
+
+        // Add any necessary attributes to tags such as "a" and "p"
+        for (let index = 0; index < allLinks.length; index++) {
+            const element = allLinks[index];
+            element.classList.add("bot-text-styles");
+            if (element.tagName === "a"){
+                element.setAttribute("target", "_blank");
+            }
+        }
+
+        // Return HTML string
+        return doc.body.innerHTML !== "null" ? doc.body.innerHTML : ""; 
+    }
+
     public setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}, dialogueID = "") => {
         const messageElement = BotUI.messagesElement;
         const messageTemplate = getContentAsHtml(chatMessageStructureTemplate);
@@ -1712,7 +1743,13 @@ class BotUI  {
             }
         }
 
-        messageTemplateTextElement.innerHTML = text;
+        if (type === MessageType.BOT){
+            const htmlText = this.convertMd(text);
+            messageTemplateTextElement.innerHTML = htmlText;
+        }else{
+            messageTemplateTextElement.innerHTML = text;
+        }
+
         messageTemplateElement.setAttribute('data-message-type', type);
         messageTemplateElement.classList.add('chat-message-' + type);
         messageTemplateElement.classList.add('chat-message-last');
@@ -1752,8 +1789,7 @@ class BotUI  {
         if (type === MessageType.BOT && this.getSettings().goTo){
             this.setGoToButton(id, dialogueID, clickCallback, messageTemplate);
         }
-        
-        
+
         messageElement.appendChild(messageTemplate.children[0]);
         this.chatMessageHeightLimit(messageElement.children[messageElement.children.length - 1] as HTMLElement);
         messageElement.scrollTop = messageElement.scrollHeight;
@@ -1761,7 +1797,7 @@ class BotUI  {
             messageElement.children[messageElement.children.length - 1].setAttribute("dialogueID", dialogueID);
             if (BotUI.settings.showTooltips){
                 const undoElement = messageElement.children[messageElement.children.length - 1].getElementsByClassName("icon--content--undo")[0];
-                this.setTooltip(undoElement, "Return Here")
+                this.setTooltip(undoElement, "Return Here");
             }
         } 
 
