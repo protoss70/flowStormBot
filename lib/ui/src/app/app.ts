@@ -1719,13 +1719,16 @@ class BotUI  {
         for (let index = 0; index < allLinks.length; index++) {
             const element = allLinks[index];
             element.classList.add("bot-text-styles");
-            if (element.tagName === "a"){
+            console.log(element.tagName);
+            if (element.tagName === "A"){
                 element.setAttribute("target", "_blank");
             }
         }
 
+        const result = doc.body.innerHTML !== "null" ? doc.body.innerHTML : "";
+
         // Return HTML string
-        return doc.body.innerHTML !== "null" ? doc.body.innerHTML : ""; 
+        return result.replace(/(?:\r\n|\r|\n)/g, '<br>'); 
     }
 
     public setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}, dialogueID = "") => {
