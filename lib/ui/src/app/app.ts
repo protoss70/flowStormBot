@@ -1728,7 +1728,7 @@ class BotUI  {
         const result = doc.body.innerHTML !== "null" ? doc.body.innerHTML : "";
 
         // Return HTML string
-        return result.replace(/(?:\r\n|\r|\n)/g, '<br>'); 
+        return result.replace(/(?:\\r\\n|\\r|\\n)/g, '<br>'); 
     }
 
     public setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}, dialogueID = "") => {
@@ -1748,6 +1748,7 @@ class BotUI  {
 
         if (type === MessageType.BOT){
             const htmlText = this.convertMd(text);
+            console.log("html text", htmlText);
             messageTemplateTextElement.innerHTML = htmlText;
         }else{
             messageTemplateTextElement.innerHTML = text;
