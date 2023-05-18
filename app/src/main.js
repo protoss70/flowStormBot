@@ -24,7 +24,7 @@ const scrollSpeed = 120; // pixels per second
 const scrollDelay = 3; // seconds before the scrolling starts
 
 const defaultURL = "5f7db5f1e662e830b20dbe7c"
-const environment = '';
+const environment = '-preview';
 let botKey = environment === '' || environment === '-preview' ? defaultURL : '606c52c6d750aa1b1537e5d6';
 let studioUrl = environment === 'local' ? 'http://localhost:8089' :  `https://studio${environment}.flowstorm.ai`;
 let defaultCoreUrl = environment === 'local' ? 'http://localhost:8080' :  `https://core${environment}.flowstorm.ai`;
