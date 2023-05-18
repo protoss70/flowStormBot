@@ -373,7 +373,6 @@ var createBot = (botUI, settings) => {
 	}
 
 	stateHandler = (section, status) => {
-		console.log(section);
 		if (section === "SOP" || section === "QUESTION"){
 			if (status === undefined || status === "SLEEPING"){
 				botUI.removeOverlay();
@@ -722,7 +721,6 @@ var createBot = (botUI, settings) => {
 	}
 
 	botUI.botMessagesCallback = (nodeID, dialogueID) => {
-		console.log("here");
 		if (botUI.getInputMode() === "button"){
 			exitButtonMode();
 		}
