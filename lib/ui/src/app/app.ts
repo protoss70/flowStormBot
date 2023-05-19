@@ -1707,6 +1707,9 @@ class BotUI  {
 
     public convertMd(text: string){
         // Convert MD to HTML
+        if (text){
+            text = text.replace(/(?:\\r\\n|\\r|\\n)/g, String.fromCharCode(10));
+        }
         var converter = new showdown.Converter();
         var html = converter.makeHtml(text);
         var parser = new DOMParser();
