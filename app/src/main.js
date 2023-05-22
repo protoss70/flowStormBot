@@ -106,6 +106,43 @@ export const initFSClientBot = (initParams = {}) => {
 	settings.textInputEnabled = false;
     botInitializer = new BotInitializer(startMessage, settings.attributes);
 
+	function setPreviewCustomizations(botUI){
+		const listenerIDs = ["textColorUser", "textColorBot", "TextOutlineUser", "TextOutlineBot", 
+							"messageBackgroundUser", "userOpacity", "messageBotBackground", "botOpacity", 
+							"botBackgroundColor"]
+		function ColorToRGBA(opacityID, colorID){
+			const opacity = document.getElementById(opacityID).value;
+			const color = document.getElementById(colorID).value;
+			const r = parseInt(color.substr(1,2), 16)
+			const g = parseInt(color.substr(3,2), 16)
+			const b = parseInt(color.substr(5,2), 16)
+			return `rgba(${r},${g},${b},${opacity})`;
+		}
+
+		listenerIDs.forEach(id => {
+			var listenerFunction;
+			if (id === "textColorUser") listenerFunction = (e) => {settings.userMessageTextColor = e.target.value; botUI.setUserMessageTextColor(e.target.value)}
+			if (id === "textColorBot") listenerFunction = (e) => {settings.botMessageTextColor = e.target.value; botUI.setBotMessageTextColor(e.target.value)}
+			if (id === "TextOutlineUser") listenerFunction = (e) => {settings.userMessageTextOutlineColor = e.target.value; botUI.setUserMessageTextOutlineColor(e.target.value)}
+			if (id === "TextOutlineBot") listenerFunction = (e) => {settings.botMessageTextOutlineColor = e.target.value; botUI.setBotMessageTextOutlineColor(e.target.value)}
+			if (id === "messageBackgroundUser") listenerFunction = () => {const color = ColorToRGBA("userOpacity", "messageBackgroundUser");
+			settings.userMessageBackgroundColor = color; botUI.setUserMessageBackgroundColor(color)}
+
+			if (id === "messageBotBackground") listenerFunction = () => {const color = ColorToRGBA("botOpacity", "messageBotBackground");
+			settings.botMessageBackgroundColor = color; botUI.setBotMessageBackgroundColor(color)}
+
+			if (id === "userOpacity") listenerFunction = () => {const color = ColorToRGBA("userOpacity", "messageBackgroundUser");
+			settings.userMessageBackgroundColor = color; botUI.setUserMessageBackgroundColor(color)}
+
+			if (id === "botOpacity") listenerFunction = () => {const color = ColorToRGBA("botOpacity", "messageBotBackground");
+			settings.botMessageBackgroundColor = color; botUI.setBotMessageBackgroundColor(color)}
+
+			if (id === "botBackgroundColor") listenerFunction = (e) => {settings.backgroundColor = e.target.value; botUI.setBackgroundColor(e.target.value)}
+
+			document.getElementById(id).addEventListener("input", (e) => {listenerFunction(e)});
+		});
+	}
+
 	if (allowUrlParams) {
 	    const urlParamsObject = {};
 	    [...(urlParams.entries())].forEach( (urlParamPair) => urlParamsObject[urlParamPair[0]]=urlParamPair[1])
@@ -175,15 +212,17 @@ export const initFSClientBot = (initParams = {}) => {
 				botUI.setTextInputEnabled(textInputEnabled);
 			}
 
-			document.getElementById("mute").addEventListener('change', () => {console.log("here");setControlIconsMain()});
+			document.getElementById("mute").addEventListener('change', () => {setControlIconsMain()});
 			document.getElementById("mic").addEventListener('change', () => {setControlIconsMain()});
 			document.getElementById("restart").addEventListener('change', () => {setControlIconsMain()});
 			document.getElementById("textInput").addEventListener('change', () => {setTextEnabled()});
+
+			setPreviewCustomizations(botUI);
 		}
 
 		if (settings.interactionMode === "SOP"){
 			bot.getUser().then((user) => {
-				console.log("User: ", user);
+				console.log("User: ", user);settings
 				if (user === null){
 					botUI.setSection("LOGIN");
 				}else{
