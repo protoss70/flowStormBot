@@ -29,6 +29,7 @@ let botKey = environment === '' || environment === '-preview' ? defaultURL : '60
 let studioUrl = environment === 'local' ? 'http://localhost:8089' :  `https://studio${environment}.flowstorm.ai`;
 let defaultCoreUrl = environment === 'local' ? 'http://localhost:8080' :  `https://core${environment}.flowstorm.ai`;
 let development = true;
+let generatodEmbedLines = {}
 
 let idToken = undefined
 let accessToken = undefined
@@ -109,7 +110,8 @@ export const initFSClientBot = (initParams = {}) => {
 	function setPreviewCustomizations(botUI){
 		const listenerIDs = ["textColorUser", "textColorBot", "TextOutlineUser", "TextOutlineBot", 
 							"messageBackgroundUser", "userOpacity", "messageBotBackground", "botOpacity", 
-							"botBackgroundColor"]
+							"botBackgroundColor"];
+		const generatorButtonID = "generateEmbedCodeButton";
 		function ColorToRGBA(opacityID, colorID){
 			const opacity = document.getElementById(opacityID).value;
 			const color = document.getElementById(colorID).value;
@@ -120,26 +122,35 @@ export const initFSClientBot = (initParams = {}) => {
 		}
 
 		listenerIDs.forEach(id => {
+			
 			var listenerFunction;
-			if (id === "textColorUser") listenerFunction = (e) => {settings.userMessageTextColor = e.target.value; botUI.setUserMessageTextColor(e.target.value)}
-			if (id === "textColorBot") listenerFunction = (e) => {settings.botMessageTextColor = e.target.value; botUI.setBotMessageTextColor(e.target.value)}
-			if (id === "TextOutlineUser") listenerFunction = (e) => {settings.userMessageTextOutlineColor = e.target.value; botUI.setUserMessageTextOutlineColor(e.target.value)}
-			if (id === "TextOutlineBot") listenerFunction = (e) => {settings.botMessageTextOutlineColor = e.target.value; botUI.setBotMessageTextOutlineColor(e.target.value)}
-			if (id === "messageBackgroundUser") listenerFunction = () => {const color = ColorToRGBA("userOpacity", "messageBackgroundUser");
+			if (id === "textColorUser") listenerFunction = (e) => {generatodEmbedLines["userMessageTextColor"] = e.target.value; settings.userMessageTextColor = e.target.value; botUI.setUserMessageTextColor(e.target.value)}
+			if (id === "textColorBot") listenerFunction = (e) => {generatodEmbedLines["botMessageTextColor"] = e.target.value; settings.botMessageTextColor = e.target.value; botUI.setBotMessageTextColor(e.target.value)}
+			if (id === "TextOutlineUser") listenerFunction = (e) => {generatodEmbedLines["userMessageTextOutlineColor"] = e.target.value; settings.userMessageTextOutlineColor = e.target.value; botUI.setUserMessageTextOutlineColor(e.target.value)}
+			if (id === "TextOutlineBot") listenerFunction = (e) => {generatodEmbedLines["botMessageTextOutlineColor"] = e.target.value; settings.botMessageTextOutlineColor = e.target.value; botUI.setBotMessageTextOutlineColor(e.target.value)}
+			if (id === "messageBackgroundUser") listenerFunction = () => {const color = ColorToRGBA("userOpacity", "messageBackgroundUser"); generatodEmbedLines["userMessageBackgroundColor"] = color;
 			settings.userMessageBackgroundColor = color; botUI.setUserMessageBackgroundColor(color)}
 
-			if (id === "messageBotBackground") listenerFunction = () => {const color = ColorToRGBA("botOpacity", "messageBotBackground");
+			if (id === "messageBotBackground") listenerFunction = () => {const color = ColorToRGBA("botOpacity", "messageBotBackground"); generatodEmbedLines["botMessageBackgroundColor"] = color; 
 			settings.botMessageBackgroundColor = color; botUI.setBotMessageBackgroundColor(color)}
 
-			if (id === "userOpacity") listenerFunction = () => {const color = ColorToRGBA("userOpacity", "messageBackgroundUser");
+			if (id === "userOpacity") listenerFunction = () => {const color = ColorToRGBA("userOpacity", "messageBackgroundUser"); generatodEmbedLines["userMessageBackgroundColor"] = color; 
 			settings.userMessageBackgroundColor = color; botUI.setUserMessageBackgroundColor(color)}
 
-			if (id === "botOpacity") listenerFunction = () => {const color = ColorToRGBA("botOpacity", "messageBotBackground");
+			if (id === "botOpacity") listenerFunction = () => {const color = ColorToRGBA("botOpacity", "messageBotBackground"); generatodEmbedLines["botMessageBackgroundColor"] = color; 
 			settings.botMessageBackgroundColor = color; botUI.setBotMessageBackgroundColor(color)}
 
-			if (id === "botBackgroundColor") listenerFunction = (e) => {settings.backgroundColor = e.target.value; botUI.setBackgroundColor(e.target.value)}
+			if (id === "botBackgroundColor") listenerFunction = (e) => {generatodEmbedLines["backgroundColor"] = e.target.value; settings.backgroundColor = e.target.value; botUI.setBackgroundColor(e.target.value)}
 
 			document.getElementById(id).addEventListener("input", (e) => {listenerFunction(e)});
+			document.getElementById(generatorButtonID).addEventListener("click", () => {
+				document.getElementById("embedParamsParent").classList.remove("hidden");
+				const embedElem = document.getElementById("embedParams");
+				embedElem.innerHTML = "";
+				Object.keys(generatodEmbedLines).forEach(key => {
+					embedElem.innerHTML += `${key}: ${generatodEmbedLines[key]}<br />`
+				})
+			})
 		});
 	}
 
