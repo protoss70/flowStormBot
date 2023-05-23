@@ -7,6 +7,8 @@ import is from 'ramda/es/is';
 import isEmpty from 'ramda/es/isEmpty';
 import merge from 'ramda/es/merge';
 import times from 'ramda/es/times';
+import tippy from 'tippy.js';
+import showdown from "showdown";
 
 import {sopSuggestionContainer} from "./templates/sop-suggestion-structure.template";
 
@@ -39,6 +41,7 @@ import {
     scrollTo as scrollToAnimated,
     wsConnection,
 } from './utils';
+import { forEach, type } from 'ramda';
 
 const defaults: Settings = {
     animationSpeed: 500,
@@ -85,12 +88,15 @@ const defaults: Settings = {
     sections: ["SOP", "QUESTION", "SOLUTIONS", "PDF", "FEEDBACK", "LOGIN", "INPUTSELECT"],
     interactionMode: "SOP",
     sound: true,
+    controlIcons: {mic: true, mute: true, restart: true},
+    showTooltips: true,
 };
 
 const fullScreenWidgetWidth = '100vw';
 const fullScreenWidgetHeight = '100vh';
 const minAnimationParticles = 0;
 const maxAnimationParticles = 20;
+const disabledChatHeight = '10px';
 const chatHeight = '80px';
 const sopHeight = '110px';
 const chatPadding = '4';
@@ -129,6 +135,7 @@ class BotUI  {
     private static element: HTMLElement;
     private static settings: Settings;
     private static orientation: OrientationEnum;
+    public dialogueID: string = "";
 
     private static rootElement: HTMLElement;
     private static avatarElement: HTMLElement;
@@ -174,7 +181,8 @@ class BotUI  {
     private static restartElement: HTMLElement;
     private static closeElement: HTMLElement;
     private static sopHeader: HTMLElement;
-    
+    private static controlIconsWrapper: HTMLElement;
+
     private static isChatEnabled: boolean = true;
     private static isMicrophoneEnabled: boolean = true;
 
@@ -233,7 +241,7 @@ class BotUI  {
         BotUI.botWrapperElement = BotUI.element.querySelector('[data-wrapper]');
         BotUI.chatInputKeyboardElement = BotUI.element.querySelector('[data-chat-input-keyboard]');
         BotUI.soundInput = BotUI.element.querySelector('[data-sound-input-wrap]');
-        BotUI.textInput = BotUI.element.querySelector('[data-text-input-wrap');
+        BotUI.textInput = BotUI.element.querySelector('[data-text-input-wrap]');
         BotUI.controllerWrapper = BotUI.element.querySelector('[data-chat-input-controllers]');
         BotUI.chatInputBackElement = BotUI.element.querySelector('[data-chat-input-back]');
         BotUI.sopSection = BotUI.element.querySelector('[data-chat-sop]');
@@ -251,6 +259,7 @@ class BotUI  {
         BotUI.botLoginPopup = BotUI.element.querySelector("[bot-loginPopup]");
         BotUI.restartElement = BotUI.element.querySelector('[data-chat-input-restart]');
         BotUI.closeElement = BotUI.element.querySelector('[data-sop-close]');
+        BotUI.controlIconsWrapper = BotUI.element.querySelector('[control-icons-wrapper]');
 
         if (!BotUI.settings.collapsed) {
             BotUI.collapsableTriggerElement.classList.add("hidden");
@@ -267,15 +276,12 @@ class BotUI  {
             BotUI.collapsableTriggerElement.parentNode.removeChild(BotUI.collapsableTriggerElement);
         }
 
+        if (BotUI.settings.controlIcons){
+            this.setControllIconStyles();
+        }
+
         if (!BotUI.settings.customIcons) {
-            icons.forEach(icon => {
-                    const suffix = BotUI.settings.interactionMode == 'SOP' || BotUI.settings.interactionMode == "GUIDE" ? '-sop' : '';
-                    const element = document.querySelector('.icon' + suffix + '--' + icon);
-                    if (element !== null){
-                        element.classList.add('icon--content--' + icon)
-                    }
-                }
-            );
+            this.setIcons()
         }
         this.setTitle(BotUI.settings.title);
         if (BotUI.settings.interactionMode === "SOP"){
@@ -324,11 +330,11 @@ class BotUI  {
                 BotUI.chatInputMicElement.classList.remove('icon--light');
             }
         }else{
-            if (BotUI.settings.sound) {
-                BotUI.chatInputMuteElement.classList.remove('icon--light');
-            } else {
-                BotUI.chatInputMuteElement.classList.add('icon--light');
-            }
+            // if (BotUI.settings.sound) {
+            //     BotUI.chatInputMuteElement.classList.remove('icon--light');
+            // } else {
+            //     BotUI.chatInputMuteElement.classList.add('icon--light');
+            // }
         }
         BotUI.backgroundElement = BotUI.element.querySelector('[data-background]');
 
@@ -363,10 +369,13 @@ class BotUI  {
             const rect: DOMRect = BotUI.element.getBoundingClientRect();
             const orientation: OrientationEnum = (rect.width > rect.height) ? OrientationEnum.LANDSCAPE : OrientationEnum.PORTRAIT;
             this.setOrientation(orientation);
+            if (BotUI.settings.showTooltips){
+                this.setInputIconTooltips();
+            }
         });
 
         BotUI.chatInputElement.onkeyup = (e) => {
-            if (e.keyCode === 13) {
+            if (e.key === "Enter") {
                 BotUI.getInputValue((BotUI.chatInputElement as HTMLInputElement).value, this.chatInputCallback);
                 (BotUI.chatInputElement as HTMLInputElement).value = '';
                 BotUI.changeClasses("icon--arrow-up--visible", "icon--arrow-up--hidden", BotUI.chatInputArrowElement);
@@ -382,11 +391,11 @@ class BotUI  {
         BotUI.chatInputMuteElement.onclick = (e) => {
             BotUI.settings.sound = !BotUI.settings.sound;
             if (BotUI.settings.sound) {
-                BotUI.chatInputMuteElement.classList.remove('icon--light');
+                // BotUI.chatInputMuteElement.classList.remove('icon--light');
                 BotUI.chatInputMuteElement.classList.remove("icon--content--volume-mute");
                 BotUI.chatInputMuteElement.classList.add("icon--content--volume");
             } else {
-                BotUI.chatInputMuteElement.classList.add('icon--light');
+                // BotUI.chatInputMuteElement.classList.add('icon--light');
                 BotUI.chatInputMuteElement.classList.add("icon--content--volume-mute");
                 BotUI.chatInputMuteElement.classList.remove("icon--content--volume");
             }
@@ -438,11 +447,11 @@ class BotUI  {
         }
 
         if (BotUI.settings.sound) {
-            BotUI.chatInputMuteElement.classList.remove('icon--light');
+            // BotUI.chatInputMuteElement.classList.remove('icon--light');
             BotUI.chatInputMuteElement.classList.remove("icon--content--volume-mute");
             BotUI.chatInputMuteElement.classList.add("icon--content--volume");
         } else {
-            BotUI.chatInputMuteElement.classList.add('icon--light');
+            // BotUI.chatInputMuteElement.classList.add('icon--light');
             BotUI.chatInputMuteElement.classList.add("icon--content--volume-mute");
             BotUI.chatInputMuteElement.classList.remove("icon--content--volume");
         }
@@ -496,6 +505,48 @@ class BotUI  {
                 BotUI.chatInputMuteElement.classList.remove('icon--light');
             }
         }
+    }
+
+    public setTooltip(element, content){
+        tippy(element, {
+            content: content,
+            delay: [500, 0],
+            duration: [100, 0],
+            placement: 'top',
+            theme: 'light',
+            arrow:  false,
+        });
+    }
+
+    public setInputIconTooltips(){
+        this.setTooltip(BotUI.restartElement, "Restart App");
+        this.setTooltip(BotUI.chatInputKeyboardElement, "Voice Input");
+        this.setTooltip(BotUI.chatInputMuteElement, "Mute/Unmute App");
+    }
+
+    public setIcons = () => {
+        icons.forEach(icon => {
+            const suffix = BotUI.settings.interactionMode == 'SOP' || BotUI.settings.interactionMode == "GUIDE" ? '-sop' : '';
+            const element = document.querySelector('.icon' + suffix + '--' + icon);
+            if (element !== null){
+                element.classList.add('icon--content--' + icon)
+            }
+        }
+    );
+    }
+
+    public setControllIcons = (controlIcons: {mic: boolean, mute: boolean, restart: boolean}) => {
+        console.log("here in settign controls");
+        const mic = `<span data-chat-input-keyboard class="icon-sop icon-sop--keyboard"></span>`;
+        const mute = `<span data-chat-input-mute class="icon-sop icon-sop--volume-mute"></span>`;
+        const restart = `<span data-chat-input-restart class="icon-sop icon-sop--restart"></span>`;
+        BotUI.settings.controlIcons = controlIcons;
+
+        this.setControllIconStyles();
+    }
+
+    public setDialogueID(id: string){
+        this.dialogueID = id;
     }
 
     public setControls = (visible: boolean) => {
@@ -560,7 +611,6 @@ class BotUI  {
             BotUI.chatInputKeyboardElement.classList.add(BotUI.settings.micIcon +'2');
             BotUI.chatInputKeyboardElement.classList.remove(BotUI.settings.keyboardIcon);
             BotUI.soundInput.setAttribute("style", "display:none;");
-            BotUI.textInput.setAttribute("style", "display:block;");
             // BotUI.chatInputBackElement.classList.add("text-mode");
             // BotUI.controllerWrapper.classList.add("text-mode");
             BotUI.settings.standardQuestionMode = mode;
@@ -572,7 +622,6 @@ class BotUI  {
             BotUI.chatInputKeyboardElement.classList.remove(BotUI.settings.micIcon +'2');
             BotUI.chatInputKeyboardElement.classList.add(BotUI.settings.keyboardIcon);
             BotUI.soundInput.setAttribute("style", "display:block;");
-            BotUI.textInput.setAttribute("style", "display:none;");
             BotUI.chatInputBackElement.classList.remove("text-mode");
             BotUI.controllerWrapper.classList.remove("text-mode");
             BotUI.chatInputSettingsElement.classList.add("text-mode");
@@ -603,8 +652,9 @@ class BotUI  {
         BotUI.botLoginPopup.classList.remove("hidden");
     }
 
-    private changeCollapsedMode = () => {
+    public changeCollapsedMode = () => {
         BotUI.settings.collapsed = !BotUI.settings.collapsed;
+        this.collapseCallback(BotUI.settings.collapsed);
         BotUI.setCollapsableUIHeight();
         this.collapsableTriggerCallback(BotUI.settings.collapsed);
         if (!BotUI.settings.collapsed) {
@@ -616,6 +666,8 @@ class BotUI  {
         const orientation: OrientationEnum = (rect.width > rect.height) ? OrientationEnum.LANDSCAPE : OrientationEnum.PORTRAIT;
         this.setOrientation(orientation);
     }
+
+    public collapseCallback = (...values) => {}
 
     private removeAllProperties(){
         BotUI.sopSection.classList.add("sop-section--hidden");
@@ -812,18 +864,6 @@ class BotUI  {
     public setScreen = (screenType: ScreenTypeEnum = ScreenTypeEnum.PLAYER) => {
     }
 
-    public toggleRestart(_open: Boolean){
-        if (!_open){
-            BotUI.restartElement.classList.add("hidden");
-            BotUI.chatInputKeyboardElement.classList.remove("hidden");
-            BotUI.chatInputMuteElement.classList.remove("hidden");
-        }else{
-            BotUI.restartElement.classList.remove("hidden");
-            BotUI.chatInputKeyboardElement.classList.add("hidden");
-            BotUI.chatInputMuteElement.classList.add("hidden");
-        }
-    }
-
     public setOrientation = (orientation: OrientationEnum = BotUI.orientation) => {
         BotUI.element.setAttribute('data-orientation', orientation);
         const { width: currentWidthInPx, height: currentHeightinPx } = BotUI.element.getBoundingClientRect();
@@ -878,7 +918,7 @@ class BotUI  {
             }, BotUI.settings.animationSpeed);
         }
         if (BotUI.settings.guiMode === GUIMode.CHAT && !(isNil(text) || isEmpty(text))) {
-            this.setChatMessage(text, null, null, MessageType.BOT, false, nodeId, this.botMessagesCallback);
+            this.setChatMessage(text, null, null, MessageType.BOT, false, nodeId, this.botMessagesCallback, this.dialogueID);
         }
     }
 
@@ -976,10 +1016,16 @@ class BotUI  {
         messageElement.appendChild(suggestionContainer);
         var mouseHover = false;
         function scrollFunction(e){
-            console.log("hovering");
             if (mouseHover){
                 e.preventDefault();
-                const scrollAmount = 30 * (e.deltaY/Math.abs(e.deltaY));
+                var maxVal;
+                if (Math.abs(e.deltaX) > Math.abs(e.deltaY)){
+                    maxVal = e.deltaX;
+                }else{
+                    maxVal = e.deltaY
+                }
+                const change = maxVal !== 0 ? (maxVal / Math.abs(maxVal)) : 0;
+                const scrollAmount = 30 * change;
                 suggestionContainer.children[0].scrollLeft += scrollAmount;
             }
         }
@@ -1033,6 +1079,42 @@ class BotUI  {
 
     public setTitle(title: string) {
         this.appSelectToggle(true, title);
+    }
+
+    public setControllIconStyles() {
+        if (!BotUI.settings.controlIcons.mic){
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-keyboard]").classList.add("hidden");
+        }else{
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-keyboard]").classList.remove("hidden");
+        }
+        if (!BotUI.settings.controlIcons.mute){
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-mute]").classList.add("hidden");
+        }else{
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-mute]").classList.remove("hidden");
+        }
+        if (!BotUI.settings.controlIcons.restart){
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-restart]").classList.add("hidden");
+        }else{
+            BotUI.controlIconsWrapper.querySelector("[data-chat-input-restart]").classList.remove("hidden");
+        }
+        const childrenList = BotUI.controlIconsWrapper.querySelectorAll(".icon-sop:not(.hidden)");
+        for (let index = 0; index < childrenList.length; index++) {
+            const element = childrenList[childrenList.length - 1 - index];
+            element.classList.remove("left-icon", "right-icon", "firstIcon", "secondIcon", "thirdIcon");
+            if (index === 0){
+                element.classList.add("right-icon");
+                element.classList.add("firstIcon");
+            }
+            if (index === 1){
+                element.classList.add("secondIcon");
+            }
+            if (index === 2){
+                element.classList.add("thirdIcon");
+            }
+            if (index === childrenList.length - 1){
+                element.classList.add("left-icon");
+            }
+        } 
     }
 
     public disableButtonGroup = (settings, callback, selector) => {
@@ -1117,7 +1199,7 @@ class BotUI  {
             }
         }
         if (BotUI.settings.guiMode === GUIMode.CHAT && !(isNil(url) || isEmpty(url))) {
-            this.setChatMessage(null, url, null, MessageType.BOT, false, nodeId,this.botMessagesCallback);
+            this.setChatMessage(null, url, null, MessageType.BOT, false, nodeId, this.botMessagesCallback, this.dialogueID);
         }
     }
 
@@ -1261,14 +1343,30 @@ class BotUI  {
         BotUI.element.style.setProperty('--bot-ui-message-color-outline-bot', textOutlineColor);
     }
 
+    public setIconsForBackground = (enabled = true) => {
+        if (enabled){
+            BotUI.restartElement.classList.add("chat-input-disabled");
+            BotUI.chatInputMuteElement.classList.add("chat-input-disabled");
+            BotUI.chatInputKeyboardElement.classList.add("chat-input-disabled");
+        }else{
+            BotUI.restartElement.classList.remove("chat-input-disabled");
+            BotUI.chatInputMuteElement.classList.remove("chat-input-disabled");
+            BotUI.chatInputKeyboardElement.classList.remove("chat-input-disabled");
+        }
+    }
+
     public setTextInputEnabled = (enabled = false) => {
         BotUI.settings.textInputEnabled = enabled;
         let elementChatHeight = disabledHeight;
+        this.setIconsForBackground(!enabled);
         if (enabled) {
             BotUI.element.setAttribute('data-with-chat-input', '');
             elementChatHeight = chatHeight;
+            BotUI.textInput.classList.remove('hidden');
         } else {
-            BotUI.element.removeAttribute('data-with-chat-input');
+            BotUI.element.setAttribute('data-with-chat-input', '');
+            elementChatHeight = disabledChatHeight;
+            BotUI.textInput.classList.add('hidden');
         }
         BotUI.element.style.setProperty('--bot-ui-chat-input-height', elementChatHeight);
         BotUI.handleBotUiHeights();
@@ -1563,7 +1661,80 @@ class BotUI  {
         }
     }
 
-    public setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}) => {
+    private setGoToButton = (id, dialogueID, clickCallback, messageTemplate) => {
+            // Create go to icon
+            const messageElement = BotUI.messagesElement;
+            const oldElems = messageElement.getElementsByClassName("latest-message");
+            for (let index = 0; index < oldElems.length; index++) {
+                const element = oldElems[index];
+                element.classList.remove("latest-message")
+            }
+            const hoverIcon = document.createElement("span");
+            hoverIcon.innerHTML = " ";
+            ["icon-sop", "icon-sop--undo", "icon--content--undo", "latest-message"].forEach(_class => {
+                hoverIcon.classList.add(_class);
+            });
+            hoverIcon.addEventListener("click", () => {
+                clickCallback(id, dialogueID);
+            })
+            messageTemplate.children[0].appendChild(hoverIcon);
+    }
+
+    public showAllGoToButtons = () => {
+        const messageElement = BotUI.messagesElement;
+        const oldElems = messageElement.getElementsByClassName("latest-message");
+        for (let index = 0; index < oldElems.length; index++) {
+            const element = oldElems[index];
+            element.classList.remove("latest-message")
+        }
+    }
+
+    public dialogueChangeCallback(dialogueIDs){
+        const messageElement = BotUI.messagesElement;
+        const allMessages = messageElement.getElementsByClassName("chat-message-bot");
+        for (let index = 0; index < allMessages.length; index++) {
+            const message = allMessages[index];
+            const lostGoBackIcons = message.getElementsByClassName("icon--content--undo");
+            if (lostGoBackIcons[0]){
+                if (dialogueIDs.includes(message.getAttribute("dialogueID"))){
+                    lostGoBackIcons[0].classList.remove("no-root-dialogue");
+                }else{
+                    lostGoBackIcons[0].classList.add("no-root-dialogue");
+                }
+            }
+        }
+    }
+
+    public convertMd(text: string){
+        // Convert MD to HTML
+        if (text){
+            text = text.replace(/(?:\\r\\n|\\r|\\n)/g, String.fromCharCode(10));
+        }
+        var converter = new showdown.Converter();
+        var html = converter.makeHtml(text);
+        var parser = new DOMParser();
+
+        // Convert string to HTMLElement
+        var doc = parser.parseFromString(html, 'text/html');
+        const allLinks = (doc.body as HTMLElement).querySelectorAll("a, p");
+
+        // Add any necessary attributes to tags such as "a" and "p"
+        for (let index = 0; index < allLinks.length; index++) {
+            const element = allLinks[index];
+            element.classList.add("bot-text-styles");
+            console.log(element.tagName);
+            if (element.tagName === "A"){
+                element.setAttribute("target", "_blank");
+            }
+        }
+
+        const result = doc.body.innerHTML !== "null" ? doc.body.innerHTML : "";
+
+        // Return HTML string
+        return result.replace(/(?:\\r\\n|\\r|\\n)/g, '<br>'); 
+    }
+
+    public setChatMessage = (text: string, imageUrl: string, videoUrl: string, type: MessageType, replace: boolean = false, id: string = null, clickCallback: Function = () => {}, dialogueID = "") => {
         const messageElement = BotUI.messagesElement;
         const messageTemplate = getContentAsHtml(chatMessageStructureTemplate);
         const messageTemplateElement = messageTemplate.querySelector('div.chat-message');
@@ -1578,7 +1749,14 @@ class BotUI  {
             }
         }
 
-        messageTemplateTextElement.innerHTML = text;
+        if (type === MessageType.BOT){
+            const htmlText = this.convertMd(text);
+            console.log("html text", htmlText);
+            messageTemplateTextElement.innerHTML = htmlText;
+        }else{
+            messageTemplateTextElement.innerHTML = text;
+        }
+
         messageTemplateElement.setAttribute('data-message-type', type);
         messageTemplateElement.classList.add('chat-message-' + type);
         messageTemplateElement.classList.add('chat-message-last');
@@ -1614,27 +1792,22 @@ class BotUI  {
                 messageTemplateElement.appendChild(video);
             }
         }
+
         if (type === MessageType.BOT && this.getSettings().goTo){
-            // Create go to icon
-            const oldElems = document.getElementsByClassName("latest-message");
-            for (let index = 0; index < oldElems.length; index++) {
-                const element = oldElems[index];
-                element.classList.remove("latest-message")
-            }
-            const hoverIcon = document.createElement("span");
-            hoverIcon.innerHTML = " ";
-            ["icon-sop", "icon-sop--undo", "icon--content--undo", "latest-message"].forEach(_class => {
-                hoverIcon.classList.add(_class);
-            });
-            hoverIcon.addEventListener("click", () => {
-                clickCallback(id)
-            })
-            messageTemplate.children[0].appendChild(hoverIcon);
+            this.setGoToButton(id, dialogueID, clickCallback, messageTemplate);
         }
-        
+
         messageElement.appendChild(messageTemplate.children[0]);
         this.chatMessageHeightLimit(messageElement.children[messageElement.children.length - 1] as HTMLElement);
         messageElement.scrollTop = messageElement.scrollHeight;
+        if (type === MessageType.BOT && this.getSettings().goTo){
+            messageElement.children[messageElement.children.length - 1].setAttribute("dialogueID", dialogueID);
+            if (BotUI.settings.showTooltips){
+                const undoElement = messageElement.children[messageElement.children.length - 1].getElementsByClassName("icon--content--undo")[0];
+                this.setTooltip(undoElement, "Return Here");
+            }
+        } 
+
         BotUI.scrollToLastMessage(messageElement);
     }
 

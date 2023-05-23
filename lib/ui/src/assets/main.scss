@@ -11,6 +11,9 @@
 
 @import "scss/0-base/bootstrap";
 
+@import 'tippy.js/dist/tippy.css';
+@import 'tippy.js/themes/light.css';
+
 
 // TODO move to .bot namespace
 [data-gui-mode] {
@@ -57,6 +60,10 @@ $amount: 20;
 	}
 }
 
+[data-text-input-wrap].hidden{
+	display: none;
+}
+
 [data-sop-header]{
 	width: 100%;
 	height: 40px;
@@ -97,7 +104,7 @@ $amount: 20;
 }
 
 @media only screen and (max-width: 1000px) {
-	[data-collapsable]{
+	[data-collapsable][data-collapsable=expanded]{
 		position: fixed !important;
 		left: 0;
 		top: 0;
@@ -130,34 +137,48 @@ $amount: 20;
 	}
 }
 
-@media (min-width: 100px){
-	[data-messages], [data-suggestions-button]{
-		font-size: 1.4rem;
-	}
-}
-
-@media (min-width: 650px){
+@media only screen and(min-width: 100px){
 	[data-messages], [data-suggestions-button]{
 		font-size: 1.3rem;
 	}
 }
 
-@media (min-width: 1000px){
+@media only screen and (min-width: 650px){
 	[data-messages], [data-suggestions-button]{
 		font-size: 1.2rem;
 	}
-	
 }
 
-@media (min-width: 1500px){
+@media (min-width: 1200px){
 	[data-messages], [data-suggestions-button]{
 		font-size: 1rem;
 	}
 }
 
+@media only screen and (max-width: 1000px) {
+	[data-chat-input-keyboard].chat-input-disabled, [data-chat-input-mute].chat-input-disabled, [data-chat-input-restart].chat-input-disabled{
+		font-size: 30px !important;
+		&::before{
+			line-height: 30px;
+		}
+		width: 40px !important;
+		height: 40px !important;
+	}
 
+	.thirdIcon.chat-input-disabled{
+		right: 95px !important;
+	}
 
+	.secondIcon.chat-input-disabled{
+		right: 55px !important;
+	}
 
+	.firstIcon.chat-input-disabled{
+		right: 15px !important;
+		font-size: 25px !important;
+	}
+	
+}
 
 .bot {
 
@@ -220,32 +241,11 @@ $amount: 20;
 	}
 }
 
-[data-text-input-wrap]{
-	display: none;
-	height: 100%;
-}
-
-[data-sound-input-wrap]{
-	display:block;
-}
-
-[data-chat-input-controllers]{
-	position: absolute;
-	right: 10px;
-	width: 40px;
-	height: 40px;
-	border-radius: 5px;
-	top: calc(50% - 19px);
-	background-color: #ffffff;
-	box-shadow: 0px 0px 1px black;
-
-	&.text-mode{
-		background: none;
-		box-shadow: none;
-	}
-}
-
 [data-with-chat-input] {
+
+	&.hidden{
+		display: none;
+	}
 
 	.chat-input {
 		display: flex;
@@ -304,6 +304,8 @@ $amount: 20;
                 height: 20px;
                 text-align: center;
                 color: #000000;
+				
+				
 
                 &--minus {
                     right: 22.6%;
@@ -415,6 +417,33 @@ $amount: 20;
 					display: none;
 				}
 
+				&.firstIcon{
+					right: 10px;
+				}
+
+				&.secondIcon{
+					right: 40px;
+				}
+
+				&.thirdIcon{
+					right: 70px;
+				}
+
+				&.chat-input-disabled{
+					background-color: #ffffff;
+
+					&.left-icon{
+						border-top-left-radius: 5px;
+						border-bottom-left-radius: 5px;
+						
+					}
+
+					&.right-icon{
+						border-top-right-radius: 5px;
+						border-bottom-right-radius: 5px;
+					}
+				}
+
 				&--minus {
 					right: 22.6%;
 					bottom: 10px;
@@ -454,23 +483,21 @@ $amount: 20;
 					top: calc(50% - 10px);
 				}
 
-				&--volume {
-					right: 10px;
-					bottom: 30px;
-				}
-
 				&--volume-mute {
-					right: 8px;
 					top: 50%;
     				transform: translateY(calc(-50% + 2px));
 					z-index: 1;
 				}
 
 				&--restart{
-					right: 8px;
 					top: 50%;
     				transform: translateY(calc(-50% + 2px));
 					z-index: 1;
+					font-size: 17px;
+					line-height: 20px;
+					&::before{
+						padding: 0 3px 0 0;
+					}
 				}
 
 				&--speaking-head {
@@ -491,14 +518,12 @@ $amount: 20;
 				}
 
 				&--keyboard {
-					right: 40px;
 					top: 50%;
     				transform: translateY(calc(-50% + 2px));
 					z-index: 1;
 
 					&-active{
 						background-color: rgba(232, 50, 50, 1);
-						border-radius: 50%;
 						color: white;
 						animation: bgColor 0.6s infinite alternate ease-in-out;
 					}
@@ -745,6 +770,10 @@ $amount: 20;
 					font-size: 16px;
 				}
 
+				&.no-root-dialogue{
+					display: none !important;
+				}
+
 				&:hover{
 					opacity: 1;
 					cursor: pointer;
@@ -824,6 +853,19 @@ $amount: 20;
 	}
 
 }
+
+a.bot-text-styles{
+	color: #008cff;
+	text-decoration: underline;
+	&:hover{
+		text-decoration: none;
+	}
+}
+
+p.bot-text-styles{
+	margin: 0;
+}
+
 
 [data-chat-input]{
 	&.chat-input{
