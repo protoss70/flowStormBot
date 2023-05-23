@@ -30,7 +30,7 @@
 		</div>
 		<br>
 		<button onclick="toggleCustomization(this)">Show Customization Options</button>
-		<div id="customizationOptions" style=" width: 100%;" class="hidden">
+		<div id="customizationOptions" class="hidden">
 			<hr/>
 			<h3>Icons</h3>
 			<div>
@@ -89,26 +89,9 @@
 			<div>
 				<div ><hr/></div>
 				<h3>Background</h3>
-				<div style="display:flex; justify-content: space-between; align-items:center;">
+				<div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 20px;">
 					<label style="margin-bottom:0;" for="botBackgroundColor">Background Color</label>
 					<input type="color" class="form-control" id="botBackgroundColor" value="#6737ff" title="Choose your color" style="width: 60px;">
-				</div>
-			</div>
-			<button id="generateEmbedCodeButton" style="margin-bottom: 20px; margin-top: 10px;">Generate Embed Code</button>
-			<div id="embedParamsParent" class="hidden">
-				Add the following lines to your embedded initFSClientBot parameters:
-				<div id="embedParams" style="background-color: #D9D9D9; padding: 20px; color:black; border-radius: 10px; margin-bottom: 20px;">
-						botKey: '6141f6fe302806105e62e745',<br>
-						collapsable: false,<br>
-						guiMode: 'chat',<br>
-						widgetSize: { width: '500px', height: '570px' }, <br>
-						fullScreen: false, <br>
-						attributes: { documentId: 'docId', personName: 'Name' }, <br>
-						userMessageTextColor: '#382929', <br>
-						botMessageTextColor: '#c85151', <br>
-						botMessageBackgroundColor: '#476885', <br>
-						userMessageBackgroundColor: '#7ba7d5', <br>
-						backgroundImageBlur: '3.4', <br>
 				</div>
 			</div>
 		</div>
