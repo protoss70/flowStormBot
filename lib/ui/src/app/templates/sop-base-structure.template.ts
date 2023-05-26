@@ -36,10 +36,11 @@ export const sopBaseStructureTemplate = `
                         </button>
                     </div>
                     <div data-chat-ask class="ask-section">
-                        <span data-chat-input-keyboard class="icon-sop icon-sop--keyboard"></span>
-                        <span data-chat-input-mute class="icon-sop icon-sop--volume-mute"></span>
-                        <span data-chat-input-restart class="icon-sop icon-sop--restart hidden"></span>
-    
+                        <div control-icons-wrapper class="control-icons-wrapper">
+                            <span data-chat-input-keyboard class="icon-sop icon-sop--keyboard"></span>
+                            <span data-chat-input-mute class="icon-sop icon-sop--volume-mute"></span>
+                            <span data-chat-input-restart class="icon-sop icon-sop--restart"></span>
+                        </div>
                         <div data-sound-input-wrap>
                             <span data-chat-input-mic class="icon-sop icon--largest icon-sop--mic"></span>
                         </div>
