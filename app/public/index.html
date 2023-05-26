@@ -176,11 +176,12 @@
 		else{
 			document.getElementById("upvBotKeyWrapper").classList.remove("hidden");
 		}
-
-		document.getElementById("mic").checked = defaultIconSetup.mic;
-		document.getElementById("mute").checked = defaultIconSetup.mute;
-		document.getElementById("restart").checked = defaultIconSetup.restart;
-		document.getElementById("textInput").checked = textInputEnabled;
+		if (document.getElementById("mic")){
+			document.getElementById("mic").checked = defaultIconSetup.mic;
+			document.getElementById("mute").checked = defaultIconSetup.mute;
+			document.getElementById("restart").checked = defaultIconSetup.restart;
+			document.getElementById("textInput").checked = textInputEnabled;
+		}
 
 		window.addEventListener("load", () => {
 			const elem = document.getElementById("botId");
