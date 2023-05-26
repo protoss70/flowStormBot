@@ -46,52 +46,59 @@
 				</div>
 			</div>
 			<div ><hr/></div>
-			<h3>Text</h3>
+			<h3>Bot Message</h3>
 			<div style="display: flex; justify-content: space-between; align-items: center;">
-				<label id="UserMessageTextLabel" for="textColorUser">User Message Text Color</label>
-				<input type="color" class="form-control" id="textColorUser" value="#FFFFFF" title="Choose your color" style="width: 60px;">
+				<label id="UserMessageTextLabel" for="textColorBot">Text Color</label>
+				<input type="color" class="form-control" id="textColorBot" value="#FFFFFF" title="Choose your color" style="width: 90px;">
 			</div>
-
+			<div style="justify-content: space-between; align-items: center; display: none;">
+				<label for="TextOutlineBot">Text Outline Color</label>
+				<input type="color" class="form-control" id="TextOutlineBot" value="#69737c" title="Choose your color" style="width: 90px;">	
+			</div>
+			<div style="display:flex; justify-content: space-between; align-items:center;">
+				<label style="margin-bottom:0;" for="messageBotBackground">Background Color</label>
+				<input type="color" class="form-control" id="messageBotBackground" value="rgb(0,0,0)" title="Choose your color" style="width: 90px;">
+			</div>
+			<div style="align-items:center; margin-top: 6px; display: flex; justify-content: space-between;">
+				<label id="customHeightLabel" style="margin-bottom:0;" for="botOpacity" class="form-label">Background Opacity</label>
+				<input type="range" value="0.4" min="0" style="width: 85px; margin-right: 1px;" max="1" step="0.05" class="form-range" id="botOpacity">
+			</div>
+			<hr style="width: 75%"/>
+			<h3>User Message</h3>
 			<div style="display: flex; justify-content: space-between; align-items: center;">
-				<label id="UserMessageTextLabel" for="textColorBot">Bot Message Text Color</label>
-				<input type="color" class="form-control" id="textColorBot" value="#FFFFFF" title="Choose your color" style="width: 60px;">
+				<label id="UserMessageTextLabel" for="textColorUser">Text Color</label>
+				<input type="color" class="form-control" id="textColorUser" value="#FFFFFF" title="Choose your color" style="width: 90px;">
 			</div>
 			<hr style="display: none"/>
 			<div style="display: none; justify-content: space-between; align-items: center;">
-				<label for="TextOutlineUser">User Message Text Outline Color</label>
-				<input type="color" class="form-control" id="TextOutlineUser" value="#B2BFCD" title="Choose your color" style="width: 60px;">	
+				<label for="TextOutlineUser">Text Outline Color</label>
+				<input type="color" class="form-control" id="TextOutlineUser" value="#B2BFCD" title="Choose your color" style="width: 90px;">	
 			</div>
-
-			<div style="justify-content: space-between; align-items: center; display: none;">
-				<label for="TextOutlineBot">Bot Message Text Outline Color</label>
-				<input type="color" class="form-control" id="TextOutlineBot" value="#69737c" title="Choose your color" style="width: 60px;">	
+			<div style="display:flex; justify-content: space-between; align-items:center;">
+				<label style="margin-bottom:0;" for="messageBackgroundUser">Background Color</label>
+				<input type="color" class="form-control" id="messageBackgroundUser" value="#FFFFFF" title="Choose your color" style="width: 90px;">
 			</div>
-			<div>
-				<div ><hr style="width: 75%"/></div>
-				<div style="display:flex; justify-content: space-between; align-items:center;">
-					<label style="margin-bottom:0;" for="messageBackgroundUser">User Message Background Color</label>
-					<input type="color" class="form-control" id="messageBackgroundUser" value="#FFFFFF" title="Choose your color" style="width: 60px;">
-				</div>
-				<div style="align-items:center; margin-top: 6px; display: flex; justify-content: space-between;">
-					<label id="customHeightLabel" style="margin-bottom:0" for="userOpacity" class="form-label">User Message Background Opacity</label>
-					<input type="range" value="0.3" min="0" max="1" step="0.05" class="form-range" id="userOpacity">
-				</div>
-				<hr style="width: 75%"/>
-				<div style="display:flex; justify-content: space-between; align-items:center;">
-					<label style="margin-bottom:0;" for="messageBotBackground">Bot Message Background Color</label>
-					<input type="color" class="form-control" id="messageBotBackground" value="rgb(0,0,0)" title="Choose your color" style="width: 60px;">
-				</div>
-				<div style="align-items:center; margin-top: 6px; display: flex; justify-content: space-between;">
-					<label id="customHeightLabel" style="margin-bottom:0" for="botOpacity" class="form-label">Bot Message Background Opacity</label>
-					<input type="range" value="0.4" min="0" max="1" step="0.05" class="form-range" id="botOpacity">
-				</div>
+			<div style="align-items:center; margin-top: 6px; display: flex; justify-content: space-between;">
+				<label id="customHeightLabel" style="margin-bottom:0;" for="userOpacity" class="form-label">Background Opacity</label>
+				<input type="range" value="0.3" min="0" max="1" step="0.05" style="width: 85px; margin-right: 1px;" class="form-range" id="userOpacity">
 			</div>
 			<div>
 				<div ><hr/></div>
 				<h3>Background</h3>
-				<div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 20px;">
-					<label style="margin-bottom:0;" for="botBackgroundColor">Background Color</label>
-					<input type="color" class="form-control" id="botBackgroundColor" value="#6737ff" title="Choose your color" style="width: 60px;">
+				<p>You can set the background as a color or an image.</p>
+				<hr style="width:80%">
+				<div style="display:flex; justify-content: space-between; align-items:center;">
+					<label style="margin-bottom:0;" for="botBackgroundColor">Color</label>
+					<input type="color" class="form-control" id="botBackgroundColor" value="#6737ff" title="Choose your color" style="width: 90px;">
+				</div>
+				<hr>
+				<div style="display:flex; justify-content: space-between; align-items:center;">
+					<label style="margin-bottom:0;" for="backgroundUrl">Url</label>
+					<input type="text" class="form-control" id="backgroundUrl" placeholder="url..." title="Choose the url" style="width: 90px;">
+				</div>
+				<div style="display:flex; justify-content: space-between; align-items:center; margin-top: 3px;">
+					<label style="margin-bottom:0;" for="backgroundBlur">Blur</label>
+					<input type="number" value="0" min="0" step="0.5" style="width: 90px; margin-right: 1px;" class="form-number" id="backgroundBlur">
 				</div>
 			</div>
 			<button id="generateEmbedCodeButton" style="margin-bottom: 20px; margin-top: 10px;">Generate Embed Code</button>
