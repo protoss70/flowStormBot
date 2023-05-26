@@ -249,6 +249,13 @@ export const initFSClientBot = (initParams = {}) => {
 			document.getElementById("textInput").addEventListener('change', () => {setTextEnabled()});
 
 			setPreviewCustomizations(botUI);
+			const url = new URL(window.location.href);
+			const showCustomizationOptions = url.searchParams.get("c") === "u_uid";
+			console.log("cCc", url.searchParams.get("c"));
+			if (!showCustomizationOptions){
+				document.getElementById("customizationOptions").remove();
+				document.getElementById("showCustomButton").remove();
+			}
 		}
 
 		if (settings.interactionMode === "SOP"){
