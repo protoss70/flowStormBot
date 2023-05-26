@@ -299,11 +299,9 @@ class BotUI  {
                 const viewportHeight = document.documentElement.clientHeight;
                 const newAddressHeight = windowHeight - viewportHeight;
                 if (newAddressHeight > 0){
-                    console.log("changing address bar height");
                     addressBarHeight = newAddressHeight;
                     BotUI.botWrapperElement.style.removeProperty('height');
                 }else{
-                    console.log(`Browser address bar height: ${addressBarHeight}px`);
                     BotUI.botWrapperElement.style.height = `calc(100vh - ${addressBarHeight}px)`;
                 }
             }
@@ -536,7 +534,6 @@ class BotUI  {
     }
 
     public setControllIcons = (controlIcons: {mic: boolean, mute: boolean, restart: boolean}) => {
-        console.log("here in settign controls");
         const mic = `<span data-chat-input-keyboard class="icon-sop icon-sop--keyboard"></span>`;
         const mute = `<span data-chat-input-mute class="icon-sop icon-sop--volume-mute"></span>`;
         const restart = `<span data-chat-input-restart class="icon-sop icon-sop--restart"></span>`;
@@ -1133,7 +1130,6 @@ class BotUI  {
     };
 
     public setButton = (settings: any = {}, callback: Function = ()=>{}) => {
-        console.log(settings);
         const messageElement = BotUI.messagesElement;
         this.setInputMode("button");
         const button = document.createElement('button');
@@ -1722,7 +1718,6 @@ class BotUI  {
         for (let index = 0; index < allLinks.length; index++) {
             const element = allLinks[index];
             element.classList.add("bot-text-styles");
-            console.log(element.tagName);
             if (element.tagName === "A"){
                 element.setAttribute("target", "_blank");
             }
@@ -1750,7 +1745,6 @@ class BotUI  {
 
         if (type === MessageType.BOT){
             const htmlText = this.convertMd(text);
-            console.log("html text", htmlText);
             messageTemplateTextElement.innerHTML = htmlText;
         }else{
             messageTemplateTextElement.innerHTML = text;

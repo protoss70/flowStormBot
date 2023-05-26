@@ -251,7 +251,6 @@ export const initFSClientBot = (initParams = {}) => {
 			setPreviewCustomizations(botUI);
 			const url = new URL(window.location.href);
 			const showCustomizationOptions = url.searchParams.get("c") === "u_uid";
-			console.log("cCc", url.searchParams.get("c"));
 			if (!showCustomizationOptions){
 				document.getElementById("customizationOptions").remove();
 				document.getElementById("showCustomButton").remove();
@@ -354,7 +353,6 @@ const checkBotUIOverlays = (element) => {
 }
 
 const setDialogueIDs = (newDialogueIDs, botUI) => {
-	console.log("DIALOGUE_IDS: ",newDialogueIDs);
 	dialogueIDs = newDialogueIDs;
 	if (botUI){
 		botUI.dialogueChangeCallback(dialogueIDs);
@@ -647,7 +645,6 @@ var createBot = (botUI, settings) => {
 	}
 
 	function setAttribute(atr, value){
-		console.log(atr, value);
 		attributeList[atr] = value
 	}
 
@@ -704,7 +701,6 @@ var createBot = (botUI, settings) => {
 
 	const run = (minimize = false) => {
 		const status = getStatus();
-		console.log(status);
 		let pauseOnListening = false;
 		bot.setOutAudio(settings.sound, status);
 		switch (status) {
@@ -852,7 +848,6 @@ var createBot = (botUI, settings) => {
 
 	botUI.chatSopNextCallback = (inputValue) => {
 		const status = getStatus();
-		console.log(status);
 		if (status !== undefined && status !== "SLEEPING") {
 			botUI.removeSuggestions();
 			bot.handleOnTextInput(`yes`, false, {sopInput: true});
