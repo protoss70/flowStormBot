@@ -874,9 +874,9 @@ class BotUI  {
 
     }
 
-    public setBackgroundColor = (color: string) => BotUI.setBackground({
+    public setBackgroundColor = (color: string, secondaryColor:string = null) => BotUI.setBackground({
         color,
-    });
+    }, secondaryColor);
 
     public setBackgroundImage = (url: string, blur = BotUI.settings.backgroundImageBlur) => BotUI.setBackground({
         url: {
@@ -1629,12 +1629,15 @@ class BotUI  {
 
     private static getChatMute = (value: boolean, callback: Function) => callback(value);
 
-    private static setBackground = (background: Background) => {
+    private static setBackground = (background: Background, secondaryColor = null) => {
         const { color = BotUI.settings.backgroundColor, url: { path = BotUI.settings.backgroundImage, blur = BotUI.settings.backgroundImageBlur } = {} } = background;
         BotUI.settings.backgroundColor = color;
         BotUI.settings.backgroundImageBlur = blur;
         BotUI.settings.backgroundImage = path;
         if (color) {
+            if (secondaryColor){
+                BotUI.element.style.setProperty('--bot-ui-base-background-color', secondaryColor);
+            }
             BotUI.element.style.setProperty('--bot-ui-background-color', color);
             BotUI.backgroundElement.classList.remove('background--image');
         }

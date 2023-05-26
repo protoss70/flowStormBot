@@ -110,7 +110,7 @@ export const initFSClientBot = (initParams = {}) => {
 	function setPreviewCustomizations(botUI){
 		const listenerIDs = ["textColorUser", "textColorBot", "TextOutlineUser", "TextOutlineBot", 
 							"messageBackgroundUser", "userOpacity", "messageBotBackground", "botOpacity", 
-							"botBackgroundColor", "backgroundUrl", "backgroundBlur"];
+							"botBackgroundColor", "backgroundUrl", "backgroundBlur", "botBackgroundColorSecondary"];
 		const generatorButtonID = "generateEmbedCodeButton";
 
 		const preTags = `
@@ -159,6 +159,9 @@ export const initFSClientBot = (initParams = {}) => {
 
 			if (id === "backgroundUrl") listenerFunction = (e) => {generatodEmbedLines["backgroundImage"] = e.target.value; settings.backgroundImageBlur = e.target.value; 
 			botUI.setBackgroundImage(e.target.value, document.getElementById("backgroundBlur").value);}
+
+			if (id === "botBackgroundColorSecondary") listenerFunction = (e) => {generatodEmbedLines["backgroundImageSecondaryColor"] = e.target.value; 
+			settings.backgroundImageSecondaryColor = e.target.value; botUI.setBackgroundColor(document.getElementById("botBackgroundColor").value, e.target.value);}
 
 			document.getElementById(id).addEventListener("input", (e) => {listenerFunction(e)});
 			document.getElementById(generatorButtonID).addEventListener("click", () => {
