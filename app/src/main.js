@@ -110,8 +110,20 @@ export const initFSClientBot = (initParams = {}) => {
 	function setPreviewCustomizations(botUI){
 		const listenerIDs = ["textColorUser", "textColorBot", "TextOutlineUser", "TextOutlineBot", 
 							"messageBackgroundUser", "userOpacity", "messageBotBackground", "botOpacity", 
-							"botBackgroundColor"];
+							"botBackgroundColor", "backgroundUrl", "backgroundBlur"];
 		const generatorButtonID = "generateEmbedCodeButton";
+
+		const preTags = `
+		&lt;script&gt;<br>
+		&emsp;initFSClientBot({<br>
+			&emsp;&emsp;...YourParameters,<br>
+		`
+
+		const endTags = `
+		&emsp;})<br>
+		&lt;/script&gt;
+		`
+
 		function ColorToRGBA(opacityID, colorID){
 			const opacity = document.getElementById(opacityID).value;
 			const color = document.getElementById(colorID).value;
@@ -142,14 +154,22 @@ export const initFSClientBot = (initParams = {}) => {
 
 			if (id === "botBackgroundColor") listenerFunction = (e) => {generatodEmbedLines["backgroundColor"] = e.target.value; settings.backgroundColor = e.target.value; botUI.setBackgroundColor(e.target.value)}
 
+			if (id === "backgroundBlur") listenerFunction = (e) => {generatodEmbedLines["backgroundImageBlur"] = e.target.value; settings.backgroundImageBlur = e.target.value; 
+			botUI.setBackgroundImage(document.getElementById("backgroundUrl").value, e.target.value);}
+
+			if (id === "backgroundUrl") listenerFunction = (e) => {generatodEmbedLines["backgroundImage"] = e.target.value; settings.backgroundImageBlur = e.target.value; 
+			botUI.setBackgroundImage(e.target.value, document.getElementById("backgroundBlur").value);}
+
 			document.getElementById(id).addEventListener("input", (e) => {listenerFunction(e)});
 			document.getElementById(generatorButtonID).addEventListener("click", () => {
 				document.getElementById("embedParamsParent").classList.remove("hidden");
 				const embedElem = document.getElementById("embedParams");
-				embedElem.innerHTML = "";
+				embedElem.innerHTML = preTags;
 				Object.keys(generatodEmbedLines).forEach(key => {
-					embedElem.innerHTML += `${key}: ${generatodEmbedLines[key]}<br />`
+					embedElem.innerHTML += `&emsp;&emsp;${key}: ${generatodEmbedLines[key]},<br />`
 				})
+				embedElem.innerHTML += endTags;
+				window.scrollTo(0, document.body.scrollHeight);
 			})
 		});
 	}
