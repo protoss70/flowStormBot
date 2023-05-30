@@ -16,8 +16,8 @@
 
 // TODO move to .bot namespace
 [data-gui-mode] {
-  --bot-ui-background-color: #927263;
-  --bot-ui-base-background-color: #28568c;
+  --bot-ui-background-color: #000000;
+  --bot-ui-base-background-color: #000000;
   //--bot-ui-base-background-color: #f1f4f7;
   --bot-ui-window-width: 100vw;
   --bot-ui-window-height: 100vh;
@@ -26,13 +26,13 @@
   --bot-ui-animation-speed: 500ms;
   --bot-ui-background-url-blur: 0px;
   --bot-ui-scrollbar-background: transparent;
-  --bot-ui-thumb-background: rgba(0, 0, 0, 0.5);
+  --bot-ui-thumb-background: #FFFFFF;
   --bot-ui-message-color-bot: #ffffff;
   --bot-ui-message-color-outline-bot: rgba(0, 0, 0, 0.5);
   --bot-ui-message-color-user: #ffffff;
   --bot-ui-message-color-outline-user: rgba(0, 0, 0, 0.5);
   --bot-ui-message-background-bot: rgba(0, 0, 0, 0.4);
-  --bot-ui-message-background-user: rgba(255, 255, 255, 0.3);
+  --bot-ui-message-background-user: rgba(255, 255, 255, 1);
   --bot-ui-avatar-height: 0px;
   --bot-ui-chat-input-height: 0px;
   --bot-ui-sop-chat-input-height: 2.5rem;
@@ -861,7 +861,7 @@ $amount: 20;
 }
 
 a.bot-text-styles {
-  color: #008cff;
+  color: #a0cbef;
   text-decoration: underline;
   &:hover {
     text-decoration: none;
@@ -1346,6 +1346,8 @@ p.bot-text-styles {
       width: 30%;
       font-size: 20px;
       font-weight: bold;
+      background-color: #BFBFBF;
+      color: #000000;
 
       &[data-pdf-question-another],
       &[data-pdf-question-continue] {
@@ -1848,8 +1850,8 @@ canvas {
     height: 100%;
 
     white-space: nowrap;
-    background-color: rgba(255, 255, 255, 0.3);
-    color: white;
+    background-color: #BFBFBF;
+    color: #000000;
     border: none;
     border-radius: 5px;
     padding: 0.55rem;

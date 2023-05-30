@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "target": "bot",
+    "site": "livebot",
     "public": "app/dist",
     "ignore": [
       "firebase.json",

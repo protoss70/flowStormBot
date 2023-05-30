@@ -28,7 +28,7 @@ const environment = '-preview';
 let botKey = environment === '' || environment === '-preview' ? defaultURL : '606c52c6d750aa1b1537e5d6';
 let studioUrl = environment === 'local' ? 'http://localhost:8089' :  `https://studio${environment}.flowstorm.ai`;
 let defaultCoreUrl = environment === 'local' ? 'http://localhost:8080' :  `https://core${environment}.flowstorm.ai`;
-let development = true;
+let development = false;
 
 let idToken = undefined
 let accessToken = undefined
@@ -191,6 +191,7 @@ export const initFSClientBot = (initParams = {}) => {
 		else if (urlBotKey !== null && urlBotKey.length === 24 && development) {
 			botKey = urlBotKey;
 		}
+		botKey = "646b4706a47a67009f647d79";
 		const url = new URL(window.location.href);
 		const intMode = url.searchParams.get("m");
 		if (intMode === "guide" || intMode === "sop"){
