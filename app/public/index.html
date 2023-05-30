@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Bot Development</title>
+	<title>Bot</title>
 
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +29,7 @@
 			</div>
 		</div>
 		<br>
-		<button onclick="toggleCustomization(this)">Show Customization Options</button>
+		<button id="showCustomButton" onclick="toggleCustomization(this)">Show Customization Options</button>
 		<div id="customizationOptions" class="hidden">
 			<hr/>
 			<h3>Icons</h3>
@@ -88,8 +88,12 @@
 				<p>You can set the background as a color or an image.</p>
 				<hr style="width:80%">
 				<div style="display:flex; justify-content: space-between; align-items:center;">
-					<label style="margin-bottom:0;" for="botBackgroundColor">Color</label>
+					<label style="margin-bottom:0;" for="botBackgroundColor">Primary Color</label>
 					<input type="color" class="form-control" id="botBackgroundColor" value="#6737ff" title="Choose your color" style="width: 90px;">
+				</div>
+				<div style="display:flex; justify-content: space-between; align-items:center;">
+					<label style="margin-bottom:0;" for="botBackgroundColorSecondary">Secondary Color</label>
+					<input type="color" class="form-control" id="botBackgroundColorSecondary" value="#28568c" title="Choose your color" style="width: 90px;">
 				</div>
 				<hr>
 				<div style="display:flex; justify-content: space-between; align-items:center;">
@@ -138,7 +142,6 @@
 		let defaultIconSetup = {}
 		let textInputEnabled = false;
 		if (inputSettings && inputSettings.length === 4){
-			console.log(inputSettings);
 			defaultIconSetup = {
 				mic: inputSettings[0] === "1",
 				mute: inputSettings[1] === "1",
@@ -177,11 +180,12 @@
 		else{
 			document.getElementById("upvBotKeyWrapper").classList.remove("hidden");
 		}
-
-		document.getElementById("mic").checked = defaultIconSetup.mic;
-		document.getElementById("mute").checked = defaultIconSetup.mute;
-		document.getElementById("restart").checked = defaultIconSetup.restart;
-		document.getElementById("textInput").checked = textInputEnabled;
+		if (document.getElementById("mic")){
+			document.getElementById("mic").checked = defaultIconSetup.mic;
+			document.getElementById("mute").checked = defaultIconSetup.mute;
+			document.getElementById("restart").checked = defaultIconSetup.restart;
+			document.getElementById("textInput").checked = textInputEnabled;
+		}
 
 		window.addEventListener("load", () => {
 			const elem = document.getElementById("botId");

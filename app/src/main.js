@@ -110,7 +110,7 @@ export const initFSClientBot = (initParams = {}) => {
 	function setPreviewCustomizations(botUI){
 		const listenerIDs = ["textColorUser", "textColorBot", "TextOutlineUser", "TextOutlineBot", 
 							"messageBackgroundUser", "userOpacity", "messageBotBackground", "botOpacity", 
-							"botBackgroundColor", "backgroundUrl", "backgroundBlur"];
+							"botBackgroundColor", "backgroundUrl", "backgroundBlur", "botBackgroundColorSecondary"];
 		const generatorButtonID = "generateEmbedCodeButton";
 
 		const preTags = `
@@ -159,6 +159,9 @@ export const initFSClientBot = (initParams = {}) => {
 
 			if (id === "backgroundUrl") listenerFunction = (e) => {generatodEmbedLines["backgroundImage"] = e.target.value; settings.backgroundImageBlur = e.target.value; 
 			botUI.setBackgroundImage(e.target.value, document.getElementById("backgroundBlur").value);}
+
+			if (id === "botBackgroundColorSecondary") listenerFunction = (e) => {generatodEmbedLines["backgroundImageSecondaryColor"] = e.target.value; 
+			settings.backgroundImageSecondaryColor = e.target.value; botUI.setBackgroundColor(document.getElementById("botBackgroundColor").value, e.target.value);}
 
 			document.getElementById(id).addEventListener("input", (e) => {listenerFunction(e)});
 			document.getElementById(generatorButtonID).addEventListener("click", () => {
@@ -249,6 +252,12 @@ export const initFSClientBot = (initParams = {}) => {
 			document.getElementById("textInput").addEventListener('change', () => {setTextEnabled()});
 
 			setPreviewCustomizations(botUI);
+			const url = new URL(window.location.href);
+			const showCustomizationOptions = url.searchParams.get("c") === "u_uid";
+			if (!showCustomizationOptions){
+				document.getElementById("customizationOptions").remove();
+				document.getElementById("showCustomButton").remove();
+			}
 		}
 
 		if (settings.interactionMode === "SOP"){
@@ -347,7 +356,6 @@ const checkBotUIOverlays = (element) => {
 }
 
 const setDialogueIDs = (newDialogueIDs, botUI) => {
-	console.log("DIALOGUE_IDS: ",newDialogueIDs);
 	dialogueIDs = newDialogueIDs;
 	if (botUI){
 		botUI.dialogueChangeCallback(dialogueIDs);
@@ -640,7 +648,6 @@ var createBot = (botUI, settings) => {
 	}
 
 	function setAttribute(atr, value){
-		console.log(atr, value);
 		attributeList[atr] = value
 	}
 
@@ -697,7 +704,6 @@ var createBot = (botUI, settings) => {
 
 	const run = (minimize = false) => {
 		const status = getStatus();
-		console.log(status);
 		let pauseOnListening = false;
 		bot.setOutAudio(settings.sound, status);
 		switch (status) {
@@ -845,7 +851,6 @@ var createBot = (botUI, settings) => {
 
 	botUI.chatSopNextCallback = (inputValue) => {
 		const status = getStatus();
-		console.log(status);
 		if (status !== undefined && status !== "SLEEPING") {
 			botUI.removeSuggestions();
 			bot.handleOnTextInput(`yes`, false, {sopInput: true});
