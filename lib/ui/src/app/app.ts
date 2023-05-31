@@ -1662,15 +1662,9 @@ class BotUI  {
 
     private setGoToButton = (id, dialogueID, clickCallback, messageTemplate) => {
             // Create go to icon
-            const messageElement = BotUI.messagesElement;
-            const oldElems = messageElement.getElementsByClassName("latest-message");
-            for (let index = 0; index < oldElems.length; index++) {
-                const element = oldElems[index];
-                element.classList.remove("latest-message")
-            }
             const hoverIcon = document.createElement("span");
             hoverIcon.innerHTML = " ";
-            ["icon-sop", "icon-sop--undo", "icon--content--undo", "latest-message"].forEach(_class => {
+            ["icon-sop", "icon-sop--undo", "icon--content--undo"].forEach(_class => {
                 hoverIcon.classList.add(_class);
             });
             hoverIcon.addEventListener("click", () => {
