@@ -274,6 +274,8 @@ class BotUI  {
             })
         } else {
             BotUI.collapsableTriggerElement.parentNode.removeChild(BotUI.collapsableTriggerElement);
+            BotUI.element.setAttribute("data-collapsable", "expanded");
+            BotUI.closeElement.classList.add("hidden");
         }
 
         if (BotUI.settings.controlIcons){

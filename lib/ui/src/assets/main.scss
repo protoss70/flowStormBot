@@ -91,6 +91,9 @@ $amount: 20;
       opacity: 1;
       cursor: pointer;
     }
+    &.hidden{
+      display: none;
+    }
   }
 }
 
