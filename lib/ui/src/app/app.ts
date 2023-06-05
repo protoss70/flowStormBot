@@ -797,8 +797,6 @@ class BotUI  {
 
         const messageElement = BotUI.messagesElement;
         messageElement.appendChild(snippetContainer);
-
-        this.setSuggestion(["Continue"]);
         BotUI.scrollToLastMessage(messageElement);
 
     }
