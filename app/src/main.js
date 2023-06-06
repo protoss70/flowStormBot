@@ -1017,6 +1017,7 @@ var createBot = (botUI, settings) => {
   botUI.chatRestartCallback = () => {
     const state = getStatus();
     botUI.removeAllMessages();
+    botUI.removeSuggestions();
 
     if (state === "SLEEPING" || state === undefined) {
       run();
