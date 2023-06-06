@@ -1016,6 +1016,8 @@ var createBot = (botUI, settings) => {
 
   botUI.chatRestartCallback = () => {
     const state = getStatus();
+    botUI.removeAllMessages();
+
     if (state === "SLEEPING" || state === undefined) {
       run();
       bot.audioInputCallback();
