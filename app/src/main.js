@@ -701,11 +701,13 @@ var createBot = (botUI, settings) => {
     } else {
       //SUCCESS
       results.result.forEach((result) => {
-        const { title, secondary } = titleAndContext(
-          result.meta.backup,
-          result.meta.backup.cnt
+        const title = result.meta.name;
+        const secondary = result.meta.snipet;
+        botUI.setSnippet(
+          result.meta.pagelink + "#" + result.meta.page_id,
+          title,
+          secondary
         );
-        botUI.setSnippet(result.meta.pagelink, title, secondary);
       });
       botUI.setSuggestion(["Continue"]);
     }
@@ -713,9 +715,6 @@ var createBot = (botUI, settings) => {
 
   defaultCallback.handleCommand = (command, code, t) => {
     const payload = JSON.parse(code);
-    // console.log("payload: ", payload);
-    console.log(command);
-    console.log("pay: ", payload);
     switch (command) {
       case "#expression":
         botUI.sendRTCData({ Expression: { Name: payload["name"] } });
@@ -774,6 +773,7 @@ var createBot = (botUI, settings) => {
         });
         break;
       case "#suggestions":
+        console.log(payload);
         if (payload.nodes) {
           const suggestionText = [];
           payload.nodes.forEach((node) => {
@@ -991,6 +991,7 @@ var createBot = (botUI, settings) => {
     if (status === "SLEEPING") {
     } else {
       botUI.setUserText(inputValue);
+      setAttribute("query", inputValue);
       bot.handleOnTextInput(`#search`, false, { sopInput: true });
       botUI.toggleLoader(true);
 
