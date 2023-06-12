@@ -10,13 +10,13 @@ import tippy from "tippy.js"; // tooltips, popovers, dropdowns
 import showdown from "showdown"; // markdown to HTML converter
 
 // Import functions from functional library lambda
-import clamp from "ramda/es/clamp";
-import defaultTo from "ramda/es/defaultTo";
-import isNil from "ramda/es/isNil";
-import is from "ramda/es/is";
-import isEmpty from "ramda/es/isEmpty";
-import merge from "ramda/es/merge";
-import times from "ramda/es/times";
+import clamp from "ramda/es/clamp"; // Restricts a number to be within a range
+import defaultTo from "ramda/es/defaultTo"; // Returns the second argument if it is not null, undefined or NaN; otherwise the first argument is returned
+import isNil from "ramda/es/isNil"; // Checks if the input value is null or undefined.
+import is from "ramda/es/is"; // See if an object (i.e. val) is an instance of the supplied constructor
+import isEmpty from "ramda/es/isEmpty"; // Returns true if the given value is its type's empty value; false otherwise.
+import merge from "ramda/es/merge"; // Creates one new object with the own properties from a list of objects. If a key exists in more than one object, the value from the last object it exists in will be used.
+import times from "ramda/es/times"; // Calls an input function n times, returning an array containing the results of those function calls.
 import { forEach, type } from "ramda";
 
 // Import custom assets
@@ -92,6 +92,7 @@ const defaults: Settings = {
   botMessageBackgroundColor: "rgba(0, 0, 0, .4)", // default background color of bot message
   botMessageTextColor: "#ffffff", // default color of bot message
   botMessageTextOutlineColor: "rgba(0, 0, 0, .5)", // default color of outline of bot message. Outline is visible only in kiosk gui mode with avatar enabled
+  textInputEnabled: true, //  displays input for messages - turns on/off input for user messages and buttons for interaction (removes all buttons). By default it is enabeled (true) for GUI mode chat and disabled (false) for kiosk
   inputMode: "sop", // ??
   standardQuestionMode: "text", // ??
   inputAudio: true, // microphone active?
@@ -109,10 +110,10 @@ const defaults: Settings = {
     "FEEDBACK",
     "LOGIN",
     "INPUTSELECT",
-  ], // ?
-  interactionMode: "SOP", // ??
+  ], // ??
+  interactionMode: "SOP", // ?? - TODO - please provide explanation - what is inputMode, sections and interactionMode and the setControllIcons relationship?? Update interface Settings - somewhere custom union types should be created instead general string??
   sound: true, // what is relation to inputAudio and outputAudio??
-  controlIcons: { mic: true, mute: true, restart: true }, // display control icons
+  controlIcons: { mic: true, mute: true, restart: false }, // display control icons
   showTooltips: true, // show tooltips of control icons
 };
 
@@ -159,12 +160,12 @@ const avatarTextOverlapRatio = 1 / 4;
 const micActiveClass = "icon-sop--mic--active";
 
 /**
- * BotUI class represents the window for the chatbot interface
- * It handles initialization, rendering and behavior of the chatbot UI
+ * BotUI class represents the window for the bot interface
+ * It handles initialization, rendering and behavior of the bot UI
  * It encapsulates numerous UI settings, interaction logic and event handling
  *
  * Responsibilities:
- * - Renders the chatbot window according given settings
+ * - Renders the bot window according given settings
  * - Manages user interactions
  * - Renders incoming responses from the server in the UI
  *
@@ -175,11 +176,11 @@ const micActiveClass = "icon-sop--mic--active";
  *
  *
  * Example:
- * const chatbot = new BotUI("container", settings)
+ * const bot = new BotUI("container", settings)
  *
  * @constructor
- * @param {string} element - The ID of the HTML element where the chatbot window should be inserted
- * @param {Settings} [settings="defaults"] - The configuration object for the chatbot window (optional). Contains settings for appearance and behavior
+ * @param {string} element - The ID of the HTML element where the bot window should be inserted
+ * @param {Settings} [settings="defaults"] - The configuration object for the bot window (optional). Contains settings for appearance and behavior
  */
 
 class BotUI {
@@ -242,22 +243,28 @@ class BotUI {
   private static avatarDataChannel: RTCDataChannel;
 
   constructor(element: string, settings: Settings = defaults) {
-    BotUI.element = document.getElementById(element);
-    defaults.textInputEnabled = settings.guiMode === GUIMode.CHAT;
+    // Modify class static properties
+    BotUI.element = document.getElementById(element); // set BotUI element according HTML element id name
 
+    defaults.textInputEnabled = settings.guiMode === GUIMode.CHAT; // by default enable text input for chat mode
     settings.guiMode = includesToDefault(
       settings.guiMode,
       Object.values(GUIMode),
       GUIMode.KIOSK
-    );
-    BotUI.settings = merge(defaults, settings);
+    ); // if guiMode is undefined in settings or it has a different value than "kiosk" or "chat", it is set to "kiosk"
+
+    BotUI.settings = merge(defaults, settings); // merge defaults with settings - settings has priority over defaults where both keys exist
+
     BotUI.settings.fullScreen = BotUI.settings.collapsable
       ? false
       : BotUI.settings.fullScreen;
-    BotUI.rootElement = document.documentElement;
+
+    BotUI.rootElement = document.documentElement; // set rootElement to root element of the document (html)
     if (!BotUI.element) {
       return;
     }
+
+    // Modify CSS variable values according settings
     BotUI.element.style.setProperty(
       "--bot-ui-animation-speed",
       `${BotUI.settings.animationSpeed}ms`
@@ -291,7 +298,9 @@ class BotUI {
       `${BotUI.settings.userMessageBackgroundColor}`
     );
     BotUI.element.style.setProperty("--bot-ui-chat-pcm-height", chatHeight);
-    BotUI.orientation = OrientationEnum.LANDSCAPE;
+
+    BotUI.orientation = OrientationEnum.LANDSCAPE; // set default orientation property to "landscape"
+
     if (
       BotUI.settings.interactionMode == "SOP" ||
       BotUI.settings.interactionMode == "GUIDE"
@@ -299,12 +308,16 @@ class BotUI {
       BotUI.element.innerHTML = sopBaseStructureTemplate;
     } else {
       BotUI.element.innerHTML = baseStructureTemplate;
-    }
+    } // set HTML template according interaction mode - why there are two templates?? are still both of them being used??
+
+    // Modify HTML element attribute values according settings
     BotUI.element.setAttribute("data-gui-mode", BotUI.settings.guiMode);
     if (BotUI.settings.fullScreen) {
       BotUI.element.setAttribute("data-fullscreen", "");
     }
     BotUI.reverseAvatarOrderAction();
+
+    // Set other class properties (HTMLElements) according HTML attribute selectors
     BotUI.imageKioskElement = BotUI.element.querySelector("[data-image]");
     BotUI.userPcmElement = BotUI.element.querySelector("[data-user-pcm]");
     BotUI.botPcmElement = BotUI.element.querySelector("[data-bot-pcm]");
@@ -384,6 +397,7 @@ class BotUI {
       "[control-icons-wrapper]"
     );
 
+    // Control collapsing of the bot window and triggering element
     if (!BotUI.settings.collapsed) {
       BotUI.collapsableTriggerElement.classList.add("hidden");
     } else {
@@ -403,14 +417,18 @@ class BotUI {
       BotUI.closeElement.classList.add("hidden");
     }
 
+    // control display of the control icons
     if (BotUI.settings.controlIcons) {
       this.setControllIconStyles();
     }
-
     if (!BotUI.settings.customIcons) {
       this.setIcons();
     }
+
+    // display app title in the bot window header
     this.setTitle(BotUI.settings.title);
+
+    // ?? TODO please add comment in the defaults definition - is there more DRY way to implement this?
     if (BotUI.settings.interactionMode === "SOP") {
       BotUI.settings.sections = [
         "SOP",
@@ -460,8 +478,10 @@ class BotUI {
         "[data-bot-message] span"
       );
     }
+
     BotUI.isChatEnabled = BotUI.settings.outputAudio;
     BotUI.isMicrophoneEnabled = BotUI.settings.inputAudio;
+
     if (
       BotUI.settings.interactionMode !== "SOP" &&
       BotUI.settings.interactionMode != "GUIDE"
@@ -483,6 +503,7 @@ class BotUI {
       //     BotUI.chatInputMuteElement.classList.add('icon--light');
       // }
     }
+
     BotUI.backgroundElement = BotUI.element.querySelector("[data-background]");
 
     if (!BotUI.settings.collapsable) {
@@ -506,6 +527,7 @@ class BotUI {
     if (!!BotUI.settings.backgroundSimpleAnimation) {
       // BotUI.backgroundElement.setAttribute('data-background-animation', '');
     }
+
     times(() => {
       BotUI.backgroundElement.appendChild(document.createElement("span"));
     }, BotUI.settings.backgroundAdvancedAnimationParticlesCount);
@@ -720,6 +742,10 @@ class BotUI {
     this.setTooltip(BotUI.chatInputMuteElement, "Mute/Unmute App");
   }
 
+  /**
+   * Loops through list of icons (global variable)
+   * If the icon element is present in DOM, extra class "icon--content--<icon name>" is added - content is inserted
+   */
   public setIcons = () => {
     icons.forEach((icon) => {
       const suffix =
@@ -728,12 +754,17 @@ class BotUI {
           ? "-sop"
           : "";
       const element = document.querySelector(".icon" + suffix + "--" + icon);
+
       if (element !== null) {
         element.classList.add("icon--content--" + icon);
       }
     });
   };
 
+  /**
+   * Public method to change icon display settings
+   * @param controlIcons - controls the display of individual icons - microphone, speaker and restart
+   */
   public setControllIcons = (controlIcons: {
     mic: boolean;
     mute: boolean;
@@ -785,6 +816,7 @@ class BotUI {
     const section = BotUI.settings.sections[index];
     this.setSection(section);
   }
+
   public nextSection() {
     if (BotUI.settings.sectionActive < BotUI.settings.sections.length - 1) {
       BotUI.settings.sectionActive += 1;
@@ -964,7 +996,7 @@ class BotUI {
 
   private setSectionUI(section: string) {
     this.removeAllProperties();
-    console.log(section);
+    // console.log(section);
     switch (section) {
       case "LOGIN":
         BotUI.messagesElement.classList.add("hidden");
@@ -1298,6 +1330,12 @@ class BotUI {
     }
   };
 
+  /**
+   * Sets and renders or hides the title of the bot window
+   *
+   * @param active - boolean indicating whether the title should be visible
+   * @param text - title of the bot window
+   */
   public appSelectToggle = (active: boolean, text: string = "") => {
     if (active) {
       BotUI.sopName.classList.remove("hidden");
@@ -1415,6 +1453,9 @@ class BotUI {
     this.appSelectToggle(true, title);
   }
 
+  /**
+   * Controls visibility of the control icons - microphone, speaker and restart according settings
+   */
   public setControllIconStyles() {
     if (!BotUI.settings.controlIcons.mic) {
       BotUI.controlIconsWrapper
@@ -1425,6 +1466,7 @@ class BotUI {
         .querySelector("[data-chat-input-keyboard]")
         .classList.remove("hidden");
     }
+
     if (!BotUI.settings.controlIcons.mute) {
       BotUI.controlIconsWrapper
         .querySelector("[data-chat-input-mute]")
@@ -1434,6 +1476,7 @@ class BotUI {
         .querySelector("[data-chat-input-mute]")
         .classList.remove("hidden");
     }
+
     if (!BotUI.settings.controlIcons.restart) {
       BotUI.controlIconsWrapper
         .querySelector("[data-chat-input-restart]")
@@ -1443,6 +1486,7 @@ class BotUI {
         .querySelector("[data-chat-input-restart]")
         .classList.remove("hidden");
     }
+
     const childrenList = BotUI.controlIconsWrapper.querySelectorAll(
       ".icon-sop:not(.hidden)"
     );
@@ -2093,6 +2137,11 @@ class BotUI {
     }
   };
 
+  /**
+   * Sets or removes element attribute "data-avatar-reverse-order"
+   *
+   * @param reverseOrder - The boolean value indicating wheter the order should be reversed or not
+   */
   private static reverseAvatarOrderAction = (
     reverseOrder: boolean = BotUI.settings.reverseAvatarOrder
   ) => {
