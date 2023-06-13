@@ -45,6 +45,7 @@ export interface Settings {
     sectionActive?: number;
     sound?: boolean;
     controlIcons?: {mic: boolean, mute: boolean, restart: boolean};
+    search?: boolean;
     showTooltips?: boolean;
 }
 

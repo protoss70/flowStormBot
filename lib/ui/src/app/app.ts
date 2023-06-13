@@ -114,6 +114,7 @@ const defaults: Settings = {
   interactionMode: "SOP", // ?? - TODO - please provide explanation - what is inputMode, sections and interactionMode and the setControllIcons relationship?? Update interface Settings - somewhere custom union types should be created instead general string??
   sound: true, // what is relation to inputAudio and outputAudio??
   controlIcons: { mic: true, mute: true, restart: false }, // display control icons
+  search: true, // setting for elastic search. It controls if the bot will do elastic search or not
   showTooltips: true, // show tooltips of control icons
 };
 
@@ -154,6 +155,7 @@ const icons = [
   "restart",
   "feedback",
   "close",
+  "search"
 ];
 
 const avatarTextOverlapRatio = 1 / 4;
@@ -202,6 +204,7 @@ class BotUI {
   private static chatTextInputElement: HTMLElement;
   private static chatElement: HTMLElement;
   private static chatInputMuteElement: HTMLElement;
+  private static searchElement: HTMLElement;
   private static chatInputArrowElement: HTMLElement;
   private static chatInputMicrophoneElement: HTMLElement;
   private static chatInputMicElement: HTMLElement;
@@ -328,6 +331,9 @@ class BotUI {
       BotUI.element.querySelector("[data-chat-input]");
     BotUI.chatInputMuteElement = BotUI.element.querySelector(
       "[data-chat-input-mute]"
+    );
+    BotUI.searchElement = BotUI.element.querySelector(
+      "[data-chat-input-search]"
     );
     BotUI.chatInputMicrophoneElement = BotUI.element.querySelector(
       "[data-chat-input-microphone]"
@@ -607,6 +613,10 @@ class BotUI {
       BotUI.getChatMute(BotUI.settings.sound, this.chatMuteCallback);
     };
 
+    BotUI.searchElement.onclick = (e) => {
+      this.searchElementCallback();
+    }
+
     BotUI.restartElement.onclick = () => {
       this.chatRestartCallback();
     };
@@ -701,6 +711,22 @@ class BotUI {
     BotUI.setBackground({});
   }
 
+  public toggleSearchIcons(on: boolean){
+    if (on){
+      BotUI.searchElement.classList.add("hidden");
+      if (BotUI.settings.controlIcons.mic){
+        BotUI.chatInputKeyboardElement.classList.remove("hidden");
+      }
+      BotUI.textInput.classList.remove("hidden");
+    }else{
+      BotUI.searchElement.classList.remove("hidden");
+      BotUI.chatInputKeyboardElement.classList.add("hidden");
+      if (!BotUI.settings.textInputEnabled){
+        BotUI.textInput.classList.add("hidden");
+      }
+    }
+  }
+
   public setMicIcon(active) {
     if (
       BotUI.settings.interactionMode == "SOP" ||
@@ -740,6 +766,7 @@ class BotUI {
     this.setTooltip(BotUI.restartElement, "Restart App");
     this.setTooltip(BotUI.chatInputKeyboardElement, "Voice Input");
     this.setTooltip(BotUI.chatInputMuteElement, "Mute/Unmute App");
+    this.setTooltip(BotUI.searchElement, "Start Search");
   }
 
   /**
@@ -770,9 +797,6 @@ class BotUI {
     mute: boolean;
     restart: boolean;
   }) => {
-    const mic = `<span data-chat-input-keyboard class="icon-sop icon-sop--keyboard"></span>`;
-    const mute = `<span data-chat-input-mute class="icon-sop icon-sop--volume-mute"></span>`;
-    const restart = `<span data-chat-input-restart class="icon-sop icon-sop--restart"></span>`;
     BotUI.settings.controlIcons = controlIcons;
 
     this.setControllIconStyles();
@@ -1060,7 +1084,7 @@ class BotUI {
     snippetContainer.classList.add("data-snippet-container");
 
     // Create the title element and set its text content
-    const titleElement = document.createElement("h3");
+    const titleElement = document.createElement("h4");
     titleElement.textContent = title;
 
     // Create the context element and set its text content
@@ -1454,39 +1478,57 @@ class BotUI {
   }
 
   /**
-   * Controls visibility of the control icons - microphone, speaker and restart according settings
+   * Controls visibility of the control icons - microphone, speaker and restart according to settings
    */
   public setControllIconStyles() {
+    
     if (!BotUI.settings.controlIcons.mic) {
       BotUI.controlIconsWrapper
-        .querySelector("[data-chat-input-keyboard]")
-        .classList.add("hidden");
-    } else {
+      .querySelector("[data-chat-input-keyboard]")
+      .classList.add("hidden");
+    } 
+    else {
       BotUI.controlIconsWrapper
-        .querySelector("[data-chat-input-keyboard]")
-        .classList.remove("hidden");
+      .querySelector("[data-chat-input-keyboard]")
+      .classList.remove("hidden");
     }
-
+      
     if (!BotUI.settings.controlIcons.mute) {
       BotUI.controlIconsWrapper
-        .querySelector("[data-chat-input-mute]")
-        .classList.add("hidden");
+      .querySelector("[data-chat-input-mute]")
+      .classList.add("hidden");
     } else {
       BotUI.controlIconsWrapper
-        .querySelector("[data-chat-input-mute]")
-        .classList.remove("hidden");
+      .querySelector("[data-chat-input-mute]")
+      .classList.remove("hidden");
     }
-
+      
     if (!BotUI.settings.controlIcons.restart) {
       BotUI.controlIconsWrapper
-        .querySelector("[data-chat-input-restart]")
-        .classList.add("hidden");
+      .querySelector("[data-chat-input-restart]")
+      .classList.add("hidden");
     } else {
       BotUI.controlIconsWrapper
-        .querySelector("[data-chat-input-restart]")
-        .classList.remove("hidden");
+      .querySelector("[data-chat-input-restart]")
+      .classList.remove("hidden");
     }
 
+    // if elastic search is active then Mic icon is be replaced with the search icon
+    if (!BotUI.settings.search) {
+      BotUI.controlIconsWrapper
+        .querySelector("[data-chat-input-search]")
+        .classList.add("hidden");
+      } 
+      else {
+        BotUI.controlIconsWrapper
+        .querySelector("[data-chat-input-search]")
+        .classList.remove("hidden");
+
+        BotUI.controlIconsWrapper
+        .querySelector("[data-chat-input-keyboard]")
+        .classList.add("hidden");
+    }
+    
     const childrenList = BotUI.controlIconsWrapper.querySelectorAll(
       ".icon-sop:not(.hidden)"
     );
@@ -1497,7 +1539,8 @@ class BotUI {
         "right-icon",
         "firstIcon",
         "secondIcon",
-        "thirdIcon"
+        "thirdIcon",
+        "fourthIcon"
       );
       if (index === 0) {
         element.classList.add("right-icon");
@@ -1509,8 +1552,20 @@ class BotUI {
       if (index === 2) {
         element.classList.add("thirdIcon");
       }
+      if (index === 3){
+        element.classList.add("fourthIcon");
+      }
       if (index === childrenList.length - 1) {
         element.classList.add("left-icon");
+      }
+
+      // search icon and mic icon is given mirroring classes
+      if (BotUI.settings.search && BotUI.settings.controlIcons.mic){
+        ["firstIcon", "secondIcon", "right-icon", "thirdIcon", "fourthIcon", "left-icon"].forEach(cls => {
+          if (BotUI.searchElement.classList.contains(cls)){
+            BotUI.chatInputKeyboardElement.classList.add(cls);
+          }
+        });
       }
     }
   }
@@ -1703,6 +1758,8 @@ class BotUI {
 
   public feedbackCallback = (...value) => {};
 
+  public searchElementCallback = (...value) => {};
+
   public chatRestartCallback = (...value) => {};
 
   public botMessagesCallback = (e) => {};
@@ -1868,7 +1925,9 @@ class BotUI {
       BotUI.restartElement.classList.add("chat-input-disabled");
       BotUI.chatInputMuteElement.classList.add("chat-input-disabled");
       BotUI.chatInputKeyboardElement.classList.add("chat-input-disabled");
+      BotUI.searchElement.classList.add("chat-input-disabled");
     } else {
+      BotUI.searchElement.classList.remove("chat-input-disabled");
       BotUI.restartElement.classList.remove("chat-input-disabled");
       BotUI.chatInputMuteElement.classList.remove("chat-input-disabled");
       BotUI.chatInputKeyboardElement.classList.remove("chat-input-disabled");
