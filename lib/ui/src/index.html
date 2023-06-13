@@ -23,14 +23,14 @@
         interactionMode: "GUIDE",
         sound: false,
         title: "Bot UI",
-        controlIcons: { mic: false, mute: true, restart: true },
+        controlIcons: { mic: true, mute: true, restart: true },
       });
 
       // window.addEventListener("click", (e) =>{
       // console.log(e.target);
       // })
 
-botUI.setScreen();
+      botUI.setScreen();
       botUI.setBackgroundColor("#927263");
       botUI.setUserText("You said something very long and keep talking ...");
       botUI.setBotText("Bot said something more interestixxxng ...");
@@ -80,7 +80,7 @@ botUI.setScreen();
         console.log(`User typed text ${e.data}`);
       };
 
-      botUI.setControllIcons({ mic: true, mute: true, restart: true });
+      // botUI.setControllIcons({ mic: true, mute: true, restart: true });
       botUI.setTextInputEnabled(true);
     </script>
   </body>
