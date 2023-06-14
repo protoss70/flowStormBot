@@ -28,6 +28,7 @@ import { sopSuggestionContainer } from "./templates/sop-suggestion-structure.tem
 
 import {
   sopBaseStructureTemplate,
+  testbedBaseStructureTemplate,
   baseStructureTemplate,
   chatMessageStructureTemplate,
   kioskMessageStructureTemplate,
@@ -305,7 +306,7 @@ class BotUI {
       BotUI.settings.interactionMode == "SOP" ||
       BotUI.settings.interactionMode == "GUIDE"
     ) {
-      BotUI.element.innerHTML = sopBaseStructureTemplate;
+      BotUI.element.innerHTML = testbedBaseStructureTemplate;
     } else {
       BotUI.element.innerHTML = baseStructureTemplate;
     } // set HTML template according interaction mode - why there are two templates?? are still both of them being used??
@@ -948,50 +949,6 @@ class BotUI {
       "--bot-ui-chat-input-height",
       sopHeight
     );
-  }
-
-  private newMessageSection(title: string) {
-    var first = true;
-    var element2: HTMLElement;
-    for (
-      let index = 0;
-      index < BotUI.messagesElement.children.length;
-      index++
-    ) {
-      const element = BotUI.messagesElement.children[index] as HTMLElement;
-      if (element.getAttribute("data-button-group") === title) {
-        if (index !== 0 && first) {
-          if (
-            (BotUI.messagesElement.children[index] as HTMLElement).tagName ===
-            "BUTTON"
-          ) {
-            element2 = BotUI.messagesElement.children[index - 1] as HTMLElement;
-          }
-          first = false;
-        }
-      } else {
-        element.style.display = "none";
-      }
-    }
-    if (element2) {
-      element2.style.display = "block";
-      element2.setAttribute("data-button-group", title);
-    }
-  }
-
-  private oldMessagesSection(title: string) {
-    const elems = document.querySelectorAll(`[data-button-group=${title}]`);
-    elems.forEach((el) => {
-      el.remove();
-    });
-    for (
-      let index = 0;
-      index < BotUI.messagesElement.children.length;
-      index++
-    ) {
-      (BotUI.messagesElement.children[index] as HTMLElement).style.display =
-        "block";
-    }
   }
 
   private setSectionUI(section: string) {

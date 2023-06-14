@@ -1,329 +1,554 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Bot</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bot</title>
 
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	<link rel="stylesheet" href="./index.css">
-	
-</head>
-<body style="font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">
-	<div id="upvBotKey">
-		<div id="upvBotKeyWrapper" class="hidden">
-			<label for="botId">Enter the id of your application from the Flowstorm website</label>
-			<div>
-				<input type="text" name="botId" id="botId" placeholder="ID...">
-				<button onclick="changeBotKey()">Apply</button>
-			</div>
-			<br>
-			<div id="parentHistory" class="hidden-index">
-				<div>ID History</div>
-				<ul id="oldItemsList">
-				</ul>
-				<button onclick="clearHistory()">clear history</button>
-			</div>
-		</div>
-		<br>
-		<button id="showCustomButton" onclick="toggleCustomization(this)">Show Customization Options</button>
-		<div id="customizationOptions" class="hidden">
-			<hr/>
-			<h3>Icons</h3>
-			<div>
-				<label for="textInput">Enable Text Input</label>
-				<input type="checkbox" name="textInput" id="textInput">
-				<div id="iconSetter">
-					<label for="mic">Mic Icon</label>
-					<input type="checkbox" name="mic" id="mic">
-					<label for="mute">Mute Icon</label>
-					<input type="checkbox" name="mic" id="mute">
-					<label for="restart">Restart Icon</label>
-					<input type="checkbox" name="mic" id="restart">
-				</div>
-			</div>
-			<div ><hr/></div>
-			<h3>Bot Message</h3>
-			<div style="display: flex; justify-content: space-between; align-items: center;">
-				<label id="UserMessageTextLabel" for="textColorBot">Text Color</label>
-				<input type="color" class="form-control" id="textColorBot" value="#FFFFFF" title="Choose your color" style="width: 90px;">
-			</div>
-			<div style="justify-content: space-between; align-items: center; display: none;">
-				<label for="TextOutlineBot">Text Outline Color</label>
-				<input type="color" class="form-control" id="TextOutlineBot" value="#69737c" title="Choose your color" style="width: 90px;">	
-			</div>
-			<div style="display:flex; justify-content: space-between; align-items:center;">
-				<label style="margin-bottom:0;" for="messageBotBackground">Background Color</label>
-				<input type="color" class="form-control" id="messageBotBackground" value="rgb(0,0,0)" title="Choose your color" style="width: 90px;">
-			</div>
-			<div style="align-items:center; margin-top: 6px; display: flex; justify-content: space-between;">
-				<label id="customHeightLabel" style="margin-bottom:0;" for="botOpacity" class="form-label">Background Opacity</label>
-				<input type="range" value="0.4" min="0" style="width: 85px; margin-right: 1px;" max="1" step="0.05" class="form-range" id="botOpacity">
-			</div>
-			<hr style="width: 75%"/>
-			<h3>User Message</h3>
-			<div style="display: flex; justify-content: space-between; align-items: center;">
-				<label id="UserMessageTextLabel" for="textColorUser">Text Color</label>
-				<input type="color" class="form-control" id="textColorUser" value="#FFFFFF" title="Choose your color" style="width: 90px;">
-			</div>
-			<hr style="display: none"/>
-			<div style="display: none; justify-content: space-between; align-items: center;">
-				<label for="TextOutlineUser">Text Outline Color</label>
-				<input type="color" class="form-control" id="TextOutlineUser" value="#B2BFCD" title="Choose your color" style="width: 90px;">	
-			</div>
-			<div style="display:flex; justify-content: space-between; align-items:center;">
-				<label style="margin-bottom:0;" for="messageBackgroundUser">Background Color</label>
-				<input type="color" class="form-control" id="messageBackgroundUser" value="#FFFFFF" title="Choose your color" style="width: 90px;">
-			</div>
-			<div style="align-items:center; margin-top: 6px; display: flex; justify-content: space-between;">
-				<label id="customHeightLabel" style="margin-bottom:0;" for="userOpacity" class="form-label">Background Opacity</label>
-				<input type="range" value="0.3" min="0" max="1" step="0.05" style="width: 85px; margin-right: 1px;" class="form-range" id="userOpacity">
-			</div>
-			<div>
-				<div ><hr/></div>
-				<h3>Background</h3>
-				<p>You can set the background as a color or an image.</p>
-				<hr style="width:80%">
-				<div style="display:flex; justify-content: space-between; align-items:center;">
-					<label style="margin-bottom:0;" for="botBackgroundColor">Primary Color</label>
-					<input type="color" class="form-control" id="botBackgroundColor" value="#6737ff" title="Choose your color" style="width: 90px;">
-				</div>
-				<div style="display:flex; justify-content: space-between; align-items:center;">
-					<label style="margin-bottom:0;" for="botBackgroundColorSecondary">Secondary Color</label>
-					<input type="color" class="form-control" id="botBackgroundColorSecondary" value="#28568c" title="Choose your color" style="width: 90px;">
-				</div>
-				<hr>
-				<div style="display:flex; justify-content: space-between; align-items:center;">
-					<label style="margin-bottom:0;" for="backgroundUrl">Url</label>
-					<input type="text" class="form-control" id="backgroundUrl" placeholder="url..." title="Choose the url" style="width: 90px;">
-				</div>
-				<div style="display:flex; justify-content: space-between; align-items:center; margin-top: 3px;">
-					<label style="margin-bottom:0;" for="backgroundBlur">Blur</label>
-					<input type="number" value="0" min="0" step="0.5" style="width: 90px; margin-right: 1px;" class="form-number" id="backgroundBlur">
-				</div>
-			</div>
-			<button id="generateEmbedCodeButton" style="margin-bottom: 20px; margin-top: 10px;">Generate Embed Code</button>
-			<div id="embedParamsParent" class="hidden">
-				Add the following lines to your embedded initFSClientBot parameters:
-				<div id="embedParams" style="background-color: #D9D9D9; padding: 20px; color:black; border-radius: 10px; margin-bottom: 20px;">
-						botKey: '6141f6fe302806105e62e745',<br>
-						collapsable: false,<br>
-						guiMode: 'chat',<br>
-						widgetSize: { width: '500px', height: '570px' }, <br>
-						fullScreen: false, <br>
-						attributes: { documentId: 'docId', personName: 'Name' }, <br>
-						userMessageTextColor: '#382929', <br>
-						botMessageTextColor: '#c85151', <br>
-						botMessageBackgroundColor: '#476885', <br>
-						userMessageBackgroundColor: '#7ba7d5', <br>
-						backgroundImageBlur: '3.4', <br>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="upvTest">
-		<h1 id="title">UPV TEST</h1>
-	</div>
-	
-	<div id="botContainer">
-		<div id="botDiv"></div>
-	</div>
-	<script>
-		var url = new URL(window.location.href);
-		var title = url.searchParams.get("title");
-		if (!title){
-			title = "Flowstorm Bot";
-		}
-		document.getElementById("title").textContent = title;
-		var inputSettings = url.searchParams.get("settings");
-		let defaultIconSetup = {}
-		let textInputEnabled = false;
-		if (inputSettings && inputSettings.length === 4){
-			defaultIconSetup = {
-				mic: inputSettings[0] === "1",
-				mute: inputSettings[1] === "1",
-				restart: inputSettings[2] === "1",
-			}
-			textInputEnabled = inputSettings[3] === "1";
-		}else{
-			defaultIconSetup = {mic: true, mute: true, restart: true};
-		}
-		const clientParams = {
-			allowUrlParams: true,
-			fullScreen: false,
-			guiMode: 'chat',
-			backgroundColor: '#6737ff',
-			textInputEnabled: textInputEnabled,
-			domain: '.flowstorm.ai',
-			mode: 'voice',
-			elementId: "botDiv",
-			collapsable: false,
-			interactionMode: "GUIDE",
-			sound: true,
-			title,
-			controlIcons: defaultIconSetup,
-		};
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body
+    style="
+      font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+        'Helvetica Neue', sans-serif;
+    "
+  >
+    <div id="upvBotKey">
+      <div id="upvBotKeyWrapper" class="hidden">
+        <label for="botId"
+          >Enter the id of your application from the Flowstorm website</label
+        >
+        <div>
+          <input type="text" name="botId" id="botId" placeholder="ID..." />
+          <button onclick="changeBotKey()">Apply</button>
+        </div>
+        <br />
+        <div id="parentHistory" class="hidden-index">
+          <div>ID History</div>
+          <ul id="oldItemsList"></ul>
+          <button onclick="clearHistory()">clear history</button>
+        </div>
+      </div>
+      <br />
+      <button id="showCustomButton" onclick="toggleCustomization(this)">
+        Show Customization Options
+      </button>
+      <div id="customizationOptions" class="hidden">
+        <hr />
+        <h3>Icons</h3>
+        <div>
+          <label for="textInput">Enable Text Input</label>
+          <input type="checkbox" name="textInput" id="textInput" />
+          <div id="iconSetter">
+            <label for="mic">Mic Icon</label>
+            <input type="checkbox" name="mic" id="mic" />
+            <label for="mute">Mute Icon</label>
+            <input type="checkbox" name="mic" id="mute" />
+            <label for="restart">Restart Icon</label>
+            <input type="checkbox" name="mic" id="restart" />
+          </div>
+        </div>
+        <div><hr /></div>
+        <h3>Bot Message</h3>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <label id="UserMessageTextLabel" for="textColorBot">Text Color</label>
+          <input
+            type="color"
+            class="form-control"
+            id="textColorBot"
+            value="#FFFFFF"
+            title="Choose your color"
+            style="width: 90px"
+          />
+        </div>
+        <div
+          style="
+            justify-content: space-between;
+            align-items: center;
+            display: none;
+          "
+        >
+          <label for="TextOutlineBot">Text Outline Color</label>
+          <input
+            type="color"
+            class="form-control"
+            id="TextOutlineBot"
+            value="#69737c"
+            title="Choose your color"
+            style="width: 90px"
+          />
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <label style="margin-bottom: 0" for="messageBotBackground"
+            >Background Color</label
+          >
+          <input
+            type="color"
+            class="form-control"
+            id="messageBotBackground"
+            value="rgb(0,0,0)"
+            title="Choose your color"
+            style="width: 90px"
+          />
+        </div>
+        <div
+          style="
+            align-items: center;
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+          "
+        >
+          <label
+            id="customHeightLabel"
+            style="margin-bottom: 0"
+            for="botOpacity"
+            class="form-label"
+            >Background Opacity</label
+          >
+          <input
+            type="range"
+            value="0.4"
+            min="0"
+            style="width: 85px; margin-right: 1px"
+            max="1"
+            step="0.05"
+            class="form-range"
+            id="botOpacity"
+          />
+        </div>
+        <hr style="width: 75%" />
+        <h3>User Message</h3>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <label id="UserMessageTextLabel" for="textColorUser"
+            >Text Color</label
+          >
+          <input
+            type="color"
+            class="form-control"
+            id="textColorUser"
+            value="#FFFFFF"
+            title="Choose your color"
+            style="width: 90px"
+          />
+        </div>
+        <hr style="display: none" />
+        <div
+          style="
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <label for="TextOutlineUser">Text Outline Color</label>
+          <input
+            type="color"
+            class="form-control"
+            id="TextOutlineUser"
+            value="#B2BFCD"
+            title="Choose your color"
+            style="width: 90px"
+          />
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <label style="margin-bottom: 0" for="messageBackgroundUser"
+            >Background Color</label
+          >
+          <input
+            type="color"
+            class="form-control"
+            id="messageBackgroundUser"
+            value="#FFFFFF"
+            title="Choose your color"
+            style="width: 90px"
+          />
+        </div>
+        <div
+          style="
+            align-items: center;
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+          "
+        >
+          <label
+            id="customHeightLabel"
+            style="margin-bottom: 0"
+            for="userOpacity"
+            class="form-label"
+            >Background Opacity</label
+          >
+          <input
+            type="range"
+            value="0.3"
+            min="0"
+            max="1"
+            step="0.05"
+            style="width: 85px; margin-right: 1px"
+            class="form-range"
+            id="userOpacity"
+          />
+        </div>
+        <div>
+          <div><hr /></div>
+          <h3>Background</h3>
+          <p>You can set the background as a color or an image.</p>
+          <hr style="width: 80%" />
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <label style="margin-bottom: 0" for="botBackgroundColor"
+              >Primary Color</label
+            >
+            <input
+              type="color"
+              class="form-control"
+              id="botBackgroundColor"
+              value="#6737ff"
+              title="Choose your color"
+              style="width: 90px"
+            />
+          </div>
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <label style="margin-bottom: 0" for="botBackgroundColorSecondary"
+              >Secondary Color</label
+            >
+            <input
+              type="color"
+              class="form-control"
+              id="botBackgroundColorSecondary"
+              value="#28568c"
+              title="Choose your color"
+              style="width: 90px"
+            />
+          </div>
+          <hr />
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <label style="margin-bottom: 0" for="backgroundUrl">Url</label>
+            <input
+              type="text"
+              class="form-control"
+              id="backgroundUrl"
+              placeholder="url..."
+              title="Choose the url"
+              style="width: 90px"
+            />
+          </div>
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-top: 3px;
+            "
+          >
+            <label style="margin-bottom: 0" for="backgroundBlur">Blur</label>
+            <input
+              type="number"
+              value="0"
+              min="0"
+              step="0.5"
+              style="width: 90px; margin-right: 1px"
+              class="form-number"
+              id="backgroundBlur"
+            />
+          </div>
+        </div>
+        <button
+          id="generateEmbedCodeButton"
+          style="margin-bottom: 20px; margin-top: 10px"
+        >
+          Generate Embed Code
+        </button>
+        <div id="embedParamsParent" class="hidden">
+          Add the following lines to your embedded initFSClientBot parameters:
+          <div
+            id="embedParams"
+            style="
+              background-color: #d9d9d9;
+              padding: 20px;
+              color: black;
+              border-radius: 10px;
+              margin-bottom: 20px;
+            "
+          >
+            botKey: '6141f6fe302806105e62e745',<br />
+            collapsable: false,<br />
+            guiMode: 'chat',<br />
+            widgetSize: { width: '500px', height: '570px' }, <br />
+            fullScreen: false, <br />
+            attributes: { documentId: 'docId', personName: 'Name' }, <br />
+            userMessageTextColor: '#382929', <br />
+            botMessageTextColor: '#c85151', <br />
+            botMessageBackgroundColor: '#476885', <br />
+            userMessageBackgroundColor: '#7ba7d5', <br />
+            backgroundImageBlur: '3.4', <br />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="upvTest">
+      <h1 id="title">UPV TEST</h1>
+    </div>
 
-		initFSClientBot({
-			...clientParams,
-		});
+    <div id="botContainer">
+      <div id="botDiv"></div>
+    </div>
+    <script>
+      var url = new URL(window.location.href);
+      var title = url.searchParams.get("title");
+      if (!title) {
+        title = "Flowstorm Bot";
+      }
+      document.getElementById("title").textContent = title;
+      var inputSettings = url.searchParams.get("settings");
+      let defaultIconSetup = {};
+      let textInputEnabled = false;
+      if (inputSettings && inputSettings.length === 4) {
+        defaultIconSetup = {
+          mic: inputSettings[0] === "1",
+          mute: inputSettings[1] === "1",
+          restart: inputSettings[2] === "1",
+        };
+        textInputEnabled = inputSettings[3] === "1";
+      } else {
+        defaultIconSetup = { mic: true, mute: true, restart: true };
+      }
+      const clientParams = {
+        allowUrlParams: true,
+        fullScreen: false,
+        guiMode: "chat",
+        backgroundColor: "#6737ff",
+        textInputEnabled: textInputEnabled,
+        domain: ".flowstorm.ai",
+        mode: "voice",
+        elementId: "botDiv",
+        collapsable: false,
+        interactionMode: "GUIDE",
+        sound: true,
+        title,
+        controlIcons: defaultIconSetup,
+      };
 
-		if (window.location.pathname.length === 25) {
-			const elem = document.getElementById("botId");
-			elem.value = window.location.pathname.substring(1);
-			localStorage.setItem("bot-app-active", elem.value);
-			localStorage.removeItem("bot-app-ids");
-		}
-		else{
-			document.getElementById("upvBotKeyWrapper").classList.remove("hidden");
-		}
-		if (document.getElementById("mic")){
-			document.getElementById("mic").checked = defaultIconSetup.mic;
-			document.getElementById("mute").checked = defaultIconSetup.mute;
-			document.getElementById("restart").checked = defaultIconSetup.restart;
-			document.getElementById("textInput").checked = textInputEnabled;
-		}
+      initFSClientBot({
+        ...clientParams,
+      });
 
-		window.addEventListener("load", () => {
-			const elem = document.getElementById("botId");
-			const storageItem = localStorage.getItem("bot-app-active");
-			if (elem.value.length === 0 && storageItem){
-				elem.value = storageItem;
-			}
-			var oldList = localStorage.getItem("bot-app-ids");
-			if (oldList && JSON.parse(oldList).length > 1){
-				document.getElementById("parentHistory").classList.remove('hidden-index');
-				oldList = JSON.parse(oldList);
-				for (let index = 1; index < oldList.length; index++) {
-					const element = oldList[oldList.length - index - 1];
-					addLinkElement(element);
-				}
-			}
-		});
-		
-		function toggleCustomization(e){
-			const customElem = document.getElementById("customizationOptions");
-			if (customElem.classList.contains("hidden")){
-				document.getElementById("title").classList.add("hidden");
-				e.textContent = "Hide Customization Options";
-				customElem.classList.remove("hidden");
-			}else{
-				document.getElementById("title").classList.remove("hidden");
-				e.textContent = "Show Customization Options";
-				customElem.classList.add("hidden");
-			}
-		}
+      if (window.location.pathname.length === 25) {
+        const elem = document.getElementById("botId");
+        elem.value = window.location.pathname.substring(1);
+        localStorage.setItem("bot-app-active", elem.value);
+        localStorage.removeItem("bot-app-ids");
+      } else {
+        document.getElementById("upvBotKeyWrapper").classList.remove("hidden");
+      }
+      if (document.getElementById("mic")) {
+        document.getElementById("mic").checked = defaultIconSetup.mic;
+        document.getElementById("mute").checked = defaultIconSetup.mute;
+        document.getElementById("restart").checked = defaultIconSetup.restart;
+        document.getElementById("textInput").checked = textInputEnabled;
+      }
 
-		function clearHistory(){
-			localStorage.removeItem('bot-app-ids');
-			window.location.reload();
-		}
+      window.addEventListener("load", () => {
+        const elem = document.getElementById("botId");
+        const storageItem = localStorage.getItem("bot-app-active");
+        if (elem.value.length === 0 && storageItem) {
+          elem.value = storageItem;
+        }
+        var oldList = localStorage.getItem("bot-app-ids");
+        if (oldList && JSON.parse(oldList).length > 1) {
+          document
+            .getElementById("parentHistory")
+            .classList.remove("hidden-index");
+          oldList = JSON.parse(oldList);
+          for (let index = 1; index < oldList.length; index++) {
+            const element = oldList[oldList.length - index - 1];
+            addLinkElement(element);
+          }
+        }
+      });
 
-		function changeBotKey(){
-			const endpoint = document.getElementById("botId").value;
-			if (!endpoint) return;
+      function toggleCustomization(e) {
+        const customElem = document.getElementById("customizationOptions");
+        if (customElem.classList.contains("hidden")) {
+          document.getElementById("title").classList.add("hidden");
+          e.textContent = "Hide Customization Options";
+          customElem.classList.remove("hidden");
+        } else {
+          document.getElementById("title").classList.remove("hidden");
+          e.textContent = "Show Customization Options";
+          customElem.classList.add("hidden");
+        }
+      }
 
-			var oldList = localStorage.getItem("bot-app-ids");
-	
-			if (oldList){
-				oldList = JSON.parse(oldList);
-				var pass = true;
-				for (let index = 0; index < oldList.length; index++) {
-					if (oldList[index] === endpoint){
-						pass = false;
-						oldList.splice(index, 1);
-						oldList.push(endpoint);
-						break;
-					}
-				}
-				if (pass){
-					oldList.push(endpoint);
-					if (oldList.length > 5){
-						oldList.shift();
-					}
-				}
-			}else{
-				oldList = [endpoint];
-			}
+      function clearHistory() {
+        localStorage.removeItem("bot-app-ids");
+        window.location.reload();
+      }
 
-			localStorage.setItem("bot-app-ids", JSON.stringify(oldList));
-			localStorage.setItem("bot-app-active", endpoint);
-			window.location.reload();
-		}
+      function changeBotKey() {
+        const endpoint = document.getElementById("botId").value;
+        if (!endpoint) return;
 
-		function addLinkElement(text){
-			const el = document.createElement("li");
-			const inner = document.createElement("span");
-			inner.onclick = (e) => {
-				const val = e.target.textContent;
-				document.getElementById("botId").value = val;
-				changeBotKey();
-			}
-			el.append(inner);
-			inner.textContent = text;
-			inner.classList.add("idItems");
-			document.getElementById("oldItemsList").append(el);
-		}
-		
-	</script>
-	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-<style>
-	#upvBotKey{
-		top: 5%;
-		left: 10%;
-		position: absolute;
-		
-	}
+        var oldList = localStorage.getItem("bot-app-ids");
 
-	#upvBotKey.hidden{
-		display: none;
-	}
+        if (oldList) {
+          oldList = JSON.parse(oldList);
+          var pass = true;
+          for (let index = 0; index < oldList.length; index++) {
+            if (oldList[index] === endpoint) {
+              pass = false;
+              oldList.splice(index, 1);
+              oldList.push(endpoint);
+              break;
+            }
+          }
+          if (pass) {
+            oldList.push(endpoint);
+            if (oldList.length > 5) {
+              oldList.shift();
+            }
+          }
+        } else {
+          oldList = [endpoint];
+        }
 
-	#upvBotKeyWrapper.hidden{
-		display: none;
-	}
+        localStorage.setItem("bot-app-ids", JSON.stringify(oldList));
+        localStorage.setItem("bot-app-active", endpoint);
+        window.location.reload();
+      }
 
-	button:hover{
-		cursor: pointer;
-	}
+      function addLinkElement(text) {
+        const el = document.createElement("li");
+        const inner = document.createElement("span");
+        inner.onclick = (e) => {
+          const val = e.target.textContent;
+          document.getElementById("botId").value = val;
+          changeBotKey();
+        };
+        el.append(inner);
+        inner.textContent = text;
+        inner.classList.add("idItems");
+        document.getElementById("oldItemsList").append(el);
+      }
+    </script>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      #upvBotKey {
+        top: 5%;
+        left: 10%;
+        position: absolute;
+      }
 
-	#botId{
-		padding: 4px 2px;
-		width: 180px;
-	}
+      #upvBotKey.hidden {
+        display: none;
+      }
 
-	#upvTest{
-		display: flex;
-		width:90vw;
-		height: 80vh;
-		justify-content: center;
-		align-items: center;
-		font-size: 3vw;
-		font-family: 'Roboto Mono', monospace;
-	}
+      #upvBotKeyWrapper.hidden {
+        display: none;
+      }
 
-	.idItems{
-		color: rgb(0,0,238);
-		text-decoration: underline;
-	}
+      button:hover {
+        cursor: pointer;
+      }
 
-	.idItems:hover{
-		cursor: pointer;
-	}
+      #botId {
+        padding: 4px 2px;
+        width: 180px;
+      }
 
-	.hidden-index{
-		display: none !important;
-	}
+      #upvTest {
+        display: flex;
+        width: 90vw;
+        height: 80vh;
+        justify-content: center;
+        align-items: center;
+        font-size: 3vw;
+        font-family: "Roboto Mono", monospace;
+      }
 
-	.hidden{
-		display: none !important;
-	}
+      .idItems {
+        color: rgb(0, 0, 238);
+        text-decoration: underline;
+      }
 
-</style>
-</body>
+      .idItems:hover {
+        cursor: pointer;
+      }
+
+      .hidden-index {
+        display: none !important;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </body>
 </html>
