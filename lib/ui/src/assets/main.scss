@@ -162,7 +162,8 @@ $amount: 20;
 @media only screen and (max-width: 1000px) {
   [data-chat-input-keyboard].chat-input-disabled,
   [data-chat-input-mute].chat-input-disabled,
-  [data-chat-input-restart].chat-input-disabled {
+  [data-chat-input-restart].chat-input-disabled, 
+  [data-chat-input-search].chat-input-disabled{
     font-size: 30px !important;
     &::before {
       line-height: 30px;
@@ -438,6 +439,10 @@ $amount: 20;
           right: 70px;
         }
 
+        &.fourthIcon{
+          right: 100px
+        }
+
         &.chat-input-disabled {
           background-color: #ffffff;
 
@@ -489,6 +494,12 @@ $amount: 20;
           right: 10px;
           bottom: 10px;
           top: calc(50% - 10px);
+        }
+
+        &--search{
+          top: 50%;
+          transform: translateY(calc(-50% + 2px));
+          z-index: 1;
         }
 
         &--volume-mute {
@@ -1788,12 +1799,14 @@ canvas {
     background-color: rgba(255, 255, 255, 0.5);
   }
 
-  & > h3 {
+  & > h4 {
     margin: 0;
+    font-weight: 700;
   }
 
   & > div {
     max-height: 100px;
+    color: rgba(255,255,255,0.85);
     overflow-y: auto;
     overflow-x: hidden;
     padding-top: 3px;

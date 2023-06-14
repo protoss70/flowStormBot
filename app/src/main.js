@@ -44,6 +44,8 @@ const converter = new Converter();
 var botInitializer = new BotInitializer();
 var buttonInput = false;
 var talkMode = "PUSH";
+var elasticSearchActive = false; // this is true when the actual query for the elastic search is being entered
+var searchCommandActive = false; // this is true when the #search command is called
 let generatodEmbedLines = {};
 
 const audios = {};
@@ -68,6 +70,7 @@ const botUIDefaultSettings = {
   collapsed: true,
   interactionMode: "GUIDE",
   sound: true,
+  search: true,
   goTo: true,
 };
 
@@ -333,6 +336,12 @@ export const initFSClientBot = (initParams = {}) => {
           bot.setInAudio(settings.inputAudio, getStatus());
           botUI.removeOverlay();
         }
+      }
+    };
+
+    bot.sttRecognizedCallback = () => {
+      if (elasticSearchActive) {
+        botUI.toggleLoader(true);
       }
     };
 
@@ -664,6 +673,35 @@ var createBot = (botUI, settings) => {
     }
     return { title, secondary };
   }
+  async function handleFlowstormApiCall(results) {
+    console.log("results are in: ", results);
+    if (results === undefined) {
+      //SERVER ERROR
+      bot.handleOnTextInput(`ERROR`, false, { sopInput: true });
+      bot.audioInputCallback();
+    } else if (results.result.length === 0) {
+      //NO PDF FILES FOUND
+      bot.handleOnTextInput(`NO_SOLUTION`, false, { sopInput: true });
+      bot.audioInputCallback();
+    } else {
+      //SUCCESS
+      if (results.result[0].meta.answer) {
+        setAttribute("FAQ_Answer", results.result[0].meta.answer);
+        bot.handleOnTextInput(`FAQ`, false, { sopInput: true });
+      } else {
+        bot.handleOnTextInput(`NOT_FAQ`, false, { sopInput: true });
+        results.result.forEach((result) => {
+          const title = result.meta.name.replaceAll("-", " ");
+          const secondary = result.meta.snipet;
+          botUI.setSnippet(
+            result.meta.pagelink + "#" + result.meta.page_id,
+            title,
+            secondary
+          );
+        });
+      }
+    }
+  }
 
   async function handleClientApiCall(url) {
     const results = (await bot.getFiles(query, url)).data;
@@ -678,7 +716,6 @@ var createBot = (botUI, settings) => {
       bot.audioInputCallback();
     } else {
       //SUCCESS
-
       results.result.forEach((result) => {
         const { title, secondary } = titleAndContext(
           result.meta.backup,
@@ -689,31 +726,8 @@ var createBot = (botUI, settings) => {
     }
   }
 
-  async function handleFlowstormApiCall(results) {
-    if (results === undefined) {
-      //SERVER ERROR
-      bot.handleOnTextInput(`ERROR`, false, { sopInput: true });
-      bot.audioInputCallback();
-    } else if (results.result.length === 0) {
-      //NO PDF FILES FOUND
-      bot.handleOnTextInput(`NO_SOLUTION`, false, { sopInput: true });
-      bot.audioInputCallback();
-    } else {
-      //SUCCESS
-      results.result.forEach((result) => {
-        const title = result.meta.name;
-        const secondary = result.meta.snipet;
-        botUI.setSnippet(
-          result.meta.pagelink + "#" + result.meta.page_id,
-          title,
-          secondary
-        );
-      });
-      botUI.setSuggestion(["Continue"]);
-    }
-  }
-
   defaultCallback.handleCommand = (command, code, t) => {
+    console.log(code);
     const payload = JSON.parse(code);
     switch (command) {
       case "#expression":
@@ -802,6 +816,18 @@ var createBot = (botUI, settings) => {
         botUI.toggleLoader(false);
         bot.audioInputCallback();
         handleFlowstormApiCall(payload.result);
+        break;
+      case "#enterSearch":
+        elasticSearchActive = true;
+        botUI.toggleSearchIcons(true);
+        break;
+      case "#exitSearch":
+        elasticSearchActive = false;
+        searchCommandActive = false;
+        botUI.toggleSearchIcons(false);
+        break;
+      case "#loadingOff":
+        botUI.toggleLoader(false);
         break;
       default:
         break;
@@ -987,21 +1013,21 @@ var createBot = (botUI, settings) => {
   };
 
   botUI.chatInputCallback = (inputValue) => {
-    const status = getStatus();
-    if (status === "SLEEPING") {
-    } else {
-      botUI.setUserText(inputValue);
-      setAttribute("query", inputValue);
-      bot.handleOnTextInput(`#search`, false, { sopInput: true });
+    sendText(inputValue);
+    if (elasticSearchActive) {
       botUI.toggleLoader(true);
-
-      // sendText(inputValue);
     }
   };
 
   botUI.collapseCallback = (collapsed) => {
     paused = !paused;
     run();
+  };
+
+  botUI.searchElementCallback = () => {
+    if (!searchCommandActive) {
+      bot.handleOnTextInput(`#search`, false, { sopInput: true });
+    }
   };
 
   botUI.chatMicrophoneCallback = (inputValue) => changeAudio("Input");
@@ -1019,6 +1045,10 @@ var createBot = (botUI, settings) => {
     const state = getStatus();
     botUI.removeAllMessages();
     botUI.removeSuggestions();
+    botUI.toggleLoader(false);
+    botUI.toggleSearchIcons(false);
+    elasticSearchActive = false;
+    searchCommandActive = false;
 
     if (state === "SLEEPING" || state === undefined) {
       run();
@@ -1120,18 +1150,6 @@ var createBot = (botUI, settings) => {
       settings.inputAudio = !settings.inputAudio;
       bot.setInAudio(settings.inputAudio, getStatus());
       if (settings.inputAudio) botUI.addOverlay();
-    }
-    //Only changes the section to voice.
-    if (false) {
-      var mode = botUI.getInputMode();
-      mode = mode === "text" ? "voice" : "text";
-      botUI.setInputMode(mode);
-      bot.setInAudio(mode === "voice" ? true : false, getStatus());
-      bot.updateUser({ inputMode: mode });
-      bot.setInAudio(mode === "voice", getStatus());
-      if (mode === "voice" && getState() === "LISTENING") {
-        botUI.addOverlay();
-      }
     }
   };
 

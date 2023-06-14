@@ -23,7 +23,7 @@ export const sopBaseStructureTemplate = `
             <div data-messages class="column column-messages">
             </div>
             <div loader class="loader hidden">
-                <span loader-text class="loader-text">Loading PDF Files...</span>
+                <span loader-text class="loader-text">Loading...</span>
             </div>
         <div data-chat-input class="chat-input">
             <div class="chat-input-wrapper">
@@ -37,6 +37,7 @@ export const sopBaseStructureTemplate = `
                     </div>
                     <div data-chat-ask class="ask-section">
                         <div control-icons-wrapper class="control-icons-wrapper">
+                        <span data-chat-input-search class="icon-sop left-icon icon-sop--search"></span>
                             <span data-chat-input-keyboard class="icon-sop icon-sop--keyboard"></span>
                             <span data-chat-input-mute class="icon-sop icon-sop--volume-mute"></span>
                             <span data-chat-input-restart class="icon-sop icon-sop--restart"></span>
