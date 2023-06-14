@@ -190,6 +190,7 @@ class BotUI {
   private static settings: Settings;
   private static orientation: OrientationEnum;
   public dialogueID: string = "";
+  public elasticSearchOn: boolean = false // If the elastic search from the Main.js is on this will be true
 
   private static rootElement: HTMLElement;
   private static avatarElement: HTMLElement;
@@ -725,6 +726,10 @@ class BotUI {
         BotUI.textInput.classList.add("hidden");
       }
     }
+  }
+
+  public toggleElasticSearch(on: boolean){
+    this.elasticSearchOn = on;
   }
 
   public setMicIcon(active) {
@@ -2469,7 +2474,7 @@ class BotUI {
       }
     }
 
-    if (type === MessageType.BOT && this.getSettings().goTo) {
+    if (type === MessageType.BOT && this.getSettings().goTo && !this.elasticSearchOn) {
       this.setGoToButton(id, dialogueID, clickCallback, messageTemplate);
     }
 
