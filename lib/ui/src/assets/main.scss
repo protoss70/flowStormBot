@@ -16,6 +16,7 @@
 
 // TODO move to .bot namespace
 [data-gui-mode] {
+  z-index: 3;
   --bot-ui-background-color: #000000;
   --bot-ui-base-background-color: #000000;
   //--bot-ui-base-background-color: #f1f4f7;
@@ -119,8 +120,8 @@ $amount: 20;
 
   [data-wrapper] {
     position: fixed !important;
-    width: 100vw !important;
-    height: 100vh;
+    width: 100% !important;
+    height: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
     border-radius: 0 !important;
@@ -153,6 +154,7 @@ $amount: 20;
   }
 }
 
+// TODO this might be causing the font new line error!!!
 @media (min-width: 1200px) {
   [data-messages],
   [data-suggestions-button] {
