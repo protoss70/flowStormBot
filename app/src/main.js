@@ -474,7 +474,6 @@ var stateHandler;
 
 var createBot = (botUI, settings) => {
   const { status = undefined } = botState;
-  const thisBot = {};
 
   window.addEventListener("message", (event) => {
     if (event.data === "BotStopEvent") {
@@ -1156,7 +1155,11 @@ var createBot = (botUI, settings) => {
       }
     };
   }
-  thisBot.stop = stop;
+
+  const thisBot = {
+    stop,
+  };
+
   return thisBot;
 };
 
