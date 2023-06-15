@@ -271,19 +271,6 @@ export const initFSClientBot = (initParams = {}) => {
     [...urlParams.entries()].forEach(
       (urlParamPair) => (urlParamsObject[urlParamPair[0]] = urlParamPair[1])
     );
-    const urlBotKey = urlParams.get("key");
-    const botKeyStorage = localStorage.getItem("bot-app-active");
-    if (
-      window.location.pathname.length === 25 &&
-      settings.botKey === defaultURL
-    ) {
-      botKey = window.location.pathname.substring(1);
-    } else if (botKeyStorage && development) {
-      botKey = botKeyStorage;
-    } else if (urlBotKey !== null && urlBotKey.length === 24 && development) {
-      botKey = urlBotKey;
-    }
-    botKey = "646b4706a47a67009f647d79";
     const url = new URL(window.location.href);
     const intMode = url.searchParams.get("m");
     if (intMode === "guide" || intMode === "sop") {
@@ -311,7 +298,7 @@ export const initFSClientBot = (initParams = {}) => {
   const botUI = initUI(settings);
 
   if (botUI) {
-    createBot(botUI, settings);
+    var myBot = createBot(botUI, settings);
     initBot();
     bot.stateHandler = stateHandler;
     bot.setInCallback = () => {
@@ -401,7 +388,7 @@ export const initFSClientBot = (initParams = {}) => {
       `Element with ID "${elementId}" was not found in DOM. Cannot initialize BOT UI. Use existing element with ID or remove elementId property from initialization.`
     );
   }
-  return autoStartBot;
+  return myBot;
 };
 
 const initUI = (settings = {}) => {
@@ -487,6 +474,7 @@ var stateHandler;
 
 var createBot = (botUI, settings) => {
   const { status = undefined } = botState;
+  const thisBot = {};
 
   window.addEventListener("message", (event) => {
     if (event.data === "BotStopEvent") {
@@ -584,15 +572,6 @@ var createBot = (botUI, settings) => {
         } else {
           botUI.setBackgroundImage(background);
         }
-      }
-    }
-  };
-
-  stateHandler = (section, status) => {
-    if (section === "SOP" || section === "QUESTION") {
-      if (status === undefined || status === "SLEEPING") {
-        botUI.removeOverlay();
-        run();
       }
     }
   };
@@ -1010,10 +989,6 @@ var createBot = (botUI, settings) => {
     }
   };
 
-  botUI.sectionChangeCallback = (section) => {
-    stateHandler(section, getStatus());
-  };
-
   botUI.chatSopNextCallback = (inputValue) => {
     const status = getStatus();
     if (status !== undefined && status !== "SLEEPING") {
@@ -1144,6 +1119,7 @@ var createBot = (botUI, settings) => {
   botUI.collapsableTriggerCallback = (collapsed) => {
     const status = getStatus();
     const section = botUI.getSection();
+    console.log("trigger");
     if (
       (status === undefined || status === "SLEEPING") &&
       !collapsed &&
@@ -1180,8 +1156,8 @@ var createBot = (botUI, settings) => {
       }
     };
   }
-
-  return bot;
+  thisBot.stop = stop;
+  return thisBot;
 };
 
 const getStartAction = () => {
