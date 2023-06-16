@@ -686,7 +686,11 @@ var createBot = (botUI, settings) => {
     } else {
       //SUCCESS
       if (results.result[0].meta.answer) {
-        setAttribute("FAQ_Answer", results.result[0].meta.answer);
+        const FaqAnswerLimit = 400;
+        setAttribute(
+          "FAQ_Answer",
+          results.result[0].meta.answer.substring(0, FaqAnswerLimit)
+        );
         bot.handleOnTextInput(`FAQ`, false, { sopInput: true });
       } else {
         bot.handleOnTextInput(`NOT_FAQ`, false, { sopInput: true });
