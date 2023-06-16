@@ -167,6 +167,19 @@
 			controlIcons: defaultIconSetup,
 		};
 
+		if (title === "UPV"){
+			clientParams = {
+				...clientParams,
+				userMessageBackgroundColor: "rgba(255,255,255,1)",
+				botMessageBackgroundColor: "rgba(25,72,120,1)",
+				botMessageTextColor: "#FFFFFF",
+				backgroundColor: "#2362A2",
+				userMessageTextColor: "#194878",
+				backgroundImageBlur: 30,
+			}
+		}
+
+
 		initFSClientBot({
 			...clientParams,
 		});
