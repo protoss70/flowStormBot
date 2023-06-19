@@ -686,7 +686,11 @@ var createBot = (botUI, settings) => {
     } else {
       //SUCCESS
       if (results.result[0].meta.answer) {
-        setAttribute("FAQ_Answer", results.result[0].meta.answer);
+        const FaqAnswerLimit = 400;
+        setAttribute(
+          "FAQ_Answer",
+          results.result[0].meta.answer.substring(0, FaqAnswerLimit)
+        );
         bot.handleOnTextInput(`FAQ`, false, { sopInput: true });
       } else {
         bot.handleOnTextInput(`NOT_FAQ`, false, { sopInput: true });
@@ -727,8 +731,8 @@ var createBot = (botUI, settings) => {
   }
 
   defaultCallback.handleCommand = (command, code, t) => {
-    console.log(code);
     const payload = JSON.parse(code);
+    console.log(payload);
     switch (command) {
       case "#expression":
         botUI.sendRTCData({ Expression: { Name: payload["name"] } });
@@ -820,11 +824,13 @@ var createBot = (botUI, settings) => {
       case "#enterSearch":
         elasticSearchActive = true;
         botUI.toggleSearchIcons(true);
+        botUI.setSuggestion([payload.endText], !botUI.isMobileDevice());
         break;
       case "#exitSearch":
         elasticSearchActive = false;
         searchCommandActive = false;
         botUI.toggleSearchIcons(false);
+        botUI.toggleElasticSearch(false);
         break;
       case "#loadingOff":
         botUI.toggleLoader(false);
@@ -1009,6 +1015,9 @@ var createBot = (botUI, settings) => {
     setAttribute("nodeId", nodeID);
     setAttribute("dialogueID", dialogueID);
     botUI.removeSuggestions();
+    if (status !== "LISTENING") {
+      bot.skipPlayedMessages();
+    }
     bot.handleOnTextInput(`#go_to`, false, { sopInput: true });
   };
 
@@ -1025,8 +1034,14 @@ var createBot = (botUI, settings) => {
   };
 
   botUI.searchElementCallback = () => {
+    const status = getStatus();
     if (!searchCommandActive) {
+      if (status !== "LISTENING") {
+        bot.skipPlayedMessages();
+      }
       bot.handleOnTextInput(`#search`, false, { sopInput: true });
+      searchCommandActive = true;
+      botUI.toggleElasticSearch(true);
     }
   };
 
@@ -1049,6 +1064,7 @@ var createBot = (botUI, settings) => {
     botUI.toggleSearchIcons(false);
     elasticSearchActive = false;
     searchCommandActive = false;
+    botUI.toggleElasticSearch(false);
 
     if (state === "SLEEPING" || state === undefined) {
       run();
