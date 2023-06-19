@@ -3,6 +3,7 @@ export interface Settings {
   backgroundAdvancedAnimationParticlesCount?: number;
   backgroundColor?: string;
   backgroundImage?: string;
+  backgroundFloorplan?: boolean;
   backgroundImageBlur?: number;
   backgroundSimpleAnimation?: boolean;
   detectOrientation?: boolean;

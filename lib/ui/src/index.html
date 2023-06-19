@@ -14,11 +14,12 @@
         fullScreen: false,
         imageAverageColorOpacity: 0.5,
         backgroundImageBlur: 5,
+        backgroundFloorplan: true,
         animationSpeed: 500,
         backgroundAdvancedAnimationParticlesCount: 0,
         backgroundSimpleAnimation: false,
         collapsable: true,
-        textInputEnabled: false,
+        textInputEnabled: true,
         collapsed: false,
         interactionMode: "GUIDE",
         sound: false,
@@ -26,12 +27,8 @@
         controlIcons: { mic: true, mute: true, restart: true },
       });
 
-      // window.addEventListener("click", (e) =>{
-      // console.log(e.target);
-      // })
-
       botUI.setScreen();
-      botUI.setBackgroundColor("#927263");
+      botUI.setBackgroundColor("#074794");
       botUI.setUserText("You said something very long and keep talking ...");
       botUI.setBotText("Bot said something more interestixxxng ...");
       botUI.setBotText("Bot said something more interesting ...");
@@ -45,7 +42,7 @@
         "[**Bot said**](www.youtube.com)\n something more interesting and very long like it is very very interesting so that you wanna know what happening..."
       );
 
-      botUI.setSuggestion(
+      /*       botUI.setSuggestion(
         [
           "Yes",
           "No",
@@ -54,7 +51,7 @@
           "Client can make a better decision",
         ],
         true
-      );
+      ); */
 
       // botUI.setUserText("You said");
       botUI.chatInputCallback = (inputValue) => {
@@ -81,7 +78,7 @@
       };
 
       // botUI.setControllIcons({ mic: true, mute: true, restart: true });
-      botUI.setTextInputEnabled(true);
+      // botUI.setTextInputEnabled(true);
     </script>
   </body>
 </html>

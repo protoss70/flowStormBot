@@ -67,6 +67,7 @@ const defaults: Settings = {
   backgroundAdvancedAnimationParticlesCount: 20, // second level of animations over background - value can be 0-20 - count of animated objects added to the background with random opacity
   backgroundColor: "#927263", // default background color. Can be changed after init via setBackgroundColor()
   backgroundImage: null, // default background image url. Can be changed after init via setBackgroundImage(). It has priority over backgroundColor.
+  backgroundFloorplan: false,
   backgroundImageBlur: 0, // blur of added image via setBackgroundImage(). It has to be whole number.
   backgroundSimpleAnimation: true, // first layer of animations over background - turns on/off simple animation of main gradient on the background
   detectOrientation: true, // ?? not used?
@@ -156,7 +157,7 @@ const icons = [
   "restart",
   "feedback",
   "close",
-  "search"
+  "search",
 ];
 
 const avatarTextOverlapRatio = 1 / 4;
@@ -191,7 +192,7 @@ class BotUI {
   private static settings: Settings;
   private static orientation: OrientationEnum;
   public dialogueID: string = "";
-  public elasticSearchOn: boolean = false // If the elastic search from the Main.js is on this will be true
+  public elasticSearchOn: boolean = false; // If the elastic search from the Main.js is on this will be true
 
   private static rootElement: HTMLElement;
   private static avatarElement: HTMLElement;
@@ -239,6 +240,7 @@ class BotUI {
   private static closeElement: HTMLElement;
   private static sopHeader: HTMLElement;
   private static controlIconsWrapper: HTMLElement;
+  private static floorplanElement: HTMLElement;
 
   private static isChatEnabled: boolean = true;
   private static isMicrophoneEnabled: boolean = true;
@@ -306,11 +308,16 @@ class BotUI {
 
     BotUI.orientation = OrientationEnum.LANDSCAPE; // set default orientation property to "landscape"
 
+    // set HTML template
     if (
       BotUI.settings.interactionMode == "SOP" ||
       BotUI.settings.interactionMode == "GUIDE"
     ) {
-      BotUI.element.innerHTML = testbedBaseStructureTemplate;
+      if (BotUI.settings.backgroundFloorplan) {
+        BotUI.element.innerHTML = testbedBaseStructureTemplate;
+      } else {
+        BotUI.element.innerHTML = sopBaseStructureTemplate;
+      }
     } else {
       BotUI.element.innerHTML = baseStructureTemplate;
     } // set HTML template according interaction mode - why there are two templates?? are still both of them being used??
@@ -404,6 +411,7 @@ class BotUI {
     BotUI.controlIconsWrapper = BotUI.element.querySelector(
       "[control-icons-wrapper]"
     );
+    BotUI.floorplanElement = BotUI.element.querySelector("[data-floorplan]");
 
     // Control collapsing of the bot window and triggering element
     if (!BotUI.settings.collapsed) {
@@ -617,7 +625,7 @@ class BotUI {
 
     BotUI.searchElement.onclick = (e) => {
       this.searchElementCallback();
-    }
+    };
 
     BotUI.restartElement.onclick = () => {
       this.chatRestartCallback();
@@ -713,23 +721,23 @@ class BotUI {
     BotUI.setBackground({});
   }
 
-  public toggleSearchIcons(on: boolean){
-    if (on){
+  public toggleSearchIcons(on: boolean) {
+    if (on) {
       BotUI.searchElement.classList.add("hidden");
-      if (BotUI.settings.controlIcons.mic){
+      if (BotUI.settings.controlIcons.mic) {
         BotUI.chatInputKeyboardElement.classList.remove("hidden");
       }
       BotUI.textInput.classList.remove("hidden");
-    }else{
+    } else {
       BotUI.searchElement.classList.remove("hidden");
       BotUI.chatInputKeyboardElement.classList.add("hidden");
-      if (!BotUI.settings.textInputEnabled){
+      if (!BotUI.settings.textInputEnabled) {
         BotUI.textInput.classList.add("hidden");
       }
     }
   }
 
-  public toggleElasticSearch(on: boolean){
+  public toggleElasticSearch(on: boolean) {
     this.elasticSearchOn = on;
   }
 
@@ -1443,36 +1451,34 @@ class BotUI {
    * Controls visibility of the control icons - microphone, speaker and restart according to settings
    */
   public setControllIconStyles() {
-    
     if (!BotUI.settings.controlIcons.mic) {
       BotUI.controlIconsWrapper
-      .querySelector("[data-chat-input-keyboard]")
-      .classList.add("hidden");
-    } 
-    else {
+        .querySelector("[data-chat-input-keyboard]")
+        .classList.add("hidden");
+    } else {
       BotUI.controlIconsWrapper
-      .querySelector("[data-chat-input-keyboard]")
-      .classList.remove("hidden");
+        .querySelector("[data-chat-input-keyboard]")
+        .classList.remove("hidden");
     }
-      
+
     if (!BotUI.settings.controlIcons.mute) {
       BotUI.controlIconsWrapper
-      .querySelector("[data-chat-input-mute]")
-      .classList.add("hidden");
+        .querySelector("[data-chat-input-mute]")
+        .classList.add("hidden");
     } else {
       BotUI.controlIconsWrapper
-      .querySelector("[data-chat-input-mute]")
-      .classList.remove("hidden");
+        .querySelector("[data-chat-input-mute]")
+        .classList.remove("hidden");
     }
-      
+
     if (!BotUI.settings.controlIcons.restart) {
       BotUI.controlIconsWrapper
-      .querySelector("[data-chat-input-restart]")
-      .classList.add("hidden");
+        .querySelector("[data-chat-input-restart]")
+        .classList.add("hidden");
     } else {
       BotUI.controlIconsWrapper
-      .querySelector("[data-chat-input-restart]")
-      .classList.remove("hidden");
+        .querySelector("[data-chat-input-restart]")
+        .classList.remove("hidden");
     }
 
     // if elastic search is active then Mic icon is be replaced with the search icon
@@ -1480,17 +1486,16 @@ class BotUI {
       BotUI.controlIconsWrapper
         .querySelector("[data-chat-input-search]")
         .classList.add("hidden");
-      } 
-      else {
-        BotUI.controlIconsWrapper
+    } else {
+      BotUI.controlIconsWrapper
         .querySelector("[data-chat-input-search]")
         .classList.remove("hidden");
 
-        BotUI.controlIconsWrapper
+      BotUI.controlIconsWrapper
         .querySelector("[data-chat-input-keyboard]")
         .classList.add("hidden");
     }
-    
+
     const childrenList = BotUI.controlIconsWrapper.querySelectorAll(
       ".icon-sop:not(.hidden)"
     );
@@ -1514,7 +1519,7 @@ class BotUI {
       if (index === 2) {
         element.classList.add("thirdIcon");
       }
-      if (index === 3){
+      if (index === 3) {
         element.classList.add("fourthIcon");
       }
       if (index === childrenList.length - 1) {
@@ -1522,9 +1527,16 @@ class BotUI {
       }
 
       // search icon and mic icon is given mirroring classes
-      if (BotUI.settings.search && BotUI.settings.controlIcons.mic){
-        ["firstIcon", "secondIcon", "right-icon", "thirdIcon", "fourthIcon", "left-icon"].forEach(cls => {
-          if (BotUI.searchElement.classList.contains(cls)){
+      if (BotUI.settings.search && BotUI.settings.controlIcons.mic) {
+        [
+          "firstIcon",
+          "secondIcon",
+          "right-icon",
+          "thirdIcon",
+          "fourthIcon",
+          "left-icon",
+        ].forEach((cls) => {
+          if (BotUI.searchElement.classList.contains(cls)) {
             BotUI.chatInputKeyboardElement.classList.add(cls);
           }
         });
@@ -2199,6 +2211,23 @@ class BotUI {
       "--bot-ui-avatar-text-overlap",
       `${avatarTextOverlap}px`
     );
+
+    if (BotUI.floorplanElement) {
+      BotUI.floorplanElement
+        .querySelector(".floorplan__img")
+        .addEventListener("load", () => {
+          const { height: floorplanHeight } =
+            BotUI.floorplanElement.getBoundingClientRect();
+
+          BotUI.element.style.setProperty(
+            "--bot-ui-floorplan-height",
+            Math.round(floorplanHeight) + "px"
+          );
+
+          if (BotUI.messagesElement)
+            BotUI.scrollToLastMessage(BotUI.messagesElement);
+        });
+    }
   };
 
   private static getInputValue = (value: string, callback: Function) =>
@@ -2416,6 +2445,7 @@ class BotUI {
         iframe.setAttribute("src", videoUrl);
         messageTemplateElement.appendChild(iframe);
         messageElement.scrollTop = messageElement.scrollHeight;
+
         BotUI.videoCallback();
       } else {
         const video = document.createElement("video");
@@ -2431,7 +2461,11 @@ class BotUI {
       }
     }
 
-    if (type === MessageType.BOT && this.getSettings().goTo && !this.elasticSearchOn) {
+    if (
+      type === MessageType.BOT &&
+      this.getSettings().goTo &&
+      !this.elasticSearchOn
+    ) {
       this.setGoToButton(id, dialogueID, clickCallback, messageTemplate);
     }
 
