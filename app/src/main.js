@@ -674,7 +674,6 @@ var createBot = (botUI, settings) => {
     return { title, secondary };
   }
   async function handleFlowstormApiCall(results) {
-    console.log("results are in: ", results);
     if (results === undefined) {
       //SERVER ERROR
       bot.handleOnTextInput(`ERROR`, false, { sopInput: true });
@@ -730,7 +729,7 @@ var createBot = (botUI, settings) => {
     }
   }
 
-  defaultCallback.handleCommand = (command, code, t) => {
+  defaultCallback.handleCommand = async (command, code, t) => {
     const payload = JSON.parse(code);
     console.log(payload);
     switch (command) {
@@ -765,7 +764,9 @@ var createBot = (botUI, settings) => {
       case "#actions":
         buttonInput = true;
         const oldMode = botUI.getInputMode();
-        payload.tiles.forEach((button) => {
+        const imageDelay = payload.delay_between_images_ms; // Delay between each image displayed
+        for (const button of payload.tiles) {
+          console.log("====================================", button);
           const settings = {
             oldMode: oldMode,
             groupName: payload.title,
@@ -779,16 +780,21 @@ var createBot = (botUI, settings) => {
             botUI.disableButtonGroup(settings, () => {}, "buttons");
           };
 
-          botUI.setButton(settings, () => {
+          botUI.setButton(settings, (activeIndex) => {
             if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
-              bot.handleOnTextInput(`#${button.action}`, false, {
+              const index = activeIndex ? activeIndex : 0;
+              bot.handleOnTextInput(`#${button.action[index]}`, false, {
                 buttonInput: true,
               });
             }
             buttonInput = false;
           });
           bot.audioInputCallback();
-        });
+
+          if (imageDelay) {
+            await new Promise((r) => setTimeout(r, imageDelay));
+          }
+        }
         break;
       case "#suggestions":
         console.log(payload);

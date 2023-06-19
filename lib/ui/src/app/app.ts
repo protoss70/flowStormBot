@@ -17,7 +17,7 @@ import is from "ramda/es/is"; // See if an object (i.e. val) is an instance of t
 import isEmpty from "ramda/es/isEmpty"; // Returns true if the given value is its type's empty value; false otherwise.
 import merge from "ramda/es/merge"; // Creates one new object with the own properties from a list of objects. If a key exists in more than one object, the value from the last object it exists in will be used.
 import times from "ramda/es/times"; // Calls an input function n times, returning an array containing the results of those function calls.
-import { forEach, type } from "ramda";
+import { forEach, head, type } from "ramda";
 
 // Import custom assets
 import "../assets/main.scss";
@@ -155,7 +155,9 @@ const icons = [
   "restart",
   "feedback",
   "close",
-  "search"
+  "search",
+  "left",
+  "right"
 ];
 
 const avatarTextOverlapRatio = 1 / 4;
@@ -1575,11 +1577,65 @@ class BotUI {
     }
   }
 
-  public disableButtonGroup = (settings, callback, selector) => {
+  private setCarouselUI(amount: number, callbacks, active=0) : HTMLElement[]{
+    const leftIcon = document.createElement("div");
+    const rightIcon = document.createElement("div");
+    if (amount > 5){
+      amount = 5;
+    }
+
+    const bottomIndexContainer = document.createElement("div");
+    for (let i = 0; i < amount; i++){
+      const carouselNode = document.createElement("div");
+
+      if (active === i){
+        carouselNode.classList.add("active");
+      }
+
+      ["carouselNode"].forEach((cls) => {
+        carouselNode.classList.add(cls);
+      });
+
+      bottomIndexContainer.appendChild(carouselNode);
+    }
+
+    ["icon-sop", "icon-sop--left", "carouselIcon", "icon--content--left"].forEach((cls) => {
+      leftIcon.classList.add(cls);
+    });
+
+    ["icon-sop", "icon-sop--right", "carouselIcon", "icon--content--right"].forEach((cls) => {
+      rightIcon.classList.add(cls);
+    });
+
+    if (active === 0){
+      leftIcon.classList.add("disabled");
+    }if (active === amount -1){
+      rightIcon.classList.add("disabled");
+    }
+
+    ["carouselBottomIndexContainer"].forEach((cls) => {
+      bottomIndexContainer.classList.add(cls);
+    });
+
+    if (callbacks){
+      if (callbacks.left){
+        leftIcon.addEventListener("click", callbacks.left)
+      }
+
+      if (callbacks.right){
+        rightIcon.addEventListener("click", callbacks.right)
+      }
+    }
+
+    return [leftIcon, rightIcon, bottomIndexContainer];
+  }
+
+  public disableButtonGroup = (settings, callback, selector, findActiveIndex) => {
     const messageElement = BotUI.messagesElement;
     BotUI.inputTakers.classList.remove("hidden");
     if (callback) {
-      callback();
+      const activeIndex = findActiveIndex();
+      callback(activeIndex);
     }
 
     if (settings.disableGroup) {
@@ -1598,11 +1654,76 @@ class BotUI {
     const button = document.createElement("button");
     const selector = "buttons";
 
+    function findActiveIndex(){
+      if (settings.background.length > 1){
+        const carouselParent = button.getElementsByClassName("carouselBottomIndexContainer")[0];
+        var activeIndex = 0;
+        for (let index = 0; index < carouselParent.children.length; index++) {
+          const element = carouselParent.children[index];
+          if (element.classList.contains("active")){
+            activeIndex = index;
+            break;
+          }
+        } 
+        return activeIndex;
+      }else{
+        return undefined;
+      }
+    }
+
     if (settings.background) {
-      const newImg = new Image();
-      button.append(newImg);
-      newImg.src = settings.background;
       button.style.background = `transparent`;
+      if (settings.background.length > 1){
+
+        for (let index = 0; index < settings.background.length; index++) {
+          const newImg = new Image();
+          button.append(newImg);
+          newImg.src = settings.background[index];
+          newImg.id = `imgID${index}`;
+          if (index !== 0){
+            newImg.classList.add("hidden");
+          }
+        }
+        function right(e){
+          e.stopPropagation();
+          const activeIndex = findActiveIndex();
+          const leftIcon = button.getElementsByClassName("icon--content--left")[0]
+          const carouselParent = button.getElementsByClassName("carouselBottomIndexContainer")[0];
+          carouselParent.children[activeIndex].classList.remove("active");
+          carouselParent.children[activeIndex + 1].classList.add("active");
+          
+          if (activeIndex + 1 === carouselParent.children.length - 1){
+            e.target.classList.add("disabled");
+          }
+          leftIcon.classList.remove("disabled");
+          (button as HTMLElement).querySelector(`#imgID${activeIndex}`).classList.add("hidden");
+          (button as HTMLElement).querySelector(`#imgID${activeIndex + 1}`).classList.remove("hidden");
+        }
+
+        function left(e){
+          e.stopPropagation();
+          const activeIndex = findActiveIndex();
+          const rightIcon = button.getElementsByClassName("icon--content--right")[0]
+          const carouselParent = button.getElementsByClassName("carouselBottomIndexContainer")[0];
+          carouselParent.children[activeIndex].classList.remove("active");
+          carouselParent.children[activeIndex - 1].classList.add("active");
+          
+          if (activeIndex - 1 === 0){
+            e.target.classList.add("disabled");
+          }
+          rightIcon.classList.remove("disabled");
+          (button as HTMLElement).querySelector(`#imgID${activeIndex}`).classList.add("hidden");
+          (button as HTMLElement).querySelector(`#imgID${activeIndex - 1}`).classList.remove("hidden");
+        }
+
+        this.setCarouselUI(settings.background.length, {right: (e) => {right(e)}, left: (e) => {left(e)}}).forEach(element => {
+          button.appendChild(element);
+        });
+      }else{
+        const newImg = new Image();
+        button.append(newImg);
+        newImg.src = settings.background[0];
+      }
     }
 
     if (settings.text) {
@@ -1614,7 +1735,7 @@ class BotUI {
     button.setAttribute("data-button-group", selector);
 
     button.onclick = () => {
-      this.disableButtonGroup(settings, callback, selector);
+      this.disableButtonGroup(settings, callback, selector, findActiveIndex);
     };
 
     messageElement.appendChild(button);
@@ -1627,7 +1748,7 @@ class BotUI {
    * From image, an average color for its background is computed and opacity can be adjusted via imageAverageColorOpacity
    *
    * @param [url]- Whole url is expected. If called with null, the image element is removed
-   * @param [nodeId] - ??
+   * @param [nodeId] - Flowstorm image node ID
    */
   public setImage = (url: string = null, nodeId: string = "") => {
     if (BotUI.settings.guiMode === GUIMode.KIOSK) {
