@@ -1913,15 +1913,19 @@ canvas {
   z-index: 1;
   margin: 0;
   width: 100%;
-  background-color: rgba(black, 0.3);
+  background-color: rgba(black, 0.5);
   color: white;
   box-shadow: 0 2px 5px 0px rgba(0, 0, 0, 0.75);
+  padding: 1rem 0.5rem;
 
   &__img {
     width: 100%;
     max-height: 210px;
     object-fit: contain;
-    padding: 1rem 0.5rem;
+  }
+
+  &__svg {
+    max-height: 210px;
   }
 
   &__header {
@@ -1954,4 +1958,74 @@ canvas {
       pointer-events: none;
     }
   }
+
+  &__bg-zone {
+    fill: #d2d2d2;
+    stroke: none;
+
+    &--active {
+      fill: #f9b413;
+    }
+
+    &--hover {
+      fill: white;
+    }
+  }
+
+  &__zones {
+    position: relative;
+  }
+
+  &__zone {
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+
+    /*     
+    &:hover .floorplan__num {
+      transform: scale(1.2);
+      transform-origin: center;
+      transition: all 0.2s;
+    } 
+    */
+
+    &:hover .floorplan__num > .floorplan__num--circle {
+      fill: #213665;
+      stroke-width: 0.5rem;
+      stroke: #213665;
+      transition: all 0.2;
+    }
+
+    &--empty {
+      fill: transparent;
+    }
+
+    &--active .floorplan__num--circle {
+      fill: #e05206;
+      stroke: #e05206;
+      stroke-width: 0.5rem;
+    }
+  }
+
+  &__num {
+    position: relative;
+    transform-origin: center;
+    transition: all 0.2s;
+
+    &--circle {
+      fill: #074794;
+      transition: all 0.2;
+    }
+
+    &--text {
+      font-family: "Inter-SemiBold", "Inter";
+      font-weight: 600;
+      font-size: 18px;
+      fill: #fff;
+    }
+  }
+}
+
+.non-clickable {
+  pointer-events: none;
 }

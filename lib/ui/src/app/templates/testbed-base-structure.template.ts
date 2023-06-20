@@ -1,5 +1,5 @@
-import img from "../../assets/images/testbed-layout.png";
 import logo from "../../assets/images/ricaip-logo.svg";
+import { testbedFloorplan } from "./testbed-floorplan.template";
 
 /**
  * html wrapper is needed for prettier formatting
@@ -17,9 +17,7 @@ export const testbedBaseStructureTemplate = html`
 
     <!-- MAP / FLOORPLAN -->
     <div data-floorplan>
-      <figure class="floorplan">
-        <img class="floorplan__img" src="${img}" />
-      </figure>
+      <figure class="floorplan">${testbedFloorplan}</figure>
     </div>
 
     <!-- IMAGE -->

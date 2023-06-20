@@ -17,7 +17,7 @@ import is from "ramda/es/is"; // See if an object (i.e. val) is an instance of t
 import isEmpty from "ramda/es/isEmpty"; // Returns true if the given value is its type's empty value; false otherwise.
 import merge from "ramda/es/merge"; // Creates one new object with the own properties from a list of objects. If a key exists in more than one object, the value from the last object it exists in will be used.
 import times from "ramda/es/times"; // Calls an input function n times, returning an array containing the results of those function calls.
-import { forEach, type } from "ramda";
+import { forEach, indexOf, type } from "ramda";
 
 // Import custom assets
 import "../assets/main.scss";
@@ -521,6 +521,58 @@ class BotUI {
     }
 
     BotUI.backgroundElement = BotUI.element.querySelector("[data-background]");
+
+    // TEST set floorplan svg event listners
+    if (BotUI.floorplanElement) {
+      console.log("-----test listeners for floorplan events here-----------");
+      const svg = BotUI.element.querySelector("#floorplanSvg");
+      const bgZoneEls = svg.querySelectorAll(".floorplan__bg-zone");
+      const bgZoneArr = Array.from(bgZoneEls);
+      const numZoneEls = svg.querySelectorAll(".floorplan__zone");
+      const numZoneArr = Array.from(numZoneEls);
+
+      const removeActiveClass = () => {
+        numZoneArr.forEach((el) => {
+          el.classList.remove("floorplan__zone--active");
+        });
+        bgZoneArr.forEach((el) => {
+          el.classList.remove("floorplan__bg-zone--active");
+        });
+      };
+
+      const getZoneNumStr = (el) => {
+        return el.id.slice(el.id.indexOf("_") + 1, el.id.indexOf("-"));
+      };
+
+      numZoneArr.forEach((el) => {
+        el.addEventListener("click", () => {
+          removeActiveClass();
+          el.classList.add("floorplan__zone--active");
+          const activeZoneIndex = getZoneNumStr(el);
+          console.log(+activeZoneIndex);
+
+          bgZoneArr
+            .find((zone) => zone.id.includes(activeZoneIndex))
+            .classList.add("floorplan__bg-zone--active");
+        });
+      });
+
+      numZoneArr.forEach((el) => {
+        const hoverZoneIndex = getZoneNumStr(el);
+
+        el.addEventListener("mouseover", () => {
+          bgZoneArr
+            .find((zone) => zone.id.includes(hoverZoneIndex))
+            .classList.add("floorplan__bg-zone--hover");
+        });
+
+        el.addEventListener("mouseout", () => {
+          bgZoneArr
+            .find((zone) => zone.id.includes(hoverZoneIndex))
+            .classList.remove("floorplan__bg-zone--hover");
+        });
+      });
+    }
 
     if (!BotUI.settings.collapsable) {
       const { width, height } = BotUI.settings.widgetSize;
@@ -2212,21 +2264,29 @@ class BotUI {
       `${avatarTextOverlap}px`
     );
 
+    // handle height if floorplan is enabled
     if (BotUI.floorplanElement) {
-      BotUI.floorplanElement
-        .querySelector(".floorplan__img")
-        .addEventListener("load", () => {
-          const { height: floorplanHeight } =
-            BotUI.floorplanElement.getBoundingClientRect();
+      const adjustHeight = () => {
+        const { height: floorplanHeight } =
+          BotUI.floorplanElement.getBoundingClientRect();
 
-          BotUI.element.style.setProperty(
-            "--bot-ui-floorplan-height",
-            Math.round(floorplanHeight) + "px"
-          );
+        BotUI.element.style.setProperty(
+          "--bot-ui-floorplan-height",
+          Math.round(floorplanHeight) + "px"
+        );
 
-          if (BotUI.messagesElement)
-            BotUI.scrollToLastMessage(BotUI.messagesElement);
-        });
+        if (BotUI.messagesElement)
+          BotUI.scrollToLastMessage(BotUI.messagesElement);
+      };
+
+      const floorplanImg =
+        BotUI.floorplanElement.querySelector(".floorplan__img");
+
+      if (floorplanImg) {
+        floorplanImg.addEventListener("load", adjustHeight); // img takes to load - only after that height can be adjusted properly as only img width is set
+      } else {
+        adjustHeight(); // svg - loads immediately
+      }
     }
   };
 
