@@ -55,6 +55,7 @@ import {
   ScreenTypeEnum,
   Settings,
   StateTypeEnum,
+  SuggestionMode,
 } from "./model/bot-ui.model";
 
 // Default BotUI init settings
@@ -115,6 +116,7 @@ const defaults: Settings = {
   sound: true, // what is relation to inputAudio and outputAudio??
   controlIcons: { mic: true, mute: true, restart: false }, // display control icons
   search: true, // setting for elastic search. It controls if the bot will do elastic search or not
+  suggestionMode: SuggestionMode.ALTERNATIVE,
   showTooltips: true, // show tooltips of control icons
 };
 
@@ -1394,13 +1396,15 @@ class BotUI {
   };
 
   public removeSuggestions = () => {
-    const elemList = document.querySelectorAll(
-      "[data-messages] > div > [data-suggestions-container]"
-    );
-    elemList.forEach((element) => {
-      const par = element.parentNode;
-      par.parentNode.removeChild(par);
-    });
+    if (this.getSettings().suggestionMode === SuggestionMode.STANDARD){
+      const elemList = document.querySelectorAll(
+        "[data-messages] > div > [data-suggestions-container]"
+      );
+      elemList.forEach((element) => {
+        const par = element.parentNode;
+        par.parentNode.removeChild(par);
+      });
+    }
   };
 
   public setSuggestion = (suggestions: string[], listView: boolean = false) => {
@@ -1449,11 +1453,8 @@ class BotUI {
         btn.classList.add("list-view");
       }
       btn.onclick = this.suggestionsCallback;
-      document
-        .querySelector(
-          "[data-suggestions-container].data-suggestions-container"
-        )
-        .appendChild(btn);
+      const allContainers = document.querySelectorAll("[data-suggestions-container].data-suggestions-container")
+      allContainers[allContainers.length - 1].appendChild(btn);
     });
 
     BotUI.scrollToLastMessage(messageElement);
@@ -2540,13 +2541,7 @@ class BotUI {
         messageElement &&
         messageElement.lastChild &&
         <HTMLElement>messageElement.lastChild;
-      if (
-        replace &&
-        messageElement.lastChild !== null &&
-        messageType !== MessageType.BOT
-      ) {
-        messageElement.removeChild(messageElement.lastChild);
-      } else if (messageType && messageType === type) {
+      if (messageType && messageType === type) {
         (messageElement.lastChild as Element).classList.remove(
           "chat-message-last"
         );

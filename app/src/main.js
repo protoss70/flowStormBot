@@ -49,9 +49,17 @@ var searchCommandActive = false; // this is true when the #search command is cal
 let generatodEmbedLines = {};
 
 const audios = {};
+var latestUserInputID = ""; // Keeps track of the UserInput node id from flowstorm. Used for Alternative Suggestions
+var alternativeReInput = false;
+var alternativeLatestText = "";
 
 const regex =
   /https:\/\/core(-([0-9]+|preview)){0,1}.flowstorm.ai\/file\/tts\/[0-9a-f]+\.wav/g;
+
+const suggestionModes = {
+  STANDARD: "disappearing",
+  ALTERNATIVE: "non-disappearing",
+};
 
 const botUIDefaultSettings = {
   guiMode: "chat",
@@ -72,6 +80,7 @@ const botUIDefaultSettings = {
   sound: true,
   search: true,
   goTo: true,
+  suggestionMode: suggestionModes.ALTERNATIVE,
 };
 
 const clientDefaultSetting = {
@@ -409,7 +418,17 @@ export const initFSClientBot = (initParams = {}) => {
       `Element with ID "${elementId}" was not found in DOM. Cannot initialize BOT UI. Use existing element with ID or remove elementId property from initialization.`
     );
   }
-  return autoStartBot;
+
+  const botReturn = {
+    stop,
+    service: {
+      ...bot,
+    },
+    UI: {
+      ...botUI,
+    },
+  };
+  return botReturn;
 };
 
 const initUI = (settings = {}) => {
@@ -611,6 +630,18 @@ var createBot = (botUI, settings) => {
 
   defaultCallback.addLogs = (logs) => {
     logs.forEach((l) => {
+      if (
+        botUI.getSettings().suggestionMode === suggestionModes.ALTERNATIVE &&
+        l.text.startsWith("Flow")
+      ) {
+        const regex = /UserInput#(-\d+)/g;
+        let lastMatch;
+
+        for (const match of l.text.matchAll(regex)) {
+          lastMatch = match[1];
+        }
+        latestUserInputID = lastMatch;
+      }
       console.log(l.text);
     });
   };
@@ -766,7 +797,6 @@ var createBot = (botUI, settings) => {
         const oldMode = botUI.getInputMode();
         const imageDelay = payload.delay_between_images_ms; // Delay between each image displayed
         for (const button of payload.tiles) {
-          console.log("====================================", button);
           const settings = {
             oldMode: oldMode,
             groupName: payload.title,
@@ -797,7 +827,13 @@ var createBot = (botUI, settings) => {
         }
         break;
       case "#suggestions":
-        console.log(payload);
+        if (alternativeReInput) {
+          alternativeReInput = false;
+          bot.handleOnTextInput(alternativeLatestText, false, {
+            sopInput: true,
+          });
+          break;
+        }
         if (payload.nodes) {
           const suggestionText = [];
           payload.nodes.forEach((node) => {
@@ -1020,7 +1056,7 @@ var createBot = (botUI, settings) => {
     }
     setAttribute("nodeId", nodeID);
     setAttribute("dialogueID", dialogueID);
-    botUI.removeSuggestions();
+    // botUI.removeSuggestions();
     if (status !== "LISTENING") {
       bot.skipPlayedMessages();
     }
@@ -1065,7 +1101,7 @@ var createBot = (botUI, settings) => {
   botUI.chatRestartCallback = () => {
     const state = getStatus();
     botUI.removeAllMessages();
-    botUI.removeSuggestions();
+    // botUI.removeSuggestions();
     botUI.toggleLoader(false);
     botUI.toggleSearchIcons(false);
     elasticSearchActive = false;
@@ -1090,7 +1126,7 @@ var createBot = (botUI, settings) => {
   botUI.chatSopNextCallback = (inputValue) => {
     const status = getStatus();
     if (status !== undefined && status !== "SLEEPING") {
-      botUI.removeSuggestions();
+      // botUI.removeSuggestions();
       bot.handleOnTextInput(`yes`, false, { sopInput: true });
     } else if (status === "SLEEPING" || status === undefined) {
       botUI.appSelectToggle(false);
@@ -1109,9 +1145,57 @@ var createBot = (botUI, settings) => {
     }
   };
 
+  function removeNodesAfterSuggestion(self) {
+    const selfParent = self.parentElement.parentElement; // Need to go 2 steps out to get the real parent
+    const parent = selfParent.parentElement;
+    const index = Array.from(parent.children).indexOf(selfParent);
+    const children = parent.children;
+    while (children.length > index + 1) {
+      parent.removeChild(children[index + 1]);
+    }
+  }
+
   botUI.suggestionsCallback = (e) => {
-    bot.handleOnTextInput(e.target.innerHTML, false);
-    botUI.removeSuggestions();
+    const self = e.target;
+    const status = getStatus();
+    if (
+      botUI.getSettings().suggestionMode === suggestionModes.ALTERNATIVE &&
+      (status !== undefined || status !== "SLEEPING")
+    ) {
+      if (self.classList.contains("active")) {
+        return;
+      } else {
+        const parent = self.parentElement;
+        const activeElems = parent.getElementsByClassName("active");
+        if (activeElems.length > 0) {
+          // Active class exists, initiate #go_to
+          console.log("here");
+          console.log(activeElems);
+          activeElems[0].classList.remove("active");
+          self.classList.add("active");
+          removeNodesAfterSuggestion(self);
+          const nodeID = self.parentElement.getAttribute("nodeId");
+          const dialogueID = self.parentElement.getAttribute("dialogueID");
+          setAttribute("nodeId", parseInt(nodeID));
+          setAttribute("dialogueID", dialogueID);
+          bot.handleOnTextInput("#go_to", false, { sopInput: true });
+          alternativeReInput = true;
+          alternativeLatestText = self.innerHTML;
+        } else {
+          // First time clicking this group of suggestions.
+          self.classList.add("active");
+          self.parentElement.setAttribute("nodeId", latestUserInputID);
+          self.parentElement.setAttribute(
+            "dialogueID",
+            dialogueIDs[dialogueIDs.length - 1]
+          );
+          bot.handleOnTextInput(self.innerHTML, false, { sopInput: true });
+        }
+      }
+    } else {
+      bot.handleOnTextInput(self.innerHTML, false);
+      botUI.removeSuggestions();
+    }
   };
 
   botUI.setModeCallback = (mode) => {
