@@ -47,6 +47,12 @@ export interface Settings {
     controlIcons?: {mic: boolean, mute: boolean, restart: boolean};
     search?: boolean;
     showTooltips?: boolean;
+    suggestionMode?: SuggestionMode;
+}
+
+export enum SuggestionMode {
+    STANDARD= "disappearing",
+    ALTERNATIVE= "non-disappearing"
 }
 
 export interface Background {
