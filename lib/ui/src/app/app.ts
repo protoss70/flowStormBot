@@ -1137,7 +1137,7 @@ class BotUI  {
         const button = document.createElement('button');
         const selector = "buttons"
 
-        if(settings.background){
+        if(settings.background[0]){
             const newImg = new Image();
             button.append(newImg);
             newImg.src = settings.background; 

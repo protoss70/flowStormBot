@@ -724,7 +724,7 @@ var createBot = (botUI, settings) => {
 
           botUI.setButton(settings, () => {
             if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
-              bot.handleOnTextInput(`#${button.action}`, false, {
+              bot.handleOnTextInput(`#${button.action[0]}`, false, {
                 buttonInput: true,
               });
             }
