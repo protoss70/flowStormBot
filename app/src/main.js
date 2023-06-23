@@ -34,7 +34,7 @@ let defaultCoreUrl =
   environment === "local"
     ? "http://localhost:8080"
     : `https://core${environment}.flowstorm.ai`;
-let development = true;
+let development = false;
 
 let idToken = undefined;
 let accessToken = undefined;
@@ -80,7 +80,7 @@ const botUIDefaultSettings = {
   sound: true,
   search: true,
   goTo: true,
-  suggestionMode: suggestionModes.ALTERNATIVE,
+  suggestionMode: suggestionModes.STANDARD,
 };
 
 const clientDefaultSetting = {
@@ -105,6 +105,8 @@ let botState = {};
 let paused = true;
 let textInputEnabled = false;
 let dialogueIDs = [];
+
+var exitButtonMode = () => {};
 
 export const initFSClientBot = (initParams = {}) => {
   Sentry.init({
@@ -663,8 +665,6 @@ var createBot = (botUI, settings) => {
     }
   };
 
-  var exitButtonMode = () => {};
-
   function titleAndContext(tags, content) {
     const h1 = (tags.h1_b = tags.h1_b.split(" |"));
     const h2 = (tags.h2_b = tags.h2_b.split(" |"));
@@ -806,8 +806,14 @@ var createBot = (botUI, settings) => {
             ...button,
           };
 
-          exitButtonMode = () => {
-            botUI.disableButtonGroup(settings, () => {}, "buttons");
+          exitButtonMode = (disableGroup = true) => {
+            if (disableGroup) {
+              botUI.disableButtonGroup(settings, () => {}, "buttons");
+            } else {
+              const newSettings = { ...settings };
+              newSettings.disableGroup = undefined;
+              botUI.disableButtonGroup(newSettings, () => {}, "buttons");
+            }
           };
 
           botUI.setButton(settings, (activeIndex) => {
@@ -1056,7 +1062,7 @@ var createBot = (botUI, settings) => {
     }
     setAttribute("nodeId", nodeID);
     setAttribute("dialogueID", dialogueID);
-    // botUI.removeSuggestions();
+    botUI.removeSuggestions();
     if (status !== "LISTENING") {
       bot.skipPlayedMessages();
     }
@@ -1101,7 +1107,7 @@ var createBot = (botUI, settings) => {
   botUI.chatRestartCallback = () => {
     const state = getStatus();
     botUI.removeAllMessages();
-    // botUI.removeSuggestions();
+    botUI.removeSuggestions();
     botUI.toggleLoader(false);
     botUI.toggleSearchIcons(false);
     elasticSearchActive = false;
@@ -1126,7 +1132,7 @@ var createBot = (botUI, settings) => {
   botUI.chatSopNextCallback = (inputValue) => {
     const status = getStatus();
     if (status !== undefined && status !== "SLEEPING") {
-      // botUI.removeSuggestions();
+      botUI.removeSuggestions();
       bot.handleOnTextInput(`yes`, false, { sopInput: true });
     } else if (status === "SLEEPING" || status === undefined) {
       botUI.appSelectToggle(false);
@@ -1158,6 +1164,11 @@ var createBot = (botUI, settings) => {
   botUI.suggestionsCallback = (e) => {
     const self = e.target;
     const status = getStatus();
+
+    if (status !== "LISTENING") {
+      bot.skipPlayedMessages();
+    }
+
     if (
       botUI.getSettings().suggestionMode === suggestionModes.ALTERNATIVE &&
       (status !== undefined || status !== "SLEEPING")
@@ -1165,6 +1176,9 @@ var createBot = (botUI, settings) => {
       if (self.classList.contains("active")) {
         return;
       } else {
+        if (botUI.getInputMode() === "button") {
+          exitButtonMode(false);
+        }
         const parent = self.parentElement;
         const activeElems = parent.getElementsByClassName("active");
         if (activeElems.length > 0) {

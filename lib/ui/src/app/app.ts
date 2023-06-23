@@ -1632,13 +1632,11 @@ class BotUI {
   }
 
   public disableButtonGroup = (settings, callback, selector, findActiveIndex) => {
-    const messageElement = BotUI.messagesElement;
     BotUI.inputTakers.classList.remove("hidden");
-    if (callback) {
+    if (callback && findActiveIndex) {
       const activeIndex = findActiveIndex();
       callback(activeIndex);
     }
-
     if (settings.disableGroup) {
       document
         .querySelectorAll(`[data-button-group=${selector}]`)
