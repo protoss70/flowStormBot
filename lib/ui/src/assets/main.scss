@@ -16,8 +16,14 @@
 
 // TODO move to .bot namespace
 [data-gui-mode] {
+  z-index: 25;
   --bot-ui-background-color: #927263;
   --bot-ui-base-background-color: #28568c;
+  --bot-ui-suggestions-background-color: #ffffff4d;
+  --bot-ui-suggestions-text-color: #ffffff;
+  --bot-ui-suggestions-alternative-background: "#ffffffb3";
+  --bot-ui-suggestions-hover-background: "#ffffff80";
+  --bot-ui-trigger-element-image: url("../assets/images/logo.svg");
   //--bot-ui-base-background-color: #f1f4f7;
   --bot-ui-window-width: 100vw;
   --bot-ui-window-height: 100vh;
@@ -1308,7 +1314,7 @@ p.bot-text-styles {
 
     &:after {
       content: "";
-      background-image: url("../assets/images/logo.svg");
+      background-image: var(--bot-ui-trigger-element-image);
       width: 90%;
       height: 90%;
       background-size: contain;
@@ -1928,13 +1934,13 @@ canvas {
     height: 100%;
 
     white-space: nowrap;
-    background-color: rgba(255, 255, 255, 0.3);
-    color: white;
+    background-color: var(--bot-ui-suggestions-background-color);
+    color: var(--bot-ui-suggestions-text-color);
     border: none;
     border-radius: 5px;
     padding: 0.55rem;
     &.active{
-      background-color: rgba(255, 255, 255, 0.7);
+      background-color: var(--bot-ui-suggestions-alternative-background);
     }
     &.list-view {
       height: auto;
@@ -1944,7 +1950,7 @@ canvas {
 
     &:not(.active):hover {
       cursor: pointer;
-      background-color: rgba(255, 255, 255, 0.5);
+      background-color: var(--bot-ui-suggestions-hover-background);
     }
   }
 }

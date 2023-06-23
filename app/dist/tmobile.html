@@ -1,1 +1,83 @@
-<head><link href="client-bot.css" rel="stylesheet"><script src="client-bot.js?dbe53480786ab1d3f45b"></script></head>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>T-Mobile Bot</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet"><link rel="stylesheet" href="./index.css"><link href="client-bot.css" rel="stylesheet"><script src="client-bot.js?bec9768a6f074b2d50bf"></script></head><body style="font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background-color: #E30074;"><div id="botContainer"><div id="botDiv"></div></div><script>function initBot(){
+			// Flowstorm Application ID's for English and Czech versions of the app
+			const englishID = "646b4706a47a67009f647d79";
+			const czechID = "6477412c2c5a5d6b18affe24";
+
+			const engRadioElement = document.getElementById("EN");
+			var botKey;
+			if (engRadioElement){
+				botKey = document.getElementById("EN").checked ? englishID : czechID;
+			}else{
+				botKey = englishID;
+			}
+
+			const clientParams = {
+				botKey,
+				allowUrlParams: true,
+				fullScreen: false,
+				guiMode: 'chat',
+				textInputEnabled: false,
+				domain: '.flowstorm.ai',
+				mode: 'voice',
+				elementId: "botDiv",
+				collapsable: true,
+				interactionMode: "GUIDE",
+				sound: true,
+				title: "T-Mobile",
+                search: false,
+                suggestionMode: "non-disappearing",
+				controlIcons: {mic: true, mute: true, restart: true},
+                backgroundColor:"#000000",
+                botMessageBackgroundColor: "#E30074",
+                userMessageTextColor: "#E30074",
+                userMessageBackgroundColor: "#FFFFFF",
+                backgroundSecondaryColor: "#000000",
+                triggerImage: `url(https://core.flowstorm.ai/file/assets/spaces/648ae13a8af625324045cf0d)`,
+                suggestions: {textColor: "#000000", backgroundColor: "#BFBFBF", hoverBackgroundColor: "#ffffff", alternative: {activeBackground: "#ffffff"}}
+			};
+			
+			return initFSClientBot({
+				...clientParams,
+			});
+		}
+		
+		var bot = initBot();</script><div class="radio-container"><input type="radio" onchange="radioClick()" id="CS" name="fav_language" value="CS"> <label for="CS" class="language-label">CS</label><br><input type="radio" onchange="radioClick()" name="fav_language" id="EN" value="EN" checked="checked"> <label for="EN" class="language-label">En</label></div><div class="T-Mobile-Logo-Container"><img src="https://core.flowstorm.ai/file/assets/spaces/648ae14f6ab74917ac716126" alt="T-Mobile Logo"></div><style>.T-Mobile-Logo-Container{
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			top: 0;
+			left: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			z-index: -1;
+		}
+
+		.radio-container{
+			position: absolute;
+			right: 100px;
+			bottom: 0px;
+			margin-bottom: 0.9rem;
+		}
+
+		@media only screen and (max-width: 1000px) {
+			.radio-container{
+				bottom: 20px !important;
+				right: 120px !important;
+			}
+			.T-Mobile-Logo-Container > img{
+				width: 370px;
+				height: 370px;
+			}
+
+		}
+
+		.language-label{
+			color: white;
+		}</style><script>function radioClick(){
+            console.log(bot);
+			bot.stop();
+			document.getElementById("botDiv").remove();
+			document.getElementById("botContainer").innerHTML = "<div id='botDiv'></div>";
+			bot = initBot();
+		}</script></body></html>

@@ -66,6 +66,7 @@ const defaults: Settings = {
   feedback: true, // ??
   backgroundAdvancedAnimationParticlesCount: 20, // second level of animations over background - value can be 0-20 - count of animated objects added to the background with random opacity
   backgroundColor: "#927263", // default background color. Can be changed after init via setBackgroundColor()
+  backgroundSecondaryColor: "#28568c", // default secondary color. Can be changed after init via setBackgroundColor()
   backgroundImage: null, // default background image url. Can be changed after init via setBackgroundImage(). It has priority over backgroundColor.
   backgroundImageBlur: 0, // blur of added image via setBackgroundImage(). It has to be whole number.
   backgroundSimpleAnimation: true, // first layer of animations over background - turns on/off simple animation of main gradient on the background
@@ -118,6 +119,8 @@ const defaults: Settings = {
   search: true, // setting for elastic search. It controls if the bot will do elastic search or not
   suggestionMode: SuggestionMode.ALTERNATIVE,
   showTooltips: true, // show tooltips of control icons
+  suggestions: {textColor: "#ffffff", backgroundColor: "#ffffff4d", hoverBackgroundColor: "#ffffff80",activeBackground: "#ffffffb3"},
+  triggerImage: `url("../assets/images/logo.svg")`
 };
 
 // global variables
@@ -289,6 +292,30 @@ class BotUI {
       "--bot-ui-background-color",
       `${BotUI.settings.backgroundColor}`
     );
+    BotUI.element.style.setProperty(
+      "--bot-ui-trigger-element-image",
+      `${BotUI.settings.triggerImage}`
+    );
+    BotUI.element.style.setProperty(
+      "--bot-ui-base-background-color",
+      `${BotUI.settings.backgroundSecondaryColor}`
+    )
+    BotUI.element.style.setProperty(
+      "--bot-ui-suggestions-text-color",
+      `${BotUI.settings.suggestions.textColor}`
+    )
+    BotUI.element.style.setProperty(
+      "--bot-ui-suggestions-background-color",
+      `${BotUI.settings.suggestions.backgroundColor}`
+    )
+    BotUI.element.style.setProperty(
+      "--bot-ui-suggestions-hover-background",
+      `${BotUI.settings.suggestions.hoverBackgroundColor}`
+    )
+    BotUI.element.style.setProperty(
+      "--bot-ui-suggestions-alternative-background",
+      `${BotUI.settings.suggestions.activeBackground}`
+    )
     BotUI.element.style.setProperty(
       "--bot-ui-message-color-bot",
       `${BotUI.settings.botMessageTextColor}`
@@ -1215,6 +1242,25 @@ class BotUI {
       },
       secondaryColor
     );
+
+  public setSuggestionColors = (_suggestion: {textColor:string, backgroundColor:string, hoverBackgroundColor?: string, activeBackground?: string}) => {
+    BotUI.element.style.setProperty(
+      "--bot-ui-suggestions-text-color",
+      `${BotUI.settings.suggestions.textColor}`
+    )
+    BotUI.element.style.setProperty(
+      "--bot-ui-suggestions-background-color",
+      `${BotUI.settings.suggestions.backgroundColor}`
+    )
+    BotUI.element.style.setProperty(
+      "--bot-ui-suggestions-hover-background",
+      `${BotUI.settings.suggestions.hoverBackgroundColor}`
+    )
+    BotUI.element.style.setProperty(
+      "--bot-ui-suggestions-alternative-background",
+      `${BotUI.settings.suggestions.activeBackground}`
+    )
+  }
 
   /**
    * Sets background image via url,

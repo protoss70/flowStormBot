@@ -324,7 +324,7 @@ export const initFSClientBot = (initParams = {}) => {
   const botUI = initUI(settings);
 
   if (botUI) {
-    createBot(botUI, settings);
+    var myBot = createBot(botUI, settings);
     initBot();
     bot.stateHandler = stateHandler;
     bot.setInCallback = () => {
@@ -420,17 +420,7 @@ export const initFSClientBot = (initParams = {}) => {
       `Element with ID "${elementId}" was not found in DOM. Cannot initialize BOT UI. Use existing element with ID or remove elementId property from initialization.`
     );
   }
-
-  const botReturn = {
-    stop,
-    service: {
-      ...bot,
-    },
-    UI: {
-      ...botUI,
-    },
-  };
-  return botReturn;
+  return myBot;
 };
 
 const initUI = (settings = {}) => {
@@ -1108,11 +1098,15 @@ var createBot = (botUI, settings) => {
     const state = getStatus();
     botUI.removeAllMessages();
     botUI.removeSuggestions();
-    botUI.toggleLoader(false);
-    botUI.toggleSearchIcons(false);
-    elasticSearchActive = false;
-    searchCommandActive = false;
-    botUI.toggleElasticSearch(false);
+
+    if (botUI.getSettings().search) {
+      // Restart elastic search functions
+      elasticSearchActive = false;
+      searchCommandActive = false;
+      botUI.toggleSearchIcons(false);
+      botUI.toggleElasticSearch(false);
+      botUI.toggleLoader(false);
+    }
 
     if (state === "SLEEPING" || state === undefined) {
       run();
@@ -1339,6 +1333,8 @@ var createBot = (botUI, settings) => {
       }
     };
   }
+
+  bot.stop = stop;
 
   return bot;
 };
