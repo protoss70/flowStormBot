@@ -322,9 +322,9 @@ export const initFSClientBot = (initParams = {}) => {
     };
   }
   const botUI = initUI(settings);
-
+  var myBot;
   if (botUI) {
-    var myBot = createBot(botUI, settings);
+    myBot = createBot(botUI, settings);
     initBot();
     bot.stateHandler = stateHandler;
     bot.setInCallback = () => {
@@ -420,6 +420,7 @@ export const initFSClientBot = (initParams = {}) => {
       `Element with ID "${elementId}" was not found in DOM. Cannot initialize BOT UI. Use existing element with ID or remove elementId property from initialization.`
     );
   }
+
   return myBot;
 };
 

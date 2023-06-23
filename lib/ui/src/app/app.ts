@@ -120,7 +120,7 @@ const defaults: Settings = {
   suggestionMode: SuggestionMode.ALTERNATIVE,
   showTooltips: true, // show tooltips of control icons
   suggestions: {textColor: "#ffffff", backgroundColor: "#ffffff4d", hoverBackgroundColor: "#ffffff80",activeBackground: "#ffffffb3"},
-  triggerImage: `url("../assets/images/logo.svg")`
+  triggerImage: `url("https://svgshare.com/i/ubQ.svg")`
 };
 
 // global variables
@@ -1244,22 +1244,30 @@ class BotUI {
     );
 
   public setSuggestionColors = (_suggestion: {textColor:string, backgroundColor:string, hoverBackgroundColor?: string, activeBackground?: string}) => {
-    BotUI.element.style.setProperty(
-      "--bot-ui-suggestions-text-color",
-      `${BotUI.settings.suggestions.textColor}`
-    )
-    BotUI.element.style.setProperty(
-      "--bot-ui-suggestions-background-color",
-      `${BotUI.settings.suggestions.backgroundColor}`
-    )
-    BotUI.element.style.setProperty(
-      "--bot-ui-suggestions-hover-background",
-      `${BotUI.settings.suggestions.hoverBackgroundColor}`
-    )
-    BotUI.element.style.setProperty(
-      "--bot-ui-suggestions-alternative-background",
-      `${BotUI.settings.suggestions.activeBackground}`
-    )
+    if (_suggestion.textColor){
+      BotUI.element.style.setProperty(
+        "--bot-ui-suggestions-text-color",
+        `${_suggestion.textColor}`
+      )
+    }
+    if (_suggestion.backgroundColor){
+      BotUI.element.style.setProperty(
+        "--bot-ui-suggestions-background-color",
+        `${_suggestion.backgroundColor}`
+      )
+    }
+    if (_suggestion.hoverBackgroundColor){
+      BotUI.element.style.setProperty(
+        "--bot-ui-suggestions-hover-background",
+        `${_suggestion.hoverBackgroundColor}`
+      )
+    }
+    if (_suggestion.activeBackground){
+      BotUI.element.style.setProperty(
+        "--bot-ui-suggestions-alternative-background",
+        `${_suggestion.activeBackground}`
+      )
+    }
   }
 
   /**
