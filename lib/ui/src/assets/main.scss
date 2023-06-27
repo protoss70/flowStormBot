@@ -110,6 +110,26 @@ $amount: 20;
   min-width: 30vh;
 }
 
+[data-wrapper]{
+  & > .bot-warning-element{
+    z-index: 1;
+    background-color: rgb(255 193 7 / 79%);
+    padding: 10px 25px;
+    position: absolute;
+    overflow-wrap: break-word;
+    font-size: 12px;
+    font-weight: bold;
+    max-width: 80%;
+    border-radius: 9999px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 60px;
+    transition: opacity 0.5s ease-out;
+    &.removed{
+      opacity: 0;
+    }
+  }
+}
 
 
 @media only screen and (max-width: 1000px) {
@@ -130,7 +150,7 @@ $amount: 20;
     height: 100vh;
     padding: 0 !important;
     margin: 0 !important;
-    border-radius: 0 !important;
+    border-radius: 0 !important; 
   }
 
   [data-trigger] {
@@ -288,6 +308,7 @@ $amount: 20;
       min-width: calc(var(--bot-ui-chat-input-height) * 1.5);
 
       input[type="text"] {
+        padding-right: 100px;
         width: 100%;
         border-radius: 0.7rem;
         height: 100%;

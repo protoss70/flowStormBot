@@ -2,9 +2,11 @@ export interface Settings {
     animationSpeed?: number;
     backgroundAdvancedAnimationParticlesCount?: number;
     backgroundColor?: string;
+    backgroundSecondaryColor?: string;
     backgroundImage?: string;
     backgroundImageBlur?: number;
     backgroundSimpleAnimation?: boolean;
+    suggestions?: Suggestions;
     detectOrientation?: boolean;
     fullScreen?: boolean;
     customIcons?: boolean;
@@ -48,6 +50,11 @@ export interface Settings {
     search?: boolean;
     showTooltips?: boolean;
     suggestionMode?: SuggestionMode;
+    triggerImage?: string;
+    elasticSearchCharLimit?: {
+        limitOn: boolean,
+        charLimit: number
+    };
 }
 
 export enum SuggestionMode {
@@ -71,6 +78,13 @@ export interface AvatarStream {
 export enum AvatarTypeEnum {
     HLS = 'hls',
     WEBRTC = 'webrtc',
+}
+
+export interface Suggestions {
+    backgroundColor: string,
+    textColor: string,
+    hoverBackgroundColor?: string,
+    activeBackground?: string,
 }
 
 export enum ScreenTypeEnum {

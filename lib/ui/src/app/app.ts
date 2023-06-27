@@ -17,7 +17,7 @@ import is from "ramda/es/is"; // See if an object (i.e. val) is an instance of t
 import isEmpty from "ramda/es/isEmpty"; // Returns true if the given value is its type's empty value; false otherwise.
 import merge from "ramda/es/merge"; // Creates one new object with the own properties from a list of objects. If a key exists in more than one object, the value from the last object it exists in will be used.
 import times from "ramda/es/times"; // Calls an input function n times, returning an array containing the results of those function calls.
-import { forEach, head, type } from "ramda";
+import { forEach, head, remove, type } from "ramda";
 
 // Import custom assets
 import "../assets/main.scss";
@@ -120,7 +120,11 @@ const defaults: Settings = {
   suggestionMode: SuggestionMode.ALTERNATIVE,
   showTooltips: true, // show tooltips of control icons
   suggestions: {textColor: "#ffffff", backgroundColor: "#ffffff4d", hoverBackgroundColor: "#ffffff80",activeBackground: "#ffffffb3"},
-  triggerImage: `url("https://svgshare.com/i/ubQ.svg")`
+  triggerImage: `url("https://svgshare.com/i/ubQ.svg")`,
+  elasticSearchCharLimit: {
+    charLimit: 50,
+    limitOn: true
+  } // Limits how many characters can be used in elastic search
 };
 
 // global variables
@@ -741,6 +745,22 @@ class BotUI {
       };
     }
     BotUI.setBackground({});
+  }
+
+  public addWarning(text: string, timeLimit: number = 2500){
+    const warningElem = document.createElement("div");
+    warningElem.classList.add("bot-warning-element");
+    warningElem.textContent = text;
+    if (timeLimit){
+      async function removeWarning(){
+        warningElem.classList.add("removed");
+
+        setTimeout(() => {warningElem.remove()}, 500);
+      }
+      setTimeout(removeWarning, timeLimit);
+    }
+    BotUI.botWrapperElement.appendChild(warningElem);
+    return warningElem;
   }
 
   public toggleSearchIcons(on: boolean){

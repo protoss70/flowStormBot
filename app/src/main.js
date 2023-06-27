@@ -81,6 +81,10 @@ const botUIDefaultSettings = {
   search: true,
   goTo: true,
   suggestionMode: suggestionModes.STANDARD,
+  elasticSearchCharLimit: {
+    charLimit: 50,
+    limitOn: true
+  }
 };
 
 const clientDefaultSetting = {
@@ -1274,8 +1278,20 @@ var createBot = (botUI, settings) => {
 
   botUI.chatStopCallback = (inputValue) => stop();
 
-  botUI.chatTextInputElementCallback = (inputValue) => {
+  botUI.chatTextInputElementCallback = (e) => {
     const status = getStatus();
+    const settings = botUI.getSettings();
+    const search = settings.search;
+    const charLimitSetting = settings.elasticSearchCharLimit;
+
+    // limit the amount of char if limit is set
+    if (search && charLimitSetting.limitOn && elasticSearchActive){
+      if (e.target.value.length > charLimitSetting.charLimit){
+        botUI.addWarning("Character limit reached", 1300)
+        e.target.value = e.target.value.substring(0, charLimitSetting.charLimit);
+      }
+    }
+
     if (status === "LISTENING") {
       bot.closeAudioStream("User started typing", true);
     } else if (status === "RESPONDING") {
