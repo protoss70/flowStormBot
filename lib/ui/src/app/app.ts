@@ -1262,7 +1262,7 @@ class BotUI {
     return [leftIcon, rightIcon, bottomIndexContainer];
   }
 
-  public disableButtonGroup = (settings, callback, selector, findActiveIndex) => {
+  public disableButtonGroup = (settings, callback, findActiveIndex) => {
     BotUI.inputTakers.classList.remove("hidden");
     if (callback && findActiveIndex) {
       const activeIndex = findActiveIndex();
@@ -1270,7 +1270,7 @@ class BotUI {
     }
     if (settings.disableGroup) {
       document
-        .querySelectorAll(`[data-button-group=${selector}]`)
+        .querySelectorAll(`[data-button-group=INPUT]`)
         .forEach((elem) => {
           elem.setAttribute("disabled", "");
         });
@@ -1280,9 +1280,7 @@ class BotUI {
 
   public setButton = (settings: any = {}, callback: Function = () => {}) => {
     const messageElement = BotUI.messagesElement;
-    this.setInputMode(true);
     const button = document.createElement("button");
-    const selector = "buttons";
 
     function findActiveIndex(){
       if (settings.background.length > 1){
@@ -1362,10 +1360,16 @@ class BotUI {
 
     button.classList.add("inputButton", "chat-message", "chat-message-bot");
     button.setAttribute("data-message-type", "bot");
-    button.setAttribute("data-button-group", selector);
+    if (!settings.buttonType || settings.buttonType === "INPUT"){
+      this.setInputMode(true);
+      button.setAttribute("data-button-group", "INPUT");
+    }else{
+      button.setAttribute("data-button-group", settings.buttonType);
+    }
 
     button.onclick = () => {
-      this.disableButtonGroup(settings, callback, selector, findActiveIndex);
+
+      this.disableButtonGroup(settings, callback, findActiveIndex);
     };
 
     messageElement.appendChild(button);

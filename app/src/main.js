@@ -743,6 +743,27 @@ var createBot = (botUI, settings) => {
     }
   }
 
+  function handleButtonClick(activeIndex, button, type){
+    const index = activeIndex ? activeIndex : 0;
+    switch (type) {
+      case "URL":
+        window.open(button.action[index], '_blank').focus();
+        break;
+      case "INPUT":
+        if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
+          bot.handleOnTextInput(`#${button.action[index]}`, false, false);
+        }  
+        break;
+      default:
+        if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
+          bot.handleOnTextInput(`#${button.action[index]}`, false, false);
+        }  
+        break;
+      
+    }
+    buttonInput = false;
+  }
+
   defaultCallback.handleCommand = async (command, code, t) => {
     const payload = JSON.parse(code);
     console.log(payload);
@@ -776,34 +797,32 @@ var createBot = (botUI, settings) => {
         botUI.sendRTCData({ Walk: payload["action"] });
         break;
       case "#actions":
-        buttonInput = true;
         const imageDelay = payload.delay_between_images_ms; // Delay between each image displayed
+        const buttonType = payload.type;
+        if (buttonType === "INPUT" || !buttonType){
+          buttonInput = true
+        }
         for (const button of payload.tiles) {
           const settings = {
             groupName: payload.title,
             disableGroup: true,
             appSelect: payload.appSelect,
             solutions: payload.solutions,
+            buttonType,
             ...button,
           };
 
           exitButtonMode = (disableGroup = true) => {
             if (disableGroup) {
-              botUI.disableButtonGroup(settings, () => {}, "buttons");
+              botUI.disableButtonGroup(settings, () => {});
             } else {
               const newSettings = { ...settings };
               newSettings.disableGroup = undefined;
-              botUI.disableButtonGroup(newSettings, () => {}, "buttons");
+              botUI.disableButtonGroup(newSettings, () => {});
             }
           };
 
-          botUI.setButton(settings, (activeIndex) => {
-            if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
-              const index = activeIndex ? activeIndex : 0;
-              bot.handleOnTextInput(`#${button.action[index]}`, false, false);
-            }
-            buttonInput = false;
-          });
+          botUI.setButton(settings, (activeIndex) => {handleButtonClick(activeIndex, button, buttonType)});
           bot.audioInputCallback();
 
           if (imageDelay) {
