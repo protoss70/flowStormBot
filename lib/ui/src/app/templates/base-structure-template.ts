@@ -1,28 +1,35 @@
 export const baseStructureTemplate = `
     <div data-wrapper class="bot bot-wrapper">
+        <div data-header>
+            <h3 data-title>UPV</h3>
+            <div data-close class="icon-sop icon--close"></div>
+        </div>
         <div class="column column-image">
-            <div data-image class="image">
+            <div data-image class="image"></div>
             </div>
-        </div>
-        <div data-avatar class="column column-avatar">
-        </div>
-        <div data-messages class="column column-messages">
-        </div>
+            <div data-avatar class="column column-avatar">
+            </div>
+            <div data-messages class="column column-messages">
+            </div>
+            <div loader class="loader hidden">
+                <span loader-text class="loader-text">Loading...</span>
+            </div>
         <div data-chat-input class="chat-input">
             <div class="chat-input-wrapper">
-                <input type="text" id="chatWindowTextInput" placeholder="Type text..." autocomplete="off" class="text-input"/>
-                <span data-chat-input-settings class="settings settings--hidden">
-                    <span data-chat-input-microphone>
-                        <span data-chat-input-mic class="icon icon--blocked"></span>
-                    </span>
-                    <span data-chat-input-mute class="icon icon--volume-mute"></span>
-                </span>
-                <span data-chat-input-controls class="controls--visible">
-                    <span data-chat-input-play class="icon icon--play"></span>
-                    <span data-chat-input-stop class="icon icon--stop"></span>
-                </span>
-                <span data-chat-input-barge class="icon icon--mic"></span>
-                <span data-chat-input-menu class="icon icon--menu"></span>
+                <div data-input-takers>
+                    <div data-chat-ask class="ask-section">
+                        <div control-icons-wrapper class="control-icons-wrapper">
+                        <span data-chat-input-search class="icon left-icon icon--search"></span>
+                            <span data-chat-input-mic class="icon icon--mic"></span>
+                            <span data-chat-input-mute class="icon icon--volume-mute"></span>
+                            <span data-chat-input-restart class="icon icon--restart"></span>
+                        </div>
+                        <div data-text-input-wrap>
+                            <input type="text" id="chatWindowTextInput" placeholder="Type text..." autocomplete="off" class="text-input"/>
+                        </div>
+    
+                    </div>
+                </div>
             </div>
         </div>
         <div data-user-pcm class="pcm pcm-user bu-invisible"></div>
@@ -31,4 +38,5 @@ export const baseStructureTemplate = `
     </div>
     <div data-trigger></div>
 `;
+
 

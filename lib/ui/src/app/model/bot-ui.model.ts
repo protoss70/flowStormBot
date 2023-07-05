@@ -14,7 +14,6 @@ export interface Settings {
     micIcon?: string;
     pauseIcon?: string;
     playIcon?: string;
-    keyboardIcon?: string;
     muteIcon?: string;
     volumeIcon?: string;
     upSop?: string;
@@ -35,9 +34,7 @@ export interface Settings {
         height: string;
         width: string;
     };
-    inputMode?: string;
-    interactionMode?: string;
-    standardQuestionMode?: string;
+    buttonInput?: boolean;
     inputAudio?: boolean;
     outputAudio?: boolean;
     reverseAvatarOrder?: boolean;
