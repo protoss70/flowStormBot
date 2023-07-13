@@ -21,7 +21,7 @@ const scrollSpeed = 120; // pixels per second
 const scrollDelay = 3; // seconds before the scrolling starts
 
 const defaultURL = "5f7db5f1e662e830b20dbe7c";
-const environment = "-preview";
+const environment = "";
 let botKey =
   environment === "" || environment === "-preview"
     ? defaultURL
