@@ -550,7 +550,7 @@ class BotUI {
           el.classList.add("floorplan__zone--active");
           const activeZoneIndex = getZoneNumStr(el);
           console.log(+activeZoneIndex);
-
+          this.mapEventCallback(activeZoneIndex);
           bgZoneArr
             .find((zone) => zone.id.includes(activeZoneIndex))
             .classList.add("floorplan__bg-zone--active");
@@ -787,6 +787,11 @@ class BotUI {
         BotUI.textInput.classList.add("hidden");
       }
     }
+  }
+
+  // update the map UI acording to the activeIndex
+  public setMapIndex = (activeIndex) => {
+      
   }
 
   public toggleElasticSearch(on: boolean) {
@@ -1777,6 +1782,10 @@ class BotUI {
   public chatArrowCallback = (...value) => {};
 
   public chatMicrophoneCallback = (...value) => {};
+
+  public mapEventCallback = (index) => {
+    console.log(index);
+  }
 
   public closeElementCallback = () => {
     this.changeCollapsedMode();
