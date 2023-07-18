@@ -84,7 +84,9 @@ const botUIDefaultSettings = {
   elasticSearchCharLimit: {
     charLimit: 50,
     limitOn: true
-  }
+  },
+  cvutIcon: false,
+  suggestionsListView: false,
 };
 
 const clientDefaultSetting = {
@@ -841,9 +843,10 @@ var createBot = (botUI, settings) => {
           payload.nodes.forEach((node) => {
             suggestionText.push(node.text);
           });
-          botUI.setSuggestion(suggestionText, !botUI.isMobileDevice());
+          // Logic is if list view is not true, the default suggestion styles for mobile and web will be used
+          botUI.setSuggestion(suggestionText, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView);
         } else {
-          botUI.setSuggestion(payload.suggestions, !botUI.isMobileDevice());
+          botUI.setSuggestion(payload.suggestions, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView);
         }
         break;
       case "#media":

@@ -110,7 +110,10 @@ const defaults: Settings = {
   elasticSearchCharLimit: {
     charLimit: 50,
     limitOn: true
-  } // Limits how many characters can be used in elastic search
+  }, // Limits how many characters can be used in elastic search
+  coreURL: "", // Flowstorm server url. (not important for this library)
+  cvutIcon: true, // show cvut icon on the bottom left
+  suggestionsListView: false, // Set the suggestions either as list view (true) or as a single line (false)
 };
 
 // global variables
@@ -118,7 +121,6 @@ const fullScreenWidgetWidth = "100vw";
 const fullScreenWidgetHeight = "100vh";
 const minAnimationParticles = 0;
 const maxAnimationParticles = 20;
-const disabledChatHeight = "10px";
 const chatHeight = "80px";
 const disabledHeight = "0px";
 const avatarMaxHeightRatio = {
@@ -206,13 +208,12 @@ class BotUI {
   private static collapsableTriggerElement: HTMLElement;
   private static botWrapperElement: HTMLElement;
   private static textInput: HTMLElement;
-  private static controllerWrapper: HTMLElement;
   private static sopName: HTMLElement;
-  private static inputTakers: HTMLElement;
   private static loadingSpinner: HTMLElement;
   private static restartElement: HTMLElement;
   private static closeElement: HTMLElement;
   private static sopHeader: HTMLElement;
+  private static cvutIconElement: HTMLElement;
   private static controlIconsWrapper: HTMLElement;
 
   private static isChatEnabled: boolean = true;
@@ -340,12 +341,8 @@ class BotUI {
       "[data-chat-input-mic]"
     );
     BotUI.textInput = BotUI.element.querySelector("[data-text-input-wrap]");
-    BotUI.controllerWrapper = BotUI.element.querySelector(
-      "[data-chat-input-controllers]"
-    );
     BotUI.sopHeader = BotUI.element.querySelector("[data-header]");
     BotUI.sopName = BotUI.element.querySelector("[data-title]");
-    BotUI.inputTakers = BotUI.element.querySelector("[data-input-takers]");
     BotUI.loadingSpinner = BotUI.element.querySelector("[loader]");
     BotUI.restartElement = BotUI.element.querySelector(
       "[data-chat-input-restart]"
@@ -354,6 +351,12 @@ class BotUI {
     BotUI.controlIconsWrapper = BotUI.element.querySelector(
       "[control-icons-wrapper]"
     );
+
+    BotUI.cvutIconElement = BotUI.element.querySelector("[bot-logo]");
+
+    if (!this.getSettings().cvutIcon){
+      BotUI.cvutIconElement.classList.add("hidden");
+    }
 
     // Control collapsing of the bot window and triggering element
     if (!BotUI.settings.collapsed) {
@@ -385,7 +388,8 @@ class BotUI {
 
     // display app title in the bot window header
     this.setTitle(BotUI.settings.title);
-
+    
+    // set bot height according to mobile device screen
     if (this.isMobileDevice()) {
       let addressBarHeight = 100;
       function calculateAddressBarHeight() {
@@ -653,8 +657,9 @@ class BotUI {
 
   public setInputMode(mode: boolean = false) {
     BotUI.settings.buttonInput = mode;
+    // true means it is button input
     if (mode) {
-      BotUI.inputTakers.classList.add("hidden");
+      BotUI.controlIconsWrapper.classList.add("hidden");
     } else {
       this.removeOverlay();
       BotUI.chatElement.classList.remove("chat-input--hidden");
@@ -1263,7 +1268,7 @@ class BotUI {
   }
 
   public disableButtonGroup = (settings, callback, findActiveIndex) => {
-    BotUI.inputTakers.classList.remove("hidden");
+    BotUI.controlIconsWrapper.classList.remove("hidden");
     if (callback && findActiveIndex) {
       const activeIndex = findActiveIndex();
       callback(activeIndex);
@@ -1665,15 +1670,13 @@ class BotUI {
    */
   public setTextInputEnabled = (enabled = false) => {
     BotUI.settings.textInputEnabled = enabled;
-    let elementChatHeight = disabledHeight;
+    let elementChatHeight = chatHeight;
     this.setIconsForBackground(!enabled);
     if (enabled) {
       BotUI.element.setAttribute("data-with-chat-input", "");
-      elementChatHeight = chatHeight;
       BotUI.textInput.classList.remove("hidden");
     } else {
       BotUI.element.setAttribute("data-with-chat-input", "");
-      elementChatHeight = disabledChatHeight;
       BotUI.textInput.classList.add("hidden");
     }
     BotUI.element.style.setProperty(

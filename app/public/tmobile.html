@@ -44,14 +44,17 @@
 				title: "T-Mobile",
                 search: false,
                 suggestionMode: "non-disappearing",
-				controlIcons: {mic: true, mute: true, restart: true},
+				controlIcons: {mic: false, mute: true, restart: true},
                 backgroundColor:"#000000",
                 botMessageBackgroundColor: "#E30074",
                 userMessageTextColor: "#E30074",
                 userMessageBackgroundColor: "#FFFFFF",
                 backgroundSecondaryColor: "#000000",
                 triggerImage: `url(https://core.flowstorm.ai/file/assets/spaces/648ae13a8af625324045cf0d)`,
-                suggestions: {textColor: "#000000", backgroundColor: "#BFBFBF", hoverBackgroundColor: "#ffffff", activeBackground:"#ffffff"}
+                suggestions: {textColor: "#000000", backgroundColor: "#BFBFBF", hoverBackgroundColor: "#ffffff", activeBackground:"#ffffff"},
+				coreURL: "https://core.flowstorm.ai",
+				cvutIcon: true,
+				suggestionsListView: true,
 			};
 			
 			return initFSClientBot({

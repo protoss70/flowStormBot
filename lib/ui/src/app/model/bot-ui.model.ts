@@ -47,11 +47,14 @@ export interface Settings {
     search?: boolean;
     showTooltips?: boolean;
     suggestionMode?: SuggestionMode;
+    suggestionsListView?: boolean;
     triggerImage?: string;
     elasticSearchCharLimit?: {
         limitOn: boolean,
         charLimit: number
     };
+    coreURL?: string;
+    cvutIcon?: boolean;
 }
 
 export enum SuggestionMode {

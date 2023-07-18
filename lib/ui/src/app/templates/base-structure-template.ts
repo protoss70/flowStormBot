@@ -16,19 +16,17 @@ export const baseStructureTemplate = `
             </div>
         <div data-chat-input class="chat-input">
             <div class="chat-input-wrapper">
-                <div data-input-takers>
-                    <div data-chat-ask class="ask-section">
-                        <div control-icons-wrapper class="control-icons-wrapper">
-                        <span data-chat-input-search class="icon left-icon icon--search"></span>
-                            <span data-chat-input-mic class="icon icon--mic"></span>
-                            <span data-chat-input-mute class="icon icon--volume-mute"></span>
-                            <span data-chat-input-restart class="icon icon--restart"></span>
-                        </div>
-                        <div data-text-input-wrap>
-                            <input type="text" id="chatWindowTextInput" placeholder="Type text..." autocomplete="off" class="text-input"/>
-                        </div>
-    
-                    </div>
+                <div bot-logo class="bot-logo">
+                    <img src="https://core.flowstorm.ai/file/assets/spaces/64b51d6ef3a1040e23586edb"/>
+                </div>
+                <div control-icons-wrapper class="control-icons-wrapper">
+                    <span data-chat-input-search class="icon left-icon icon--search"></span>
+                    <span data-chat-input-mic class="icon icon--mic"></span>
+                    <span data-chat-input-mute class="icon icon--volume-mute"></span>
+                    <span data-chat-input-restart class="icon icon--restart"></span>
+                </div>
+                <div data-text-input-wrap>
+                    <input type="text" id="chatWindowTextInput" placeholder="Type text..." autocomplete="off" class="text-input"/>
                 </div>
             </div>
         </div>

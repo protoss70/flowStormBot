@@ -25,9 +25,10 @@
         interactionMode: "GUIDE",
         sound: false,
         title: "Bot UI",
-        controlIcons: { mic: true, mute: true, restart: true },
+        controlIcons: { mic: false, mute: true, restart: true },
         suggestions: {textColor: "#000000", backgroundColor: "#BFBFBF", hoverBackgroundColor: "#ffffff80", activeBackground: "#ffffffb3"},
-        triggerImage: `url(https://core.flowstorm.ai/file/assets/spaces/648ae13a8af625324045cf0d)`
+        triggerImage: `url(https://core.flowstorm.ai/file/assets/spaces/648ae13a8af625324045cf0d)`,
+        search: false,
       });
 
       // window.addEventListener("click", (e) =>{
@@ -87,7 +88,6 @@
       };
 
       // botUI.setControllIcons({ mic: true, mute: true, restart: true });
-      botUI.setTextInputEnabled(true);
       // botUI.setButton({background: ["https://core.flowstorm.ai/file/assets/spaces/646b4174a47a67009f645a05", "https://core.flowstorm.ai/file/assets/spaces/646b41ab81e688603583a2f2"]}, () => {})
     
     </script>
