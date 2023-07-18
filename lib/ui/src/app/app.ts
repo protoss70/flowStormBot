@@ -240,7 +240,6 @@ class BotUI {
   private static closeElement: HTMLElement;
   private static sopHeader: HTMLElement;
   private static controlIconsWrapper: HTMLElement;
-  private static floorplanElement: HTMLElement;
 
   private static isChatEnabled: boolean = true;
   private static isMicrophoneEnabled: boolean = true;
@@ -248,6 +247,10 @@ class BotUI {
   private static avatarWs: WebSocket;
   private static avatarConnection: RTCPeerConnection;
   private static avatarDataChannel: RTCDataChannel;
+
+  private static mapElement: HTMLElement;
+  private static mapZones: Element[];
+  private static mapNumbers: Element[];
 
   constructor(element: string, settings: Settings = defaults) {
     // Modify class static properties
@@ -411,7 +414,7 @@ class BotUI {
     BotUI.controlIconsWrapper = BotUI.element.querySelector(
       "[control-icons-wrapper]"
     );
-    BotUI.floorplanElement = BotUI.element.querySelector("[data-floorplan]");
+    BotUI.mapElement = BotUI.element.querySelector("[data-floorplan]");
 
     // Control collapsing of the bot window and triggering element
     if (!BotUI.settings.collapsed) {
@@ -523,51 +526,33 @@ class BotUI {
     BotUI.backgroundElement = BotUI.element.querySelector("[data-background]");
 
     // TEST set floorplan svg event listners
-    if (BotUI.floorplanElement) {
-      console.log("-----test listeners for floorplan events here-----------");
+    if (BotUI.mapElement) {
       const svg = BotUI.element.querySelector("#floorplanSvg");
-      const bgZoneEls = svg.querySelectorAll(".floorplan__bg-zone");
-      const bgZoneArr = Array.from(bgZoneEls);
-      const numZoneEls = svg.querySelectorAll(".floorplan__zone");
-      const numZoneArr = Array.from(numZoneEls);
-
-      const removeActiveClass = () => {
-        numZoneArr.forEach((el) => {
-          el.classList.remove("floorplan__zone--active");
-        });
-        bgZoneArr.forEach((el) => {
-          el.classList.remove("floorplan__bg-zone--active");
-        });
-      };
+      BotUI.mapZones = Array.from(svg.querySelectorAll(".floorplan__bg-zone"));
+      BotUI.mapNumbers = Array.from(svg.querySelectorAll(".floorplan__zone"));
 
       const getZoneNumStr = (el) => {
         return el.id.slice(el.id.indexOf("_") + 1, el.id.indexOf("-"));
       };
 
-      numZoneArr.forEach((el) => {
+      BotUI.mapNumbers.forEach((el) => {
         el.addEventListener("click", () => {
-          removeActiveClass();
-          el.classList.add("floorplan__zone--active");
           const activeZoneIndex = getZoneNumStr(el);
-          console.log(+activeZoneIndex);
-          this.mapEventCallback(activeZoneIndex);
-          bgZoneArr
-            .find((zone) => zone.id.includes(activeZoneIndex))
-            .classList.add("floorplan__bg-zone--active");
+          this.mapEventCallback(+activeZoneIndex);
         });
       });
 
-      numZoneArr.forEach((el) => {
+      BotUI.mapNumbers.forEach((el) => {
         const hoverZoneIndex = getZoneNumStr(el);
 
         el.addEventListener("mouseover", () => {
-          bgZoneArr
+          BotUI.mapZones
             .find((zone) => zone.id.includes(hoverZoneIndex))
             .classList.add("floorplan__bg-zone--hover");
         });
 
         el.addEventListener("mouseout", () => {
-          bgZoneArr
+          BotUI.mapZones
             .find((zone) => zone.id.includes(hoverZoneIndex))
             .classList.remove("floorplan__bg-zone--hover");
         });
@@ -791,8 +776,35 @@ class BotUI {
 
   // update the map UI acording to the activeIndex
   public setMapIndex = (activeIndex) => {
-      
-  }
+    // 1. remove previos active zone
+    this.removeMapActiveClass();
+    // 2. add new active zone
+    this.addMapActiveClass(activeIndex);
+  };
+
+  private removeMapActiveClass = () => {
+    const entranceActiveEl = document.querySelector(
+      ".floorplan__entrance--active"
+    );
+    if (entranceActiveEl)
+      entranceActiveEl.classList.remove("floorplan__entrance--active");
+
+    BotUI.mapNumbers.forEach((el) => {
+      el.classList.remove("floorplan__zone--active");
+    });
+    BotUI.mapZones.forEach((el) => {
+      el.classList.remove("floorplan__bg-zone--active");
+    });
+  };
+
+  private addMapActiveClass = (index) => {
+    BotUI.mapNumbers
+      .find((num) => num.id.includes(index))
+      .classList.add("floorplan__zone--active");
+    BotUI.mapZones
+      .find((zone) => zone.id.includes(index))
+      .classList.add("floorplan__bg-zone--active");
+  };
 
   public toggleElasticSearch(on: boolean) {
     this.elasticSearchOn = on;
@@ -1785,7 +1797,8 @@ class BotUI {
 
   public mapEventCallback = (index) => {
     console.log(index);
-  }
+    // this.setMapIndex(index); // call this to update map UI after getting response from flowstorm
+  };
 
   public closeElementCallback = () => {
     this.changeCollapsedMode();
@@ -2274,10 +2287,10 @@ class BotUI {
     );
 
     // handle height if floorplan is enabled
-    if (BotUI.floorplanElement) {
+    if (BotUI.mapElement) {
       const adjustHeight = () => {
         const { height: floorplanHeight } =
-          BotUI.floorplanElement.getBoundingClientRect();
+          BotUI.mapElement.getBoundingClientRect();
 
         BotUI.element.style.setProperty(
           "--bot-ui-floorplan-height",
@@ -2288,8 +2301,7 @@ class BotUI {
           BotUI.scrollToLastMessage(BotUI.messagesElement);
       };
 
-      const floorplanImg =
-        BotUI.floorplanElement.querySelector(".floorplan__img");
+      const floorplanImg = BotUI.mapElement.querySelector(".floorplan__img");
 
       if (floorplanImg) {
         floorplanImg.addEventListener("load", adjustHeight); // img takes to load - only after that height can be adjusted properly as only img width is set

@@ -2007,6 +2007,15 @@ canvas {
     }
   }
 
+  &__entrance {
+    fill: #074794;
+    transition: all 0.2s;
+
+    &--active {
+      fill: #e05206;
+    }
+  }
+
   &__num {
     position: relative;
     transform-origin: center;

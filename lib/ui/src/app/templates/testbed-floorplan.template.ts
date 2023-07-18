@@ -2120,12 +2120,11 @@ export const testbedFloorplan = html`
         />
       </g>
 
-      <g id="_00-num" class="floorplan__zone">
-        <g class="floorplan__num">
+      <g id="_00-num" class="floorplan__entrance floorplan__entrance--active">
+        <g class="floorplan__arrow">
           <path
             id="entrance"
             d="M13.422,97.317l-0,-6.269l10.559,0l-3.135,-3.134l6.269,0l6.269,6.269l-6.269,6.268l-6.269,0l3.135,-3.134l-10.559,-0Z"
-            class="floorplan__num--circle"
           />
         </g>
       </g>
