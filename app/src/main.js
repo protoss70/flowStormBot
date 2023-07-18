@@ -34,7 +34,7 @@ let defaultCoreUrl =
   environment === "local"
     ? "http://localhost:8080"
     : `https://core${environment}.flowstorm.ai`;
-let development = true;
+let development = false;
 
 let idToken = undefined;
 let accessToken = undefined;
@@ -353,24 +353,6 @@ export const initFSClientBot = (initParams = {}) => {
           restart: document.getElementById("restart").checked,
         });
       }
-
-      function setTextEnabled() {
-        const textInputEnabled = document.getElementById("textInput").checked;
-        botUI.setTextInputEnabled(textInputEnabled);
-      }
-
-      document.getElementById("mute").addEventListener("change", () => {
-        setControlIconsMain();
-      });
-      document.getElementById("mic").addEventListener("change", () => {
-        setControlIconsMain();
-      });
-      document.getElementById("restart").addEventListener("change", () => {
-        setControlIconsMain();
-      });
-      document.getElementById("textInput").addEventListener("change", () => {
-        setTextEnabled();
-      });
 
       setPreviewCustomizations(botUI);
       const url = new URL(window.location.href);
@@ -730,6 +712,19 @@ var createBot = (botUI, settings) => {
     }
   }
 
+  function setBackAndNextIndex(index){
+    if (index < 13){
+      setAttribute("nextIndex", index + 1);
+    }else{
+      setAttribute("nextIndex", 13)
+    }
+    if (index > 1){
+      setAttribute("backIndex", index -1)
+    }else{
+      setAttribute("backIndex", 1)
+    }
+  }
+
   defaultCallback.handleCommand = (command, code, t) => {
     const payload = JSON.parse(code);
     console.log(payload);
@@ -834,6 +829,10 @@ var createBot = (botUI, settings) => {
         break;
       case "#loadingOff":
         botUI.toggleLoader(false);
+        break;
+      case "#mapIndex":
+        botUI.setMapIndex(payload.index);
+        setBackAndNextIndex(payload.index);
         break;
       default:
         break;
@@ -1028,6 +1027,11 @@ var createBot = (botUI, settings) => {
     }
   };
 
+  botUI.mapEventCallback = (index) => {
+    bot.handleOnTextInput(index.toString(), false);
+    setBackAndNextIndex(index);
+  }
+
   botUI.collapseCallback = (collapsed) => {
     paused = !paused;
     run();
@@ -1061,10 +1065,12 @@ var createBot = (botUI, settings) => {
     botUI.removeAllMessages();
     botUI.removeSuggestions();
     botUI.toggleLoader(false);
-    botUI.toggleSearchIcons(false);
-    elasticSearchActive = false;
-    searchCommandActive = false;
-    botUI.toggleElasticSearch(false);
+    if (botUI.getSettings().search){
+      botUI.toggleSearchIcons(false);
+      elasticSearchActive = false;
+      searchCommandActive = false;
+      botUI.toggleElasticSearch(false);
+    }
 
     if (state === "SLEEPING" || state === undefined) {
       run();
@@ -1214,7 +1220,7 @@ var createBot = (botUI, settings) => {
   };
 
   bot = Bot(
-    settings.coreUrl,
+    "https://core.flowstorm.ai",
     deviceId, // sender
     settings.autoStart, // autostart
     clientCallback,
