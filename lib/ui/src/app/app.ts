@@ -797,13 +797,17 @@ class BotUI {
     });
   };
 
-  private addMapActiveClass = (index) => {
+  private addMapActiveClass = (index: number) => {
+    const indexStr = index < 10 ? `0${index.toString()}` : index.toString();
+
     BotUI.mapNumbers
-      .find((num) => num.id.includes(index))
+      .find((num) => num.id.includes(indexStr))
       .classList.add("floorplan__zone--active");
+    
     BotUI.mapZones
-      .find((zone) => zone.id.includes(index))
+      .find((zone) => zone.id.includes(indexStr))
       .classList.add("floorplan__bg-zone--active");
+
   };
 
   public toggleElasticSearch(on: boolean) {
