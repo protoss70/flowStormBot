@@ -98,7 +98,7 @@ const clientDefaultSetting = {
   jwtToken: null,
   attributes: {},
   callback: {},
-  coreUrl: defaultCoreUrl,
+  coreURL: defaultCoreUrl,
   autoStart: false,
   ttsFileType: "mp3",
 };
@@ -115,19 +115,20 @@ let dialogueIDs = [];
 var exitButtonMode = () => {};
 
 export const initFSClientBot = (initParams = {}) => {
-  Sentry.init({
-    dsn: "https://da1caa885aee4032898d553d1129571b@o318069.ingest.sentry.io/5438705",
-    integrations: [new Integrations.BrowserTracing()],
-    tracesSampleRate: 1.0,
-    environment,
-  });
-
+  
   const urlParams = new URLSearchParams(window.location.search);
   let settings = {
     ...clientDefaultSetting,
     ...botUIDefaultSettings,
     ...initParams,
   };
+
+  Sentry.init({
+    dsn: "https://da1caa885aee4032898d553d1129571b@o318069.ingest.sentry.io/5438705",
+    integrations: [new Integrations.BrowserTracing()],
+    tracesSampleRate: 1.0,
+    environment,
+  });
   const { allowUrlParams, startMessage } = settings;
   botKey = settings.botKey;
   textInputEnabled = settings.textInputEnabled;
@@ -689,6 +690,47 @@ var createBot = (botUI, settings) => {
     }
     return { title, secondary };
   }
+
+  function findSubTags(inputString) {
+    const openingTagRegex = /<sub[^>]*>/g;
+    const closingTagRegex = /<\/sub>/g;
+  
+    const openingTags = [];
+    let openingTagMatch;
+    while ((openingTagMatch = openingTagRegex.exec(inputString)) !== null) {
+      openingTags.push({ tag: openingTagMatch[0], index: openingTagMatch.index });
+    }
+  
+    const closingTags = [];
+    let closingTagMatch;
+    while ((closingTagMatch = closingTagRegex.exec(inputString)) !== null) {
+      closingTags.push({ tag: closingTagMatch[0], index: closingTagMatch.index });
+    }
+  
+    return { openingTags, closingTags };
+  }
+
+  function limitSearchResult(inputString){
+    const charLimit = 800;
+    if (inputString.length <= charLimit){
+      return inputString;
+    }
+
+    const {openingTags, closingTags} = findSubTags(inputString);
+    for (let index = 0; index < openingTags.length; index++) {
+      const opening = openingTags[index];
+      const closing = closingTags[index];
+      if (opening.index > charLimit){
+        break;
+      }else if(opening.index <= charLimit && closing.index > charLimit){
+        inputString = inputString.substring(0, opening.index);
+        break;
+      }
+    }
+
+    return inputString.substring(0, charLimit);
+  }
+
   async function handleFlowstormApiCall(results) {
     if (results === undefined) {
       //SERVER ERROR
@@ -701,10 +743,9 @@ var createBot = (botUI, settings) => {
     } else {
       //SUCCESS
       if (results.result[0].meta.answer) {
-        const FaqAnswerLimit = 400;
         setAttribute(
           "FAQ_Answer",
-          results.result[0].meta.answer.substring(0, FaqAnswerLimit)
+          limitSearchResult(results.result[0].meta.answer)
         );
         bot.handleOnTextInput(`FAQ`, false, false);
       } else {
@@ -1259,9 +1300,9 @@ var createBot = (botUI, settings) => {
     ...defaultCallback,
     ...settings.callback,
   };
-
+  console.log("core", settings.coreURL)
   bot = Bot(
-    settings.coreUrl,
+    settings.coreURL,
     deviceId, // sender
     settings.autoStart, // autostart
     clientCallback,
