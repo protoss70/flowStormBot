@@ -43,7 +43,6 @@ let termsId = undefined;
 const converter = new Converter();
 var botInitializer = new BotInitializer();
 var buttonInput = false;
-var talkMode = "PUSH";
 var elasticSearchActive = false; // this is true when the actual query for the elastic search is being entered
 var searchCommandActive = false; // this is true when the #search command is called
 let generatodEmbedLines = {};
@@ -347,12 +346,10 @@ export const initFSClientBot = (initParams = {}) => {
     };
 
     bot.audioInputCallback = () => {
-      if (talkMode === "PUSH") {
-        if (settings.inputAudio) {
-          settings.inputAudio = false;
-          bot.setInAudio(settings.inputAudio, getStatus());
-          botUI.removeOverlay();
-        }
+      if (settings.inputAudio) {
+        settings.inputAudio = false;
+        bot.setInAudio(settings.inputAudio, getStatus());
+        botUI.removeOverlay();
       }
     };
 
@@ -747,7 +744,7 @@ var createBot = (botUI, settings) => {
           "FAQ_Answer",
           limitSearchResult(results.result[0].meta.answer)
         );
-        bot.handleOnTextInput(`FAQ`, false, false);
+        bot.handleOnTextInput(`SUCCESS`, false, false);
       } else {
         bot.handleOnTextInput(`NOT_FAQ`, false, false);
         results.result.forEach((result) => {
@@ -760,29 +757,6 @@ var createBot = (botUI, settings) => {
           );
         });
       }
-    }
-  }
-
-  async function handleClientApiCall(url) {
-    const results = (await bot.getFiles(query, url)).data;
-    botUI.toggleLoader(false);
-    if (results === undefined) {
-      //SERVER ERROR
-      bot.handleOnTextInput(`ERROR`, false, false);
-      bot.audioInputCallback();
-    } else if (results.result.length === 0) {
-      //NO PDF FILES FOUND
-      bot.handleOnTextInput(`NO_SOLUTION`, false, false);
-      bot.audioInputCallback();
-    } else {
-      //SUCCESS
-      results.result.forEach((result) => {
-        const { title, secondary } = titleAndContext(
-          result.meta.backup,
-          result.meta.backup.cnt
-        );
-        botUI.setSnippet(result.meta.pagelink, title, secondary);
-      });
     }
   }
 
@@ -912,7 +886,7 @@ var createBot = (botUI, settings) => {
       case "#enterSearch":
         elasticSearchActive = true;
         botUI.toggleSearchIcons(true);
-        botUI.setSuggestion([payload.endText], !botUI.isMobileDevice());
+        botUI.removeSuggestions();
         break;
       case "#exitSearch":
         elasticSearchActive = false;
@@ -1129,6 +1103,7 @@ var createBot = (botUI, settings) => {
   };
 
   botUI.chatRestartCallback = () => {
+    console.log("here");
     const state = getStatus();
     botUI.removeSuggestions();
 
@@ -1300,7 +1275,7 @@ var createBot = (botUI, settings) => {
     ...defaultCallback,
     ...settings.callback,
   };
-  console.log("core", settings.coreURL)
+
   bot = Bot(
     settings.coreURL,
     deviceId, // sender
