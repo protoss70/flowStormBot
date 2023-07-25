@@ -729,33 +729,29 @@ var createBot = (botUI, settings) => {
   }
 
   async function handleFlowstormApiCall(results) {
+    console.log("results", results);
     if (results === undefined) {
       //SERVER ERROR
       bot.handleOnTextInput(`ERROR`, false, false);
       bot.audioInputCallback();
-    } else if (results.result.length === 0) {
+    } else if ((results.result && results.result.length === 0) && !results.answer) {
       //NO PDF FILES FOUND
       bot.handleOnTextInput(`NO_SOLUTION`, false, false);
       bot.audioInputCallback();
     } else {
       //SUCCESS
-      if (results.result[0].meta.answer) {
+      if (results.result && results.result[0].meta.answer) {
         setAttribute(
           "FAQ_Answer",
           limitSearchResult(results.result[0].meta.answer)
         );
         bot.handleOnTextInput(`SUCCESS`, false, false);
-      } else {
-        bot.handleOnTextInput(`NOT_FAQ`, false, false);
-        results.result.forEach((result) => {
-          const title = result.meta.name.replaceAll("-", " ");
-          const secondary = result.meta.snipet;
-          botUI.setSnippet(
-            result.meta.pagelink + "#" + result.meta.page_id,
-            title,
-            secondary
-          );
-        });
+      } else{
+        setAttribute(
+          "FAQ_Answer",
+          limitSearchResult(results.answer)
+        );
+        bot.handleOnTextInput(`SUCCESS`, false, false);
       }
     }
   }

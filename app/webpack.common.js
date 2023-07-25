@@ -17,6 +17,14 @@ const upvPlugin = new HtmlWebPackPlugin({
   chunks: ["app"],
 });
 
+const porschePlugin = new HtmlWebPackPlugin({
+  template: "./public/porsche.html",
+  filename: "./porsche.html",
+  // scriptLoading: 'defer'
+  inject: "head",
+  chunks: ["app"],
+});
+
 const tMobilePlugin = new HtmlWebPackPlugin({
   template: "./public/tmobile.html",
   filename: "./tmobile.html",
@@ -78,5 +86,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [htmlPlugin, upvPlugin, tMobilePlugin],
+  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin],
 };

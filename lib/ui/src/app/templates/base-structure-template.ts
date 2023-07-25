@@ -11,6 +11,8 @@ export const baseStructureTemplate = `
             </div>
             <div data-messages class="column column-messages">
             </div>
+            <div data-pdf-viewer class="hidden" id="data-pdf-viewer">
+            </div>
             <div loader class="loader hidden">
                 <span loader-text class="loader-text">Loading...</span>
             </div>
@@ -24,6 +26,9 @@ export const baseStructureTemplate = `
                     <span data-chat-input-mic class="icon icon--mic"></span>
                     <span data-chat-input-mute class="icon icon--volume-mute"></span>
                     <span data-chat-input-restart class="icon icon--restart"></span>
+                </div>
+                <div pdf-controls class="hidden">
+                    <button pdf-controls-close>Close</button>
                 </div>
                 <div data-text-input-wrap>
                     <input type="text" id="chatWindowTextInput" placeholder="Type text..." autocomplete="off" class="text-input"/>

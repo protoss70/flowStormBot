@@ -86,10 +86,17 @@
       botUI.chatTextInputElementCallback = (e) => {
         console.log(`User typed text ${e.data}`);
       };
-
-      // botUI.setControllIcons({ mic: true, mute: true, restart: true });
-      // botUI.setButton({background: ["https://core.flowstorm.ai/file/assets/spaces/646b4174a47a67009f645a05", "https://core.flowstorm.ai/file/assets/spaces/646b41ab81e688603583a2f2"]}, () => {})
-    
+      
+      document.addEventListener("keydown", (event) => {
+        if (event.keyCode === 66) {
+          botUI.setPDFMode(true);
+          botUI.setPDF("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 88);
+        }
+        if (event.keyCode === 86){
+          botUI.setPDFMode(true);
+          botUI.setPDF("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 1);
+        }
+      })
     </script>
   </body>
 </html>

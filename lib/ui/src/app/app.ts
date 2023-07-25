@@ -17,7 +17,8 @@ import is from "ramda/es/is"; // See if an object (i.e. val) is an instance of t
 import isEmpty from "ramda/es/isEmpty"; // Returns true if the given value is its type's empty value; false otherwise.
 import merge from "ramda/es/merge"; // Creates one new object with the own properties from a list of objects. If a key exists in more than one object, the value from the last object it exists in will be used.
 import times from "ramda/es/times"; // Calls an input function n times, returning an array containing the results of those function calls.
-import { forEach, head, remove, type } from "ramda";
+import { forEach, head, remove, type, view } from "ramda";
+import PDFObject  from "pdfobject"
 
 // Import custom assets
 import "../assets/main.scss";
@@ -204,6 +205,8 @@ class BotUI {
   private static searchElement: HTMLElement;
   private static chatInputBargeElement: HTMLElement;
   private static chatInputPlayElement: HTMLElement;
+  private static pdfViewerElement: HTMLElement;
+  private static pdfControllers: HTMLElement;
   private static chatInputMicElement: HTMLElement;
   private static collapsableTriggerElement: HTMLElement;
   private static botWrapperElement: HTMLElement;
@@ -211,6 +214,7 @@ class BotUI {
   private static sopName: HTMLElement;
   private static loadingSpinner: HTMLElement;
   private static restartElement: HTMLElement;
+  private static pdfControlsClose: HTMLElement;
   private static closeElement: HTMLElement;
   private static sopHeader: HTMLElement;
   private static cvutIconElement: HTMLElement;
@@ -334,6 +338,10 @@ class BotUI {
     BotUI.chatInputPlayElement = BotUI.element.querySelector(
       "[data-chat-input-play]"
     );
+
+    BotUI.pdfViewerElement = BotUI.element.querySelector("[data-pdf-viewer]");
+    BotUI.pdfControlsClose = BotUI.element.querySelector("[pdf-controls-close]");
+    BotUI.pdfControllers = BotUI.element.querySelector("[pdf-controls]");
     BotUI.collapsableTriggerElement =
       BotUI.element.querySelector("[data-trigger]");
     BotUI.botWrapperElement = BotUI.element.querySelector("[data-wrapper]");
@@ -538,9 +546,12 @@ class BotUI {
     BotUI.chatInputMicElement.onclick = (e) => {
       this.chatMicCallback();
     };
-
     BotUI.closeElement.onclick = (e) => {
       this.closeElementCallback();
+    };
+
+    BotUI.pdfControlsClose.onclick = (e) => {
+      this.closePDFCallback();
     };
     
     BotUI.setBackground({});
@@ -591,6 +602,29 @@ class BotUI {
       theme: "light",
       arrow: false,
     });
+  }
+
+  public setPDFMode(on: boolean){
+    if (on){
+      BotUI.messagesElement.classList.add("hidden");
+      BotUI.controlIconsWrapper.classList.add("hidden");
+      BotUI.pdfViewerElement.classList.remove("hidden");
+      BotUI.pdfControllers.classList.remove("hidden");
+    }
+    else{
+      BotUI.messagesElement.classList.remove("hidden");
+      BotUI.controlIconsWrapper.classList.remove("hidden");
+      BotUI.pdfViewerElement.classList.add("hidden");
+      BotUI.pdfControllers.classList.add("hidden");
+    }
+  }
+
+  public setPDF(url, page=1, zoom=150){
+    const options = {
+
+      pdfOpenParams: { view: 'FitV', page , zoom}
+    };
+    PDFObject.embed(url, "#data-pdf-viewer", options)
   }
 
   public setInputIconTooltips() {
@@ -1506,6 +1540,10 @@ class BotUI {
   public closeElementCallback = () => {
     this.changeCollapsedMode();
   };
+
+  public closePDFCallback = (...value) => {
+    this.setPDFMode(false);
+  } 
 
   public feedbackCallback = (...value) => {};
 

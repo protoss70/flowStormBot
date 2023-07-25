@@ -97,6 +97,7 @@ $amount: 20;
   }
 }
 
+
 [data-with-chat-input]:not([data-collapsable="collapsed"]) {
   max-height: 80vh;
   max-width: 90vw;
@@ -592,6 +593,17 @@ $amount: 20;
       }
     }
   }
+}
+
+[data-pdf-viewer]#data-pdf-viewer{
+  &.hidden{
+    display: none;
+  }
+  z-index: 1;
+  height: calc(
+          100% - var(--bot-ui-chat-input-height) - var(--bot-ui-avatar-height) -
+            var(--bot-ui-sop-name-height)
+  );
 }
 
 [data-gui-mode="chat"] {
@@ -1336,39 +1348,6 @@ canvas {
   z-index: 1;
 }
 
-[data-chat-pdf] {
-  height: 100%;
-}
-
-[data-pdf-controls] {
-  &.hidden {
-    display: none;
-  }
-  display: flex;
-  height: 100%;
-  gap: 5px;
-  justify-content: center;
-  align-items: center;
-  & > button {
-    font-size: 24px;
-    height: 50%;
-  }
-  & > .pageControllers {
-    font-size: 24px;
-    height: 50%;
-    & > input {
-      font-size: 24px;
-      width: 60px;
-      height: 100%;
-    }
-
-    & > span {
-      font-weight: bold;
-      color: white;
-    }
-  }
-}
-
 [bot-logo].bot-logo{
   &.hidden{
     display: none;
@@ -1402,47 +1381,31 @@ canvas {
   }
 }
 
-/* TODO implement tooltips */
-//.tooltip {
-//	position: relative;
-//	display: inline-block;
-//
-//	.tooltiptext {
-//		font-family: "Century Gothic", sans-serif;
-//		font-size: 1rem;
-//		visibility: hidden;
-//		width: 100px;
-//		background-color: black;
-//		color: #fff;
-//		text-align: center;
-//		border-radius: 6px;
-//		padding: 5px 5px;
-//
-//		/* Position the tooltip */
-//		position: absolute;
-//		z-index: 1;
-//		bottom: 150%;
-//		left: 50%;
-//		margin-left: -50px; /* Use half of the width (120/2 = 60), to center the tooltip */
-//
-//		&::after {
-//			content: " ";
-//			position: absolute;
-//			top: 100%; /* At the bottom of the tooltip */
-//			left: 50%;
-//			margin-left: -5px;
-//			border-width: 5px;
-//			border-style: solid;
-//			border-color: black transparent transparent transparent;
-//		}
-//	}
-//
-//	&:hover {
-//		.tooltiptext {
-//			visibility: visible;
-//		}
-//	}
-//}
+[control-icons-wrapper].hidden{
+  display: none;
+}
+
+[pdf-controls]{
+  &.hidden{
+    display: none;
+  }
+  & > button{
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    height: 30px;
+    font-weight: bold;
+    width: 60px;
+    transform: translateY(-50%);
+    border-radius: 5px;
+    font-size: 18px;
+    line-height: 30px;
+
+    &:hover{
+      cursor: pointer;
+    }
+  }
+}
 
 .background {
   width: 100%;
