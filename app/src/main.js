@@ -767,6 +767,14 @@ var createBot = (botUI, settings) => {
           bot.handleOnTextInput(`#${button.action[index]}`, false, false);
         }  
         break;
+      case "PDF":
+        if (botUI.getSettings().pdfID){
+          botUI.setPDF(button.action[0] + "#zoom=scale", button.page, 200, botUI.getSettings().pdfID);
+        }else{
+          botUI.setPDF(button.action[0] + "#zoom=scale", button.page, 200);
+          botUI.setPDFMode(true);
+        }
+        break;
       default:
         if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
           bot.handleOnTextInput(`#${button.action[index]}`, false, false);
@@ -824,7 +832,11 @@ var createBot = (botUI, settings) => {
             buttonType,
             ...button,
           };
-
+        
+          if (buttonType === "PDF" && botUI.getSettings().pdfID){
+            botUI.setPDF(button.action[0] + "#zoom=scale", button.page, 200, botUI.getSettings().pdfID);
+            break;
+          }
           exitButtonMode = (disableGroup = true) => {
             if (disableGroup) {
               botUI.disableButtonGroup(settings, () => {});

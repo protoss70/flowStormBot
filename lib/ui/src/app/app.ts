@@ -619,12 +619,12 @@ class BotUI {
     }
   }
 
-  public setPDF(url, page=1, zoom=150){
+  public setPDF(url, page=1, zoom=150, id="#data-pdf-viewer"){
     const options = {
 
       pdfOpenParams: { view: 'FitV', page , zoom}
     };
-    PDFObject.embed(url, "#data-pdf-viewer", options)
+    PDFObject.embed(url, id, options)
   }
 
   public setInputIconTooltips() {
@@ -1322,7 +1322,7 @@ class BotUI {
     const button = document.createElement("button");
 
     function findActiveIndex(){
-      if (settings.background.length > 1){
+      if (settings.background && settings.background.length > 1){
         const carouselParent = button.getElementsByClassName("carouselBottomIndexContainer")[0];
         var activeIndex = 0;
         for (let index = 0; index < carouselParent.children.length; index++) {

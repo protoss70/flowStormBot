@@ -25,6 +25,14 @@ const porschePlugin = new HtmlWebPackPlugin({
   chunks: ["app"],
 });
 
+const pdfPlugin = new HtmlWebPackPlugin({
+  template: "./public/pdf.html",
+  filename: "./pdf.html",
+  // scriptLoading: 'defer'
+  inject: "head",
+  chunks: ["app"],
+});
+
 const tMobilePlugin = new HtmlWebPackPlugin({
   template: "./public/tmobile.html",
   filename: "./tmobile.html",
@@ -86,5 +94,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin],
+  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin],
 };
