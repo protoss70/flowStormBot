@@ -1,6 +1,6 @@
 {
   "name": "@flowstorm/bot-ui",
-  "version": "2.7.5",
+  "version": "2.3335.5",
   "main": "app.bundle.js",
   "author": "PromethistAI",
   "license": "MIT",
@@ -22,7 +22,7 @@
     "clean-webpack-plugin": "^3.0.0",
     "copy-pkg-json-webpack-plugin": "^0.0.39",
     "css-loader": "^4.3.0",
-    "file-loader": "^6.1.0",
+    "file-loader": "^6.2.0",
     "html-webpack-inject-attributes-plugin": "1.0.6",
     "html-webpack-plugin": "^4.4.1",
     "mini-css-extract-plugin": "^0.11.1",
@@ -47,6 +47,7 @@
     "core-js": "3.6.5",
     "fast-average-color": "6.3.0",
     "hls.js": "0.14.17",
+    "pdfobject": "^2.2.12",
     "ramda": "0.27.1",
     "showdown": "^2.1.0",
     "tippy.js": "^6.3.7"
