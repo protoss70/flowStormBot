@@ -19,6 +19,7 @@ import merge from "ramda/es/merge"; // Creates one new object with the own prope
 import times from "ramda/es/times"; // Calls an input function n times, returning an array containing the results of those function calls.
 import { forEach, head, remove, type, view } from "ramda";
 import PDFObject  from "pdfobject"
+import * as pdfjsLib from "pdfjs-dist";
 
 // Import custom assets
 import "../assets/main.scss";
@@ -603,6 +604,54 @@ class BotUI {
       arrow: false,
     });
   }
+
+  public PDFStart = (nameRoute, numPage, id="#data-pdf-viewer") => {           
+    let loadingTask = pdfjsLib.getDocument(nameRoute),
+        pdfDoc = null,
+        canvas = document.querySelector(id) as HTMLCanvasElement,
+        ctx = canvas.getContext('2d'),
+        scale = 1.5
+
+        const GeneratePDF = numPage => {
+
+            pdfDoc.getPage(numPage).then(page => {
+
+                let viewport = page.getViewport({ scale: scale });
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                
+                let renderContext = {
+                    canvasContext : ctx,
+                    viewport:  viewport
+                }
+
+                page.render(renderContext);
+            })
+
+        }
+
+        const PrevPage = () => {
+            if(numPage === 1){
+                return
+            }
+            numPage--;
+            GeneratePDF(numPage);
+        }
+
+        const NextPage = () => {
+            if(numPage >= pdfDoc.numPages){
+                return
+            }
+            numPage++;
+            GeneratePDF(numPage);
+        }
+
+        loadingTask.promise.then(pdfDoc_ => {
+            pdfDoc = pdfDoc_;
+            GeneratePDF(numPage)
+        });
+}
+
 
   public setPDFMode(on: boolean){
     if (on){

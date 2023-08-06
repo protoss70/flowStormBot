@@ -88,13 +88,14 @@
       };
       
       document.addEventListener("keydown", (event) => {
-        if (event.keyCode === 66) {
+        if (event.keyCode === 11) {
           botUI.setPDFMode(true);
           botUI.setPDF("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 88);
         }
-        if (event.keyCode === 86){
+
+        if (event.keyCode === 66) {
           botUI.setPDFMode(true);
-          botUI.setPDF("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 1);
+          botUI.PDFStart("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 32);
         }
       })
 

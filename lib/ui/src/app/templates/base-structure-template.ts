@@ -11,8 +11,8 @@ export const baseStructureTemplate = `
             </div>
             <div data-messages class="column column-messages">
             </div>
-            <div data-pdf-viewer class="hidden" id="data-pdf-viewer">
-            </div>
+            <canvas data-pdf-viewer class="hidden" id="data-pdf-viewer">
+            </canvas>
             <div loader class="loader hidden">
                 <span loader-text class="loader-text">Loading...</span>
             </div>

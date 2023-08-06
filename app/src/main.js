@@ -346,11 +346,9 @@ export const initFSClientBot = (initParams = {}) => {
     };
 
     bot.audioInputCallback = () => {
-      if (settings.inputAudio) {
-        settings.inputAudio = false;
-        bot.setInAudio(settings.inputAudio, getStatus());
-        botUI.removeOverlay();
-      }
+      settings.inputAudio = false;
+      bot.setInAudio(settings.inputAudio, getStatus());
+      botUI.removeOverlay();
     };
 
     bot.sttRecognizedCallback = () => {
@@ -708,7 +706,7 @@ var createBot = (botUI, settings) => {
   }
 
   function limitSearchResult(inputString){
-    const charLimit = 800;
+    const charLimit = 800; // TODO increase the limit
     if (inputString.length <= charLimit){
       return inputString;
     }
@@ -740,10 +738,13 @@ var createBot = (botUI, settings) => {
       bot.audioInputCallback();
     } else {
       //SUCCESS
-      if (results.result && results.result[0].meta.answer) {
+      if (results.result && results.result[0].meta.answer) {-4
+        let answer = results.result[0].meta.answer
+        // answer = answer.slice(0, answer.length -4) + answer.slice(answer.length - 3);
+        console.log("answer: ", answer);
         setAttribute(
           "FAQ_Answer",
-          limitSearchResult(results.result[0].meta.answer)
+          limitSearchResult(answer)
         );
         bot.handleOnTextInput(`SUCCESS`, false, false);
       } else{
@@ -1103,7 +1104,10 @@ var createBot = (botUI, settings) => {
 
   botUI.chatMicrophoneCallback = (inputValue) => changeAudio("Input");
 
-  botUI.chatMuteCallback = (inputValue) => changeAudio("Output");
+  botUI.chatMuteCallback = (inputValue) => {
+    changeAudio("Output");
+    bot.audioInputCallback();
+  }
 
   botUI.chatPlayCallback = (inputValue) => {
     paused = !paused;
@@ -1111,10 +1115,9 @@ var createBot = (botUI, settings) => {
   };
 
   botUI.chatRestartCallback = () => {
-    console.log("here");
     const state = getStatus();
     botUI.removeSuggestions();
-
+    bot.audioInputCallback();
     if (botUI.getSettings().search) {
       // Restart elastic search functions
       elasticSearchActive = false;
