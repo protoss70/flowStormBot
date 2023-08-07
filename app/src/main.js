@@ -745,9 +745,9 @@ var createBot = (botUI, settings) => {
           payload.nodes.forEach((node) => {
             suggestionText.push(node.text);
           });
-          botUI.setSuggestion(suggestionText, !botUI.isMobileDevice());
+          botUI.setSuggestion(suggestionText, true);
         } else {
-          botUI.setSuggestion(payload.suggestions, !botUI.isMobileDevice());
+          botUI.setSuggestion(payload.suggestions, true);
         }
         break;
       case "#media":
