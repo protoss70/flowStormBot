@@ -20,6 +20,8 @@ import "./assets/main.scss";
 const scrollSpeed = 120; // pixels per second
 const scrollDelay = 3; // seconds before the scrolling starts
 
+var currentPDF = undefined
+
 const defaultURL = "5f7db5f1e662e830b20dbe7c";
 const environment = "-preview";
 let botKey =
@@ -769,11 +771,24 @@ var createBot = (botUI, settings) => {
         }  
         break;
       case "PDF":
-        if (botUI.getSettings().pdfID){
-          botUI.setPDF(button.action[0] + "#zoom=scale", button.page, 200, botUI.getSettings().pdfID);
+        if (botUI.getSettings().canvasID !== "#data-pdf-viewer"){
+          if (currentPDF === button.action[0]){
+            botUI.showPage(button.page);
+            console.log("show page");
+          }else{
+            currentPDF = button.action[0]
+            botUI.pdfStart(button.action[0], button.page);
+          }
         }else{
-          botUI.setPDF(button.action[0] + "#zoom=scale", button.page, 200);
-          botUI.setPDFMode(true);
+          if (currentPDF === button.action[0]){
+            botUI.showPage(button.page);
+            botUI.setPDFMode(true);
+            console.log("show page");
+          }else{
+            currentPDF = button.action[0]
+            botUI.pdfStart(button.action[0], button.page);
+            botUI.setPDFMode(true);
+          }
         }
         break;
       default:
@@ -834,8 +849,14 @@ var createBot = (botUI, settings) => {
             ...button,
           };
         
-          if (buttonType === "PDF" && botUI.getSettings().pdfID){
-            botUI.setPDF(button.action[0] + "#zoom=scale", button.page, 200, botUI.getSettings().pdfID);
+          if (buttonType === "PDF" && botUI.getSettings().canvasID !== "#data-pdf-viewer"){
+            if (currentPDF === button.action[0]){
+              botUI.showPage(button.page);
+              console.log("show page");
+            }else{
+              currentPDF = button.action[0]
+              botUI.pdfStart(button.action[0], button.page);
+            }
             break;
           }
           exitButtonMode = (disableGroup = true) => {

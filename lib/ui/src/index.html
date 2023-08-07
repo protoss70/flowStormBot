@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Bot UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=1.0" />
   </head>
   <body>
     <div id="stage"></div>
@@ -43,8 +44,6 @@
       botUI.setImage(
         "https://upload.wikimedia.org/wikipedia/tr/7/77/Lukepromo2321.jpg"
       );
-
-      botUI.addWarning("Character Limit Exceeded")
       botUI.setBotText(
         "lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens"
       );
@@ -90,16 +89,35 @@
       document.addEventListener("keydown", (event) => {
         if (event.keyCode === 11) {
           botUI.setPDFMode(true);
-          botUI.setPDF("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 88);
+          botUI.setPDF("https://www.sldttc.org/allpdf/21583473018.pdf", 88);
         }
 
         if (event.keyCode === 66) {
           botUI.setPDFMode(true);
-          botUI.PDFStart("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 32);
+          botUI.pdfStart("https://www.sldttc.org/allpdf/21583473018.pdf", 1);
         }
-      })
 
-      botUI.setButton({text: "This is a button"})
+        if (event.keyCode === 81) {
+          botUI.setPDFMode(true);
+          botUI.showPage(1);
+        }
+
+        if (event.keyCode === 87) {
+          botUI.setPDFMode(true);
+          botUI.showPage(2);
+        }
+
+        if (event.keyCode === 69) {
+          botUI.setPDFMode(true);
+          botUI.showPage(3);
+        }
+
+        if (event.keyCode === 82) {
+          botUI.setPDFMode(true);
+          botUI.showPage(4);
+        }
+
+      })
     </script>
   </body>
 </html>

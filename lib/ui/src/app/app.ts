@@ -18,8 +18,16 @@ import isEmpty from "ramda/es/isEmpty"; // Returns true if the given value is it
 import merge from "ramda/es/merge"; // Creates one new object with the own properties from a list of objects. If a key exists in more than one object, the value from the last object it exists in will be used.
 import times from "ramda/es/times"; // Calls an input function n times, returning an array containing the results of those function calls.
 import { forEach, head, remove, type, view } from "ramda";
-import PDFObject  from "pdfobject"
+
+// PDF viewer setup
 import * as pdfjsLib from "pdfjs-dist";
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.1.266/pdf.worker.js`;
+const initialState = {
+  pdfDoc: null,
+  currentPage: 1,
+  pageCount: 0,
+  zoom: 2,
+};
 
 // Import custom assets
 import "../assets/main.scss";
@@ -114,8 +122,9 @@ const defaults: Settings = {
     limitOn: true
   }, // Limits how many characters can be used in elastic search
   coreURL: "", // Flowstorm server url. (not important for this library)
-  cvutIcon: true, // show cvut icon on the bottom left
+  cvutIcon: false, // show cvut icon on the bottom left
   suggestionsListView: false, // Set the suggestions either as list view (true) or as a single line (false)
+  canvasID: "#data-pdf-viewer"
 };
 
 // global variables
@@ -154,7 +163,11 @@ const icons = [
   "right",
   "star-empty",
   "star-half",
-  "star-full"
+  "star-full",
+  "circle-left",
+  "circle-right",
+  "zoom-in",
+  "zoom-out"
 ];
 
 const avatarTextOverlapRatio = 1 / 4;
@@ -220,6 +233,9 @@ class BotUI {
   private static sopHeader: HTMLElement;
   private static cvutIconElement: HTMLElement;
   private static controlIconsWrapper: HTMLElement;
+  private static nextPageElement: HTMLElement;
+  private static previousPageElement: HTMLElement;
+  private static pdfPageDisplay: HTMLElement;
 
   private static isChatEnabled: boolean = true;
   private static isMicrophoneEnabled: boolean = true;
@@ -339,6 +355,10 @@ class BotUI {
     BotUI.chatInputPlayElement = BotUI.element.querySelector(
       "[data-chat-input-play]"
     );
+
+    BotUI.nextPageElement = BotUI.element.querySelector("[data-pdf-next]");
+    BotUI.previousPageElement = BotUI.element.querySelector("[data-pdf-previous]");
+    BotUI.pdfPageDisplay = BotUI.element.querySelector("[pdf-pageNum-display]");
 
     BotUI.pdfViewerElement = BotUI.element.querySelector("[data-pdf-viewer]");
     BotUI.pdfControlsClose = BotUI.element.querySelector("[pdf-controls-close]");
@@ -512,6 +532,14 @@ class BotUI {
       BotUI.getChatMute(BotUI.settings.sound, this.chatMuteCallback);
     };
 
+    BotUI.nextPageElement.onclick = (e) => {
+      this.pdfNextCallback();
+    }
+
+    BotUI.previousPageElement.onclick = (e) => {
+      this.pdfPreviousCallback();
+    }
+
     BotUI.searchElement.onclick = (e) => {
       this.searchElementCallback();
     }
@@ -605,52 +633,81 @@ class BotUI {
     });
   }
 
-  public PDFStart = (nameRoute, numPage, id="#data-pdf-viewer") => {           
-    let loadingTask = pdfjsLib.getDocument(nameRoute),
-        pdfDoc = null,
-        canvas = document.querySelector(id) as HTMLCanvasElement,
-        ctx = canvas.getContext('2d'),
-        scale = 1.5
-
-        const GeneratePDF = numPage => {
-
-            pdfDoc.getPage(numPage).then(page => {
-
-                let viewport = page.getViewport({ scale: scale });
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-                
-                let renderContext = {
-                    canvasContext : ctx,
-                    viewport:  viewport
-                }
-
-                page.render(renderContext);
-            })
-
-        }
-
-        const PrevPage = () => {
-            if(numPage === 1){
-                return
-            }
-            numPage--;
-            GeneratePDF(numPage);
-        }
-
-        const NextPage = () => {
-            if(numPage >= pdfDoc.numPages){
-                return
-            }
-            numPage++;
-            GeneratePDF(numPage);
-        }
-
-        loadingTask.promise.then(pdfDoc_ => {
-            pdfDoc = pdfDoc_;
-            GeneratePDF(numPage)
+  private renderPage = () => {
+    // Load the first page.
+    console.log(initialState.pdfDoc, 'pdfDoc');
+    initialState.pdfDoc
+      .getPage(initialState.currentPage)
+      .then((page) => {
+        console.log('page', page);
+        const id = this.getSettings().canvasID
+        const canvas = document.querySelector(id) as HTMLCanvasElement;
+        const ctx = canvas.getContext("2d");
+        const viewport = page.getViewport({
+          scale: initialState.zoom,
         });
-}
+
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        // Render the PDF page into the canvas context.
+        const renderCtx = {
+          canvasContext: ctx,
+          viewport: viewport,
+        };
+
+        page.render(renderCtx);
+      });
+  };
+
+  public setPdfPageNumber(num){
+    BotUI.pdfPageDisplay.textContent = "Page: " + num;
+  }
+
+  public pdfStart(nameRoute, numPage){
+    if(numPage < 0) return;
+    initialState.currentPage = numPage;
+    this.setPdfPageNumber(numPage);
+    // Render the page.
+    pdfjsLib.getDocument(nameRoute)
+    .promise.then((data) => {
+      initialState.pdfDoc = data;
+      console.log('pdfDocument', initialState.pdfDoc);
+      this.renderPage();
+    })
+    .catch((err) => {
+      alert(err.message);
+    });
+  }
+
+  public showPage = (pageNum) => {
+    if (initialState.pdfDoc === null || pageNum > initialState.pdfDoc._pdfInfo.numPages || pageNum < 0) 
+      return;
+
+    initialState.currentPage = pageNum;
+    this.setPdfPageNumber(pageNum);
+    this.renderPage();
+  };
+
+  public showPrevPage = () => {
+    if (initialState.pdfDoc === null || initialState.currentPage <= 1)
+      return;
+    initialState.currentPage--;
+    this.setPdfPageNumber(initialState.currentPage);
+    this.renderPage();
+  };
+  
+  public showNextPage = () => {
+    if (
+      initialState.pdfDoc === null ||
+      initialState.currentPage >= initialState.pdfDoc._pdfInfo.numPages
+    )
+      return;
+  
+    initialState.currentPage++;
+    this.setPdfPageNumber(initialState.currentPage);
+    this.renderPage();
+  };
 
 
   public setPDFMode(on: boolean){
@@ -659,21 +716,15 @@ class BotUI {
       BotUI.controlIconsWrapper.classList.add("hidden");
       BotUI.pdfViewerElement.classList.remove("hidden");
       BotUI.pdfControllers.classList.remove("hidden");
+      BotUI.chatTextInputElement.classList.add("pdf-mode");
     }
     else{
       BotUI.messagesElement.classList.remove("hidden");
       BotUI.controlIconsWrapper.classList.remove("hidden");
       BotUI.pdfViewerElement.classList.add("hidden");
       BotUI.pdfControllers.classList.add("hidden");
+      BotUI.chatTextInputElement.classList.remove("pdf-mode");
     }
-  }
-
-  public setPDF(url, page=1, zoom=150, id="#data-pdf-viewer"){
-    const options = {
-
-      pdfOpenParams: { view: 'FitV', page , zoom}
-    };
-    PDFObject.embed(url, id, options)
   }
 
   public setInputIconTooltips() {
@@ -1593,6 +1644,14 @@ class BotUI {
   public closePDFCallback = (...value) => {
     this.setPDFMode(false);
   } 
+
+  public pdfNextCallback = (...value) => {
+    this.showNextPage();
+  };
+
+  public pdfPreviousCallback = (...value) => {
+    this.showPrevPage();
+  };
 
   public feedbackCallback = (...value) => {};
 

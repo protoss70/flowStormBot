@@ -55,6 +55,7 @@ export interface Settings {
     };
     coreURL?: string;
     cvutIcon?: boolean;
+    canvasID?: string;
 }
 
 export enum SuggestionMode {

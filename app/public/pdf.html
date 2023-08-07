@@ -17,8 +17,15 @@
 	<div id="botContainer">
 		<div id="botDiv"></div>
 	</div>
-    <div id="pdf-div"></div>
+    <canvas id="pdf-div"></canvas>
 	<script>
+		const queryString = window.location.search;
+		const urlParams = new URLSearchParams(queryString);
+		var canvasID ="#pdf-div"
+		if(urlParams.get('builtin')){
+			canvasID = "#data-pdf-viewer"
+		}
+
 		var clientParams = {
             botKey: "64c78b654992877fa1eafef9",
 			allowUrlParams: true,
@@ -35,7 +42,7 @@
 			title: "Porsche",
 			search: false,
 			controlIcons: {mic: true, mute: true, restart: true},
-            pdfID: "#pdf-div"
+            canvasID
 		};
 
 		initFSClientBot({
