@@ -11,7 +11,7 @@ export const baseStructureTemplate = `
             </div>
             <div data-messages class="column column-messages">
             </div>
-            <div data-start-button-wrapper>
+            <div data-start-button-wrapper class="hidden">
                 <button id="button-test" data-start-button class="icon icon--play">
             </button>
             </div>

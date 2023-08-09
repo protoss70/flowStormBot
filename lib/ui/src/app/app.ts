@@ -1690,6 +1690,8 @@ class BotUI {
     }
   };
 
+  public startButtonCallback = (...value) => { this.setStartButton(false) };
+
   public chatTextInputElementCallback = (...value) => {};
 
   public dataChannelMessageCallback = (...value) => {};
@@ -2369,22 +2371,21 @@ class BotUI {
     BotUI.element.style.height = BotUI.settings.collapsed ? null : height;
   };
 
-  public startButtonCallback = (...value) => { alert("hello");};
+  
 
   public setStartButton = (on : boolean) => { // TODO add hide param
     const startButtonElement = BotUI.startButtonElement;
 
     if (on) {
+      this.setPDFMode(false);
       BotUI.messagesElement.classList.add("hidden");
       BotUI.controlIconsWrapper.classList.add("hidden");
-      BotUI.pdfControllers.classList.add("hidden");
-      BotUI.textInput.classList.add("hidden");
+      BotUI.chatTextInputElement.classList.add("hidden")
       BotUI.startButtonWrapperElement.classList.remove("hidden");
     } else {
-      BotUI.messagesElement.classList.remove("hidden");
       BotUI.controlIconsWrapper.classList.remove("hidden");
-      BotUI.pdfControllers.classList.remove("hidden");
-      BotUI.textInput.classList.remove("hidden");
+      BotUI.chatTextInputElement.classList.remove("hidden")
+      BotUI.messagesElement.classList.remove("hidden");
       BotUI.startButtonWrapperElement.classList.add("hidden");
     }
 

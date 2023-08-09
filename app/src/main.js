@@ -331,6 +331,10 @@ export const initFSClientBot = (initParams = {}) => {
   const botUI = initUI(settings);
   var myBot;
   if (botUI) {
+    if(!botUI.getSettings().collapsable){
+      botUI.setStartButton(true);
+    }
+
     myBot = createBot(botUI, settings);
     initBot();
     bot.stateHandler = stateHandler;
@@ -1084,6 +1088,11 @@ var createBot = (botUI, settings) => {
       accessToken = response["access"];
       signupAnonymous(botUI);
     });
+  }
+
+  botUI.startButtonCallback = () => {
+    botUI.setStartButton(false);
+    run();
   }
 
   botUI.botMessagesCallback = (nodeID, dialogueID) => {
