@@ -1,6 +1,6 @@
 {
   "name": "@flowstorm/bot-ui",
-  "version": "2.3335.5",
+  "version": "2.0.6",
   "main": "app.bundle.js",
   "author": "PromethistAI",
   "license": "MIT",
@@ -47,7 +47,7 @@
     "core-js": "3.6.5",
     "fast-average-color": "6.3.0",
     "hls.js": "0.14.17",
-    "pdfobject": "^2.2.12",
+    "pdfjs-dist": "2.1.266",
     "ramda": "0.27.1",
     "showdown": "^2.1.0",
     "tippy.js": "^6.3.7"

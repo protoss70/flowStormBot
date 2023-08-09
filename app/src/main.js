@@ -20,6 +20,8 @@ import "./assets/main.scss";
 const scrollSpeed = 120; // pixels per second
 const scrollDelay = 3; // seconds before the scrolling starts
 
+var currentPDF = undefined
+
 const defaultURL = "5f7db5f1e662e830b20dbe7c";
 const environment = "-preview";
 let botKey =
@@ -346,11 +348,9 @@ export const initFSClientBot = (initParams = {}) => {
     };
 
     bot.audioInputCallback = () => {
-      if (settings.inputAudio) {
-        settings.inputAudio = false;
-        bot.setInAudio(settings.inputAudio, getStatus());
-        botUI.removeOverlay();
-      }
+      settings.inputAudio = false;
+      bot.setInAudio(settings.inputAudio, getStatus());
+      botUI.removeOverlay();
     };
 
     bot.sttRecognizedCallback = () => {
@@ -708,7 +708,7 @@ var createBot = (botUI, settings) => {
   }
 
   function limitSearchResult(inputString){
-    const charLimit = 800;
+    const charLimit = 800; // TODO increase the limit
     if (inputString.length <= charLimit){
       return inputString;
     }
@@ -740,10 +740,13 @@ var createBot = (botUI, settings) => {
       bot.audioInputCallback();
     } else {
       //SUCCESS
-      if (results.result && results.result[0].meta.answer) {
+      if (results.result && results.result[0].meta.answer) {-4
+        let answer = results.result[0].meta.answer
+        // answer = answer.slice(0, answer.length -4) + answer.slice(answer.length - 3);
+        console.log("answer: ", answer);
         setAttribute(
           "FAQ_Answer",
-          limitSearchResult(results.result[0].meta.answer)
+          limitSearchResult(answer)
         );
         bot.handleOnTextInput(`SUCCESS`, false, false);
       } else{
@@ -768,11 +771,24 @@ var createBot = (botUI, settings) => {
         }  
         break;
       case "PDF":
-        if (botUI.getSettings().pdfID){
-          botUI.setPDF(button.action[0] + "#zoom=scale", button.page, 200, botUI.getSettings().pdfID);
+        if (botUI.getSettings().canvasID !== "#data-pdf-viewer"){
+          if (currentPDF === button.action[0]){
+            botUI.showPage(button.page);
+            console.log("show page");
+          }else{
+            currentPDF = button.action[0]
+            botUI.pdfStart(button.action[0], button.page);
+          }
         }else{
-          botUI.setPDF(button.action[0] + "#zoom=scale", button.page, 200);
-          botUI.setPDFMode(true);
+          if (currentPDF === button.action[0]){
+            botUI.showPage(button.page);
+            botUI.setPDFMode(true);
+            console.log("show page");
+          }else{
+            currentPDF = button.action[0]
+            botUI.pdfStart(button.action[0], button.page);
+            botUI.setPDFMode(true);
+          }
         }
         break;
       default:
@@ -833,8 +849,14 @@ var createBot = (botUI, settings) => {
             ...button,
           };
         
-          if (buttonType === "PDF" && botUI.getSettings().pdfID){
-            botUI.setPDF(button.action[0] + "#zoom=scale", button.page, 200, botUI.getSettings().pdfID);
+          if (buttonType === "PDF" && botUI.getSettings().canvasID !== "#data-pdf-viewer"){
+            if (currentPDF === button.action[0]){
+              botUI.showPage(button.page);
+              console.log("show page");
+            }else{
+              currentPDF = button.action[0]
+              botUI.pdfStart(button.action[0], button.page);
+            }
             break;
           }
           exitButtonMode = (disableGroup = true) => {
@@ -1103,7 +1125,10 @@ var createBot = (botUI, settings) => {
 
   botUI.chatMicrophoneCallback = (inputValue) => changeAudio("Input");
 
-  botUI.chatMuteCallback = (inputValue) => changeAudio("Output");
+  botUI.chatMuteCallback = (inputValue) => {
+    changeAudio("Output");
+    bot.audioInputCallback();
+  }
 
   botUI.chatPlayCallback = (inputValue) => {
     paused = !paused;
@@ -1111,10 +1136,9 @@ var createBot = (botUI, settings) => {
   };
 
   botUI.chatRestartCallback = () => {
-    console.log("here");
     const state = getStatus();
     botUI.removeSuggestions();
-
+    bot.audioInputCallback();
     if (botUI.getSettings().search) {
       // Restart elastic search functions
       elasticSearchActive = false;

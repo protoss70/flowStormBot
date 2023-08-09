@@ -37,31 +37,31 @@
 
       botUI.setScreen();
       botUI.setBackgroundColor("#927263");
-      // botUI.setUserText("You said something very long and keep talking ...");
-      // botUI.setBotText("Bot said something more interestixxxng ...");
-      // botUI.setBotText("Bot said something more interesting ...");
-      // botUI.setImage(
-      //   "https://upload.wikimedia.org/wikipedia/tr/7/77/Lukepromo2321.jpg"
-      // );
-      //
-      // botUI.addWarning("Character Limit Exceeded")
-      // botUI.setBotText(
-      //   "lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens"
-      // );
-      // botUI.setBotText(
-      //   "[**Bot said**](www.youtube.com)\n something more interesting and very long like it is very very interesting so that you wanna know what happening..."
-      // );
-      //
-      // botUI.setSuggestion(
-      //   [
-      //     "Yes",
-      //     "No",
-      //     "This is a longer suggestion",
-      //     "These suggestions can be different lengths, but should all look nice",
-      //     "Client can make a better decision",
-      //   ],
-      //   true
-      // );
+      botUI.setUserText("You said something very long and keep talking ...");
+      botUI.setBotText("Bot said something more interestixxxng ...");
+      botUI.setBotText("Bot said something more interesting ...");
+      botUI.setImage(
+        "https://upload.wikimedia.org/wikipedia/tr/7/77/Lukepromo2321.jpg"
+      );
+
+      botUI.addWarning("Character Limit Exceeded")
+      botUI.setBotText(
+        "lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens"
+      );
+      botUI.setBotText(
+        "[**Bot said**](www.youtube.com)\n something more interesting and very long like it is very very interesting so that you wanna know what happening..."
+      );
+
+      botUI.setSuggestion(
+        [
+          "Yes",
+          "No",
+          "This is a longer suggestion",
+          "These suggestions can be different lengths, but should all look nice",
+          "Client can make a better decision",
+        ],
+        true
+      );
 
       // botUI.setUserText("You said");
       botUI.chatInputCallback = (inputValue) => {
@@ -98,8 +98,7 @@
         }
       })
 
-      botUI.setStartButton(false);
-
+      botUI.setButton({text: "This is a button"})
     </script>
   </body>
 </html>

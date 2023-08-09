@@ -15,8 +15,8 @@ export const baseStructureTemplate = `
                 <button id="button-test" data-start-button class="icon icon--play">
             </button>
             </div>
-            <div data-pdf-viewer class="hidden" id="data-pdf-viewer">
-            </div>
+            <canvas data-pdf-viewer class="hidden" id="data-pdf-viewer">
+            </canvas>
             <div loader class="loader hidden">
                 <span loader-text class="loader-text">Loading...</span>
             </div>
@@ -32,7 +32,18 @@ export const baseStructureTemplate = `
                     <span data-chat-input-restart class="icon icon--restart"></span>
                 </div>
                 <div pdf-controls class="hidden">
-                    <button pdf-controls-close>Close</button>
+                    <div class="pdf-controls-section">
+                        <div class="pdf-pageNum-section">
+                            <div class="pdf-icon-container">
+                                <span data-pdf-previous class="icon icon--circle-left"></span>
+                            </div>
+                            <div pdf-pageNum-display id="pdf-pageNum-display">Page: 1</div>
+                            <div class="pdf-icon-container">
+                                <span data-pdf-next class="icon icon--circle-right"></span>
+                            </div>
+                        </div>
+                        <button pdf-controls-close>Close</button>  
+                    </div>
                 </div>
                 <div data-text-input-wrap>
                     <input type="text" id="chatWindowTextInput" placeholder="Type text..." autocomplete="off" class="text-input"/>
