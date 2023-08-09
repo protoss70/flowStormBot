@@ -11,6 +11,10 @@ export const baseStructureTemplate = `
             </div>
             <div data-messages class="column column-messages">
             </div>
+            <div data-start-button-wrapper>
+                <button id="button-test" data-start-button class="icon icon--play">
+            </button>
+            </div>
             <div data-pdf-viewer class="hidden" id="data-pdf-viewer">
             </div>
             <div loader class="loader hidden">

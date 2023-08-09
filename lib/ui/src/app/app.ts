@@ -195,6 +195,8 @@ class BotUI {
   private static userTextKioskElement: HTMLElement;
   private static botTextKioskElement: HTMLElement;
   private static messagesElement: HTMLElement;
+  private static startButtonElement: HTMLElement;
+  private static startButtonWrapperElement: HTMLElement;
   private static userPcmElement: HTMLElement;
   private static botPcmElement: HTMLElement;
   private static backgroundElement: HTMLElement;
@@ -324,6 +326,8 @@ class BotUI {
     BotUI.userPcmElement = BotUI.element.querySelector("[data-user-pcm]");
     BotUI.botPcmElement = BotUI.element.querySelector("[data-bot-pcm]");
     BotUI.messagesElement = BotUI.element.querySelector("[data-messages]");
+    BotUI.startButtonElement = BotUI.element.querySelector("[data-start-button]");
+    BotUI.startButtonWrapperElement = BotUI.element.querySelector("[data-start-button-wrapper]");
     BotUI.chatElement = BotUI.element.querySelector("[data-chat-input]");
     BotUI.chatInputElement = BotUI.chatElement.querySelector("input");
     BotUI.chatTextInputElement =
@@ -2255,6 +2259,30 @@ class BotUI {
     const { width, height } = BotUI.settings.widgetSize;
     BotUI.element.style.width = BotUI.settings.collapsed ? null : width;
     BotUI.element.style.height = BotUI.settings.collapsed ? null : height;
+  };
+
+  public startButtonCallback = (...value) => { alert("hello");};
+
+  public setStartButton = (on : boolean) => { // TODO add hide param
+    const startButtonElement = BotUI.startButtonElement;
+
+    if (on) {
+      BotUI.messagesElement.classList.add("hidden");
+      BotUI.controlIconsWrapper.classList.add("hidden");
+      BotUI.pdfControllers.classList.add("hidden");
+      BotUI.textInput.classList.add("hidden");
+      BotUI.startButtonWrapperElement.classList.remove("hidden");
+    } else {
+      BotUI.messagesElement.classList.remove("hidden");
+      BotUI.controlIconsWrapper.classList.remove("hidden");
+      BotUI.pdfControllers.classList.remove("hidden");
+      BotUI.textInput.classList.remove("hidden");
+      BotUI.startButtonWrapperElement.classList.add("hidden");
+    }
+
+
+    startButtonElement.onclick = () => { this.startButtonCallback();};
+
   };
 }
 

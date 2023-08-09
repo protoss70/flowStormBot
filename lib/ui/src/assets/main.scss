@@ -1701,3 +1701,34 @@ canvas {
     opacity: 0;
   }
 }
+
+#button-test {
+  font-size: 5rem;
+  background: none;
+  border: none;
+  opacity: 70%;
+  cursor: pointer;
+  color: white;
+
+}
+
+#button-test:hover {
+  opacity: 100%;
+
+}
+
+[data-start-button-wrapper]{
+  &.hidden{
+    display: none;
+  }
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1;
+  height: calc(
+          100% - var(--bot-ui-chat-input-height) - var(--bot-ui-avatar-height) -
+          var(--bot-ui-sop-name-height)
+  );
+}
