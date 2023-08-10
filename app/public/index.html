@@ -151,7 +151,7 @@
 		}else{
 			defaultIconSetup = {mic: true, mute: true, restart: true};
 		}
-		const clientParams = {
+		var clientParams = {
 			allowUrlParams: true,
 			fullScreen: false,
 			guiMode: 'chat',
@@ -160,12 +160,27 @@
 			domain: '.flowstorm.ai',
 			mode: 'voice',
 			elementId: "botDiv",
-			collapsable: false,
+			collapsable: true,
 			interactionMode: "GUIDE",
 			sound: true,
 			title,
+			search: true,
 			controlIcons: defaultIconSetup,
+
 		};
+
+		if (title === "UPV"){
+			clientParams = {
+				...clientParams,
+				userMessageBackgroundColor: "rgba(255,255,255,1)",
+				botMessageBackgroundColor: "rgba(25,72,120,1)",
+				botMessageTextColor: "#FFFFFF",
+				backgroundColor: "#2362A2",
+				userMessageTextColor: "#194878",
+				backgroundImageBlur: 30,
+			}
+		}
+
 
 		initFSClientBot({
 			...clientParams,
@@ -324,6 +339,7 @@
 		display: none !important;
 	}
 
+	
 </style>
 </body>
 </html>

@@ -17,6 +17,8 @@
         animationSpeed: 500,
         backgroundAdvancedAnimationParticlesCount: 0,
         backgroundSimpleAnimation: false,
+        backgroundSecondaryColor: "#000000",
+        backgroundColor: '#6737ff',
         collapsable: true,
         textInputEnabled: false,
         collapsed: false,
@@ -24,13 +26,16 @@
         sound: false,
         title: "Bot UI",
         controlIcons: { mic: false, mute: true, restart: true },
+        suggestions: {textColor: "#000000", backgroundColor: "#BFBFBF", hoverBackgroundColor: "#ffffff80", activeBackground: "#ffffffb3"},
+        triggerImage: `url(https://core.flowstorm.ai/file/assets/spaces/648ae13a8af625324045cf0d)`,
+        search: false,
       });
 
       // window.addEventListener("click", (e) =>{
       // console.log(e.target);
       // })
 
-botUI.setScreen();
+      botUI.setScreen();
       botUI.setBackgroundColor("#927263");
       botUI.setUserText("You said something very long and keep talking ...");
       botUI.setBotText("Bot said something more interestixxxng ...");
@@ -38,6 +43,8 @@ botUI.setScreen();
       botUI.setImage(
         "https://upload.wikimedia.org/wikipedia/tr/7/77/Lukepromo2321.jpg"
       );
+
+      botUI.addWarning("Character Limit Exceeded")
       botUI.setBotText(
         "lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies lacinia, nunc nisl aliquam lorem, eget ultrici es la cini long text please check it out and see what happens very long just write stuff here and see what happens"
       );
@@ -79,9 +86,20 @@ botUI.setScreen();
       botUI.chatTextInputElementCallback = (e) => {
         console.log(`User typed text ${e.data}`);
       };
+      
+      document.addEventListener("keydown", (event) => {
+        if (event.keyCode === 66) {
+          botUI.setPDFMode(true);
+          botUI.setPDF("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 88);
+        }
+        if (event.keyCode === 86){
+          botUI.setPDFMode(true);
+          botUI.setPDF("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 1);
+        }
+      })
 
-      botUI.setControllIcons({ mic: true, mute: true, restart: true });
-      botUI.setTextInputEnabled(true);
+      botUI.setButton({text: "This is a button"})
+      botUI.setStartButton(true);
     </script>
   </body>
 </html>

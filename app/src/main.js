@@ -20,6 +20,8 @@ import "./assets/main.scss";
 const scrollSpeed = 120; // pixels per second
 const scrollDelay = 3; // seconds before the scrolling starts
 
+var currentPDF = undefined
+
 const defaultURL = "5f7db5f1e662e830b20dbe7c";
 const environment = "-preview";
 let botKey =
@@ -34,7 +36,7 @@ let defaultCoreUrl =
   environment === "local"
     ? "http://localhost:8080"
     : `https://core${environment}.flowstorm.ai`;
-let development = true;
+let development = false;
 
 let idToken = undefined;
 let accessToken = undefined;
@@ -43,13 +45,22 @@ let termsId = undefined;
 const converter = new Converter();
 var botInitializer = new BotInitializer();
 var buttonInput = false;
-var talkMode = "PUSH";
+var elasticSearchActive = false; // this is true when the actual query for the elastic search is being entered
+var searchCommandActive = false; // this is true when the #search command is called
 let generatodEmbedLines = {};
 
 const audios = {};
+var latestUserInputID = ""; // Keeps track of the UserInput node id from flowstorm. Used for Alternative Suggestions
+var alternativeReInput = false;
+var alternativeLatestText = "";
 
 const regex =
   /https:\/\/core(-([0-9]+|preview)){0,1}.flowstorm.ai\/file\/tts\/[0-9a-f]+\.wav/g;
+
+const suggestionModes = {
+  STANDARD: "disappearing",
+  ALTERNATIVE: "non-disappearing",
+};
 
 const botUIDefaultSettings = {
   guiMode: "chat",
@@ -68,7 +79,15 @@ const botUIDefaultSettings = {
   collapsed: true,
   interactionMode: "GUIDE",
   sound: true,
+  search: true,
   goTo: true,
+  suggestionMode: suggestionModes.STANDARD,
+  elasticSearchCharLimit: {
+    charLimit: 50,
+    limitOn: true
+  },
+  cvutIcon: false,
+  suggestionsListView: false,
 };
 
 const clientDefaultSetting = {
@@ -80,7 +99,7 @@ const clientDefaultSetting = {
   jwtToken: null,
   attributes: {},
   callback: {},
-  coreUrl: defaultCoreUrl,
+  coreURL: defaultCoreUrl,
   autoStart: false,
   ttsFileType: "mp3",
 };
@@ -94,20 +113,23 @@ let paused = true;
 let textInputEnabled = false;
 let dialogueIDs = [];
 
-export const initFSClientBot = (initParams = {}) => {
-  Sentry.init({
-    dsn: "https://da1caa885aee4032898d553d1129571b@o318069.ingest.sentry.io/5438705",
-    integrations: [new Integrations.BrowserTracing()],
-    tracesSampleRate: 1.0,
-    environment,
-  });
+var exitButtonMode = () => {};
 
+export const initFSClientBot = (initParams = {}) => {
+  
   const urlParams = new URLSearchParams(window.location.search);
   let settings = {
     ...clientDefaultSetting,
     ...botUIDefaultSettings,
     ...initParams,
   };
+
+  Sentry.init({
+    dsn: "https://da1caa885aee4032898d553d1129571b@o318069.ingest.sentry.io/5438705",
+    integrations: [new Integrations.BrowserTracing()],
+    tracesSampleRate: 1.0,
+    environment,
+  });
   const { allowUrlParams, startMessage } = settings;
   botKey = settings.botKey;
   textInputEnabled = settings.textInputEnabled;
@@ -115,6 +137,7 @@ export const initFSClientBot = (initParams = {}) => {
   botInitializer = new BotInitializer(startMessage, settings.attributes);
 
   function setPreviewCustomizations(botUI) {
+    // Customization parameters and IDs for customization showcase website only
     const listenerIDs = [
       "textColorUser",
       "textColorBot",
@@ -131,6 +154,7 @@ export const initFSClientBot = (initParams = {}) => {
     ];
     const generatorButtonID = "generateEmbedCodeButton";
 
+    // HTML tags for generating the embed code
     const preTags = `
 		&lt;script&gt;<br>
 		&emsp;initFSClientBot({<br>
@@ -143,6 +167,7 @@ export const initFSClientBot = (initParams = {}) => {
 		`;
 
     function ColorToRGBA(opacityID, colorID) {
+      /* Conversion logic */
       const opacity = document.getElementById(opacityID).value;
       const color = document.getElementById(colorID).value;
       const r = parseInt(color.substr(1, 2), 16);
@@ -284,10 +309,6 @@ export const initFSClientBot = (initParams = {}) => {
       botKey = urlBotKey;
     }
     const url = new URL(window.location.href);
-    const intMode = url.searchParams.get("m");
-    if (intMode === "guide" || intMode === "sop") {
-      settings.interactionMode = intMode.toUpperCase();
-    }
     const backgroundAdvancedAnimationParticlesCount =
       urlParams.get("animObjects") === null
         ? 5
@@ -308,31 +329,37 @@ export const initFSClientBot = (initParams = {}) => {
     };
   }
   const botUI = initUI(settings);
-
+  var myBot;
   if (botUI) {
-    createBot(botUI, settings);
+    if(!botUI.getSettings().collapsable){
+      botUI.setStartButton(true);
+    }
+
+    myBot = createBot(botUI, settings);
     initBot();
     bot.stateHandler = stateHandler;
     bot.setInCallback = () => {
       if (settings.inputAudio) {
         document
-          .querySelector("[data-chat-input-keyboard]")
-          .classList.add("icon-sop--keyboard-active");
+          .querySelector("[data-chat-input-mic]")
+          .classList.add("icon--mic-active");
       } else {
         document
-          .querySelector("[data-chat-input-keyboard]")
-          .classList.remove("icon-sop--keyboard-active");
+          .querySelector("[data-chat-input-mic]")
+          .classList.remove("icon--mic-active");
         botUI.removeOverlay();
       }
     };
 
     bot.audioInputCallback = () => {
-      if (talkMode === "PUSH") {
-        if (settings.inputAudio) {
-          settings.inputAudio = false;
-          bot.setInAudio(settings.inputAudio, getStatus());
-          botUI.removeOverlay();
-        }
+      settings.inputAudio = false;
+      bot.setInAudio(settings.inputAudio, getStatus());
+      botUI.removeOverlay();
+    };
+
+    bot.sttRecognizedCallback = () => {
+      if (elasticSearchActive) {
+        botUI.toggleLoader(true);
       }
     };
 
@@ -378,14 +405,6 @@ export const initFSClientBot = (initParams = {}) => {
         settings;
         if (user === null) {
           botUI.setSection("LOGIN");
-        } else {
-          const userInputChoice = user.inputMode;
-          if (userInputChoice === undefined) {
-            botUI.setSection("INPUTSELECT");
-          } else {
-            console.log(userInputChoice);
-            botUI.setInputMode(userInputChoice.stringValue);
-          }
         }
       });
     } else if (
@@ -400,7 +419,8 @@ export const initFSClientBot = (initParams = {}) => {
       `Element with ID "${elementId}" was not found in DOM. Cannot initialize BOT UI. Use existing element with ID or remove elementId property from initialization.`
     );
   }
-  return autoStartBot;
+
+  return myBot;
 };
 
 const initUI = (settings = {}) => {
@@ -420,6 +440,7 @@ const initUI = (settings = {}) => {
   }
   const botUI = new BotUI(elementId, settings);
   botUI.setUserText();
+  console.log(botUI.getButtonInputMode());
 
   botElement = BotUI.element;
   if (!botElement) {
@@ -493,8 +514,6 @@ var createBot = (botUI, settings) => {
     }
   });
 
-  botUI.disableStop(status === "SLEEPING" || !status);
-
   const defaultCallback = {};
 
   defaultCallback.setStatus = (newState) => {
@@ -511,10 +530,8 @@ var createBot = (botUI, settings) => {
         !newState.status,
       botUI
     );
-    botUI.disableStop(newState.status === "SLEEPING");
 
     if (newState.status === "SLEEPING") {
-      botUI.setMicIcon(false);
       botUI.showAllGoToButtons();
       setDialogueIDs([], botUI);
     } else if (newState.status === undefined) {
@@ -602,6 +619,18 @@ var createBot = (botUI, settings) => {
 
   defaultCallback.addLogs = (logs) => {
     logs.forEach((l) => {
+      if (
+        botUI.getSettings().suggestionMode === suggestionModes.ALTERNATIVE &&
+        l.text.startsWith("Flow")
+      ) {
+        const regex = /UserInput#(-\d+)/g;
+        let lastMatch;
+
+        for (const match of l.text.matchAll(regex)) {
+          lastMatch = match[1];
+        }
+        latestUserInputID = lastMatch;
+      }
       console.log(l.text);
     });
   };
@@ -622,8 +651,6 @@ var createBot = (botUI, settings) => {
       initBot();
     }
   };
-
-  var exitButtonMode = () => {};
 
   function titleAndContext(tags, content) {
     const h1 = (tags.h1_b = tags.h1_b.split(" |"));
@@ -665,56 +692,122 @@ var createBot = (botUI, settings) => {
     return { title, secondary };
   }
 
-  async function handleClientApiCall(url) {
-    const results = (await bot.getFiles(query, url)).data;
-    botUI.toggleLoader(false);
-    if (results === undefined) {
-      //SERVER ERROR
-      bot.handleOnTextInput(`ERROR`, false, { sopInput: true });
-      bot.audioInputCallback();
-    } else if (results.result.length === 0) {
-      //NO PDF FILES FOUND
-      bot.handleOnTextInput(`NO_SOLUTION`, false, { sopInput: true });
-      bot.audioInputCallback();
-    } else {
-      //SUCCESS
-
-      results.result.forEach((result) => {
-        const { title, secondary } = titleAndContext(
-          result.meta.backup,
-          result.meta.backup.cnt
-        );
-        botUI.setSnippet(result.meta.pagelink, title, secondary);
-      });
+  function findSubTags(inputString) {
+    const openingTagRegex = /<sub[^>]*>/g;
+    const closingTagRegex = /<\/sub>/g;
+  
+    const openingTags = [];
+    let openingTagMatch;
+    while ((openingTagMatch = openingTagRegex.exec(inputString)) !== null) {
+      openingTags.push({ tag: openingTagMatch[0], index: openingTagMatch.index });
     }
+  
+    const closingTags = [];
+    let closingTagMatch;
+    while ((closingTagMatch = closingTagRegex.exec(inputString)) !== null) {
+      closingTags.push({ tag: closingTagMatch[0], index: closingTagMatch.index });
+    }
+  
+    return { openingTags, closingTags };
+  }
+
+  function limitSearchResult(inputString){
+    const charLimit = 800; // TODO increase the limit
+    if (inputString.length <= charLimit){
+      return inputString;
+    }
+
+    const {openingTags, closingTags} = findSubTags(inputString);
+    for (let index = 0; index < openingTags.length; index++) {
+      const opening = openingTags[index];
+      const closing = closingTags[index];
+      if (opening.index > charLimit){
+        break;
+      }else if(opening.index <= charLimit && closing.index > charLimit){
+        inputString = inputString.substring(0, opening.index);
+        break;
+      }
+    }
+
+    return inputString.substring(0, charLimit);
   }
 
   async function handleFlowstormApiCall(results) {
+    console.log("results", results);
     if (results === undefined) {
       //SERVER ERROR
-      bot.handleOnTextInput(`ERROR`, false, { sopInput: true });
+      bot.handleOnTextInput(`ERROR`, false, false);
       bot.audioInputCallback();
-    } else if (results.result.length === 0) {
+    } else if ((results.result && results.result.length === 0) && !results.answer) {
       //NO PDF FILES FOUND
-      bot.handleOnTextInput(`NO_SOLUTION`, false, { sopInput: true });
+      bot.handleOnTextInput(`NO_SOLUTION`, false, false);
       bot.audioInputCallback();
     } else {
       //SUCCESS
-      results.result.forEach((result) => {
-        const title = result.meta.name;
-        const secondary = result.meta.snipet;
-        botUI.setSnippet(
-          result.meta.pagelink + "#" + result.meta.page_id,
-          title,
-          secondary
+      if (results.result && results.result[0].meta.answer) {-4
+        let answer = results.result[0].meta.answer
+        // answer = answer.slice(0, answer.length -4) + answer.slice(answer.length - 3);
+        console.log("answer: ", answer);
+        setAttribute(
+          "FAQ_Answer",
+          limitSearchResult(answer)
         );
-      });
-      botUI.setSuggestion(["Continue"]);
+        bot.handleOnTextInput(`SUCCESS`, false, false);
+      } else{
+        setAttribute(
+          "FAQ_Answer",
+          limitSearchResult(results.answer)
+        );
+        bot.handleOnTextInput(`SUCCESS`, false, false);
+      }
     }
   }
 
-  defaultCallback.handleCommand = (command, code, t) => {
+  function handleButtonClick(activeIndex, button, type){
+    const index = activeIndex ? activeIndex : 0;
+    switch (type) {
+      case "URL":
+        window.open(button.action[index], '_blank').focus();
+        break;
+      case "INPUT":
+        if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
+          bot.handleOnTextInput(`#${button.action[index]}`, false, false);
+        }  
+        break;
+      case "PDF":
+        if (botUI.getSettings().canvasID !== "#data-pdf-viewer"){
+          if (currentPDF === button.action[0]){
+            botUI.showPage(button.page);
+            console.log("show page");
+          }else{
+            currentPDF = button.action[0]
+            botUI.pdfStart(button.action[0], button.page);
+          }
+        }else{
+          if (currentPDF === button.action[0]){
+            botUI.showPage(button.page);
+            botUI.setPDFMode(true);
+            console.log("show page");
+          }else{
+            currentPDF = button.action[0]
+            botUI.pdfStart(button.action[0], button.page);
+            botUI.setPDFMode(true);
+          }
+        }
+        break;
+      default:
+        if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
+          bot.handleOnTextInput(`#${button.action[index]}`, false, false);
+        }  
+        break;
+      
+    }
+    buttonInput = false;
+  }
+
+  defaultCallback.handleCommand = async (command, code, t) => {
     const payload = JSON.parse(code);
+    console.log(payload);
     switch (command) {
       case "#expression":
         botUI.sendRTCData({ Expression: { Name: payload["name"] } });
@@ -745,43 +838,64 @@ var createBot = (botUI, settings) => {
         botUI.sendRTCData({ Walk: payload["action"] });
         break;
       case "#actions":
-        buttonInput = true;
-        const oldMode = botUI.getInputMode();
-        payload.tiles.forEach((button) => {
+        const imageDelay = payload.delay_between_images_ms; // Delay between each image displayed
+        const buttonType = payload.type;
+        if (buttonType === "INPUT" || !buttonType){
+          buttonInput = true
+        }
+        for (const button of payload.tiles) {
           const settings = {
-            oldMode: oldMode,
             groupName: payload.title,
             disableGroup: true,
             appSelect: payload.appSelect,
             solutions: payload.solutions,
+            buttonType,
             ...button,
           };
-
-          exitButtonMode = () => {
-            botUI.disableButtonGroup(settings, () => {}, "buttons");
+        
+          if (buttonType === "PDF" && botUI.getSettings().canvasID !== "#data-pdf-viewer"){
+            if (currentPDF === button.action[0]){
+              botUI.showPage(button.page);
+              console.log("show page");
+            }else{
+              currentPDF = button.action[0]
+              botUI.pdfStart(button.action[0], button.page);
+            }
+            break;
+          }
+          exitButtonMode = (disableGroup = true) => {
+            if (disableGroup) {
+              botUI.disableButtonGroup(settings, () => {});
+            } else {
+              const newSettings = { ...settings };
+              newSettings.disableGroup = undefined;
+              botUI.disableButtonGroup(newSettings, () => {});
+            }
           };
 
-          botUI.setButton(settings, () => {
-            if (getStatus() === "LISTENING" || getStatus() === "RESPONDING") {
-              bot.handleOnTextInput(`#${button.action}`, false, {
-                buttonInput: true,
-              });
-            }
-            buttonInput = false;
-          });
+          botUI.setButton(settings, (activeIndex) => {handleButtonClick(activeIndex, button, buttonType)});
           bot.audioInputCallback();
-        });
+
+          if (imageDelay) {
+            await new Promise((r) => setTimeout(r, imageDelay));
+          }
+        }
         break;
       case "#suggestions":
-        console.log(payload);
+        if (alternativeReInput) {
+          alternativeReInput = false;
+          bot.handleOnTextInput(alternativeLatestText, false, false);
+          break;
+        }
         if (payload.nodes) {
           const suggestionText = [];
           payload.nodes.forEach((node) => {
             suggestionText.push(node.text);
           });
-          botUI.setSuggestion(suggestionText, !botUI.isMobileDevice());
+          // Logic is if list view is not true, the default suggestion styles for mobile and web will be used
+          botUI.setSuggestion(suggestionText, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView);
         } else {
-          botUI.setSuggestion(payload.suggestions, !botUI.isMobileDevice());
+          botUI.setSuggestion(payload.suggestions, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView);
         }
         break;
       case "#media":
@@ -802,6 +916,20 @@ var createBot = (botUI, settings) => {
         botUI.toggleLoader(false);
         bot.audioInputCallback();
         handleFlowstormApiCall(payload.result);
+        break;
+      case "#enterSearch":
+        elasticSearchActive = true;
+        botUI.toggleSearchIcons(true);
+        botUI.removeSuggestions();
+        break;
+      case "#exitSearch":
+        elasticSearchActive = false;
+        searchCommandActive = false;
+        botUI.toggleSearchIcons(false);
+        botUI.toggleElasticSearch(false);
+        break;
+      case "#loadingOff":
+        botUI.toggleLoader(false);
         break;
       default:
         break;
@@ -844,8 +972,7 @@ var createBot = (botUI, settings) => {
     const status = getStatus();
     if (text === "") return;
     if (status === "LISTENING" || status === "RESPONDING") {
-      const audioOn = status === "LISTENING" && botUI.getInputMode == "voice";
-      bot.handleOnTextInput(text, audioOn);
+      bot.handleOnTextInput(text, false);
     }
   };
 
@@ -885,7 +1012,6 @@ var createBot = (botUI, settings) => {
     switch (status) {
       case "SLEEPING":
         if (!minimize) {
-          botUI.setMicIcon(true);
           startBot();
         }
         break;
@@ -910,14 +1036,12 @@ var createBot = (botUI, settings) => {
         if (settings.avatarURL) {
           botUI.sendRTCData({ Pause: "false" });
           bot.setInAudio(
-            botUI.getInputMode() === "voice" ? true : false,
+            false,
             getStatus()
           );
-          botUI.resume(botUI.getInputMode, buttonInput);
         }
         break;
       case undefined:
-        botUI.setMicIcon(true);
         if (BotUI.avatarElement.children[0]) {
           BotUI.avatarElement.children[0].play();
         }
@@ -966,36 +1090,28 @@ var createBot = (botUI, settings) => {
     });
   }
 
-  botUI.inputModeCallback = (e) => {
-    botUI.setInputMode(e);
-    bot.updateUser({ inputMode: e });
-    if (e === "voice") {
-      botUI.setSection("QUESTION");
-    } else {
-      botUI.setSectionByIndex(0);
-    }
-  };
+  botUI.startButtonCallback = () => {
+    botUI.setStartButton(false);
+    run();
+  }
 
   botUI.botMessagesCallback = (nodeID, dialogueID) => {
-    if (botUI.getInputMode() === "button") {
+    if (botUI.getButtonInputMode()) {
       exitButtonMode();
     }
     setAttribute("nodeId", nodeID);
     setAttribute("dialogueID", dialogueID);
     botUI.removeSuggestions();
-    bot.handleOnTextInput(`#go_to`, false, { sopInput: true });
+    if (status !== "LISTENING") {
+      bot.skipPlayedMessages();
+    }
+    bot.handleOnTextInput(`#go_to`, false, false);
   };
 
   botUI.chatInputCallback = (inputValue) => {
-    const status = getStatus();
-    if (status === "SLEEPING") {
-    } else {
-      botUI.setUserText(inputValue);
-      setAttribute("query", inputValue);
-      bot.handleOnTextInput(`#search`, false, { sopInput: true });
+    sendText(inputValue);
+    if (elasticSearchActive) {
       botUI.toggleLoader(true);
-
-      // sendText(inputValue);
     }
   };
 
@@ -1004,11 +1120,24 @@ var createBot = (botUI, settings) => {
     run();
   };
 
+  botUI.searchElementCallback = () => {
+    const status = getStatus();
+    if (!searchCommandActive) {
+      if (status !== "LISTENING") {
+        bot.skipPlayedMessages();
+      }
+      bot.handleOnTextInput(`#search`, false, false);
+      searchCommandActive = true;
+      botUI.toggleElasticSearch(true);
+    }
+  };
+
   botUI.chatMicrophoneCallback = (inputValue) => changeAudio("Input");
 
-  botUI.chatMuteCallback = (inputValue) => changeAudio("Output");
-
-  botUI.chatArrowCallback = (inputValue) => click();
+  botUI.chatMuteCallback = (inputValue) => {
+    changeAudio("Output");
+    bot.audioInputCallback();
+  }
 
   botUI.chatPlayCallback = (inputValue) => {
     paused = !paused;
@@ -1017,8 +1146,16 @@ var createBot = (botUI, settings) => {
 
   botUI.chatRestartCallback = () => {
     const state = getStatus();
-    botUI.removeAllMessages();
     botUI.removeSuggestions();
+    bot.audioInputCallback();
+    if (botUI.getSettings().search) {
+      // Restart elastic search functions
+      elasticSearchActive = false;
+      searchCommandActive = false;
+      botUI.toggleSearchIcons(false);
+      botUI.toggleElasticSearch(false);
+      botUI.toggleLoader(false);
+    }
 
     if (state === "SLEEPING" || state === undefined) {
       run();
@@ -1026,40 +1163,68 @@ var createBot = (botUI, settings) => {
     } else {
       stop();
       setTimeout(() => {
+        botUI.removeAllMessages();
         run();
       }, 750);
     }
   };
 
-  botUI.sectionChangeCallback = (section) => {
-    stateHandler(section, getStatus());
-  };
-
-  botUI.chatSopNextCallback = (inputValue) => {
-    const status = getStatus();
-    if (status !== undefined && status !== "SLEEPING") {
-      botUI.removeSuggestions();
-      bot.handleOnTextInput(`yes`, false, { sopInput: true });
-    } else if (status === "SLEEPING" || status === undefined) {
-      botUI.appSelectToggle(false);
-      botUI.removeAllMessages();
-      run();
+  function removeNodesAfterSuggestion(self) {
+    const selfParent = self.parentElement.parentElement; // Need to go 2 steps out to get the real parent
+    const parent = selfParent.parentElement;
+    const index = Array.from(parent.children).indexOf(selfParent);
+    const children = parent.children;
+    while (children.length > index + 1) {
+      parent.removeChild(children[index + 1]);
     }
-  };
-
-  botUI.chatBackCallback = (inputValue) => {
-    if (settings.interactionMode === "SOP") {
-      botUI.previousSection();
-      bot.setInAudio(
-        botUI.getInputMode() === "voice" ? true : false,
-        getStatus()
-      );
-    }
-  };
+  }
 
   botUI.suggestionsCallback = (e) => {
-    bot.handleOnTextInput(e.target.innerHTML, false);
-    botUI.removeSuggestions();
+    const self = e.target;
+    const status = getStatus();
+
+    if (status !== "LISTENING") {
+      bot.skipPlayedMessages();
+    }
+
+    if (botUI.getSettings().suggestionMode === suggestionModes.ALTERNATIVE && (status !== undefined || status !== "SLEEPING")) {
+      if (self.classList.contains("active")) {
+        return;
+      } else {
+        if (botUI.getButtonInputMode()) {
+          exitButtonMode(false);
+        }
+        const parent = self.parentElement;
+        const activeElems = parent.getElementsByClassName("active");
+        if (activeElems.length > 0) {
+          // Active class exists, initiate #go_to
+          console.log("here");
+          console.log(activeElems);
+          activeElems[0].classList.remove("active");
+          self.classList.add("active");
+          removeNodesAfterSuggestion(self);
+          const nodeID = self.parentElement.getAttribute("nodeId");
+          const dialogueID = self.parentElement.getAttribute("dialogueID");
+          setAttribute("nodeId", parseInt(nodeID));
+          setAttribute("dialogueID", dialogueID);
+          bot.handleOnTextInput("#go_to", false, false);
+          alternativeReInput = true;
+          alternativeLatestText = self.innerHTML;
+        } else {
+          // First time clicking this group of suggestions.
+          self.classList.add("active");
+          self.parentElement.setAttribute("nodeId", latestUserInputID);
+          self.parentElement.setAttribute(
+            "dialogueID",
+            dialogueIDs[dialogueIDs.length - 1]
+          );
+          bot.handleOnTextInput(self.innerHTML, false, false);
+        }
+      }
+    } else {
+      bot.handleOnTextInput(self.innerHTML, false);
+      botUI.removeSuggestions();
+    }
   };
 
   botUI.setModeCallback = (mode) => {
@@ -1082,56 +1247,18 @@ var createBot = (botUI, settings) => {
       const status = getStatus();
       if (status === "SLEEPING" || status === undefined) {
         run();
-        botUI.setMicIcon(true);
       } else {
         stop();
       }
     } else {
-      botUI.setMicIcon(
-        BotUI.chatInputMicElement.classList.contains("icon--light")
-      );
       botUI.chatMicrophoneCallback();
     }
   };
-
-  botUI.chatSopQuestionCallback = (inputValue) => {
-    botUI.setSection("QUESTION");
-  };
-
-  botUI.loginCallback = async () => {
-    await bot.signIn();
-    const res = await bot.checkExistingUser();
-    if (res) {
-      const user = await bot.getUser();
-      console.log(user);
-      if (user.inputMode === undefined) {
-        botUI.setSection("INPUTSELECT");
-      } else {
-        botUI.setSectionByIndex(0);
-      }
-    } else {
-      botUI.loginPop();
-      console.log("account doesn't exist");
-    }
-  };
-
-  botUI.chatKeyboardCallback = (inputValue) => {
+  botUI.chatMicCallback = (inputValue) => {
     if (getStatus() === "LISTENING") {
       settings.inputAudio = !settings.inputAudio;
       bot.setInAudio(settings.inputAudio, getStatus());
       if (settings.inputAudio) botUI.addOverlay();
-    }
-    //Only changes the section to voice.
-    if (false) {
-      var mode = botUI.getInputMode();
-      mode = mode === "text" ? "voice" : "text";
-      botUI.setInputMode(mode);
-      bot.setInAudio(mode === "voice" ? true : false, getStatus());
-      bot.updateUser({ inputMode: mode });
-      bot.setInAudio(mode === "voice", getStatus());
-      if (mode === "voice" && getState() === "LISTENING") {
-        botUI.addOverlay();
-      }
     }
   };
 
@@ -1141,8 +1268,20 @@ var createBot = (botUI, settings) => {
 
   botUI.chatStopCallback = (inputValue) => stop();
 
-  botUI.chatTextInputElementCallback = (inputValue) => {
+  botUI.chatTextInputElementCallback = (e) => {
     const status = getStatus();
+    const settings = botUI.getSettings();
+    const search = settings.search;
+    const charLimitSetting = settings.elasticSearchCharLimit;
+
+    // limit the amount of char if limit is set
+    if (search && charLimitSetting.limitOn && elasticSearchActive){
+      if (e.target.value.length > charLimitSetting.charLimit){
+        botUI.addWarning("Character limit reached", 1300)
+        e.target.value = e.target.value.substring(0, charLimitSetting.charLimit);
+      }
+    }
+
     if (status === "LISTENING") {
       bot.closeAudioStream("User started typing", true);
     } else if (status === "RESPONDING") {
@@ -1164,7 +1303,6 @@ var createBot = (botUI, settings) => {
 
   botUI.collapsableTriggerCallback = (collapsed) => {
     const status = getStatus();
-    const section = botUI.getSection();
     if (
       (status === undefined || status === "SLEEPING") &&
       !collapsed &&
@@ -1180,7 +1318,7 @@ var createBot = (botUI, settings) => {
   };
 
   bot = Bot(
-    settings.coreUrl,
+    settings.coreURL,
     deviceId, // sender
     settings.autoStart, // autostart
     clientCallback,
@@ -1201,6 +1339,8 @@ var createBot = (botUI, settings) => {
       }
     };
   }
+
+  bot.stop = stop;
 
   return bot;
 };

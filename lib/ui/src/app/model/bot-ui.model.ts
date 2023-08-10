@@ -2,9 +2,11 @@ export interface Settings {
     animationSpeed?: number;
     backgroundAdvancedAnimationParticlesCount?: number;
     backgroundColor?: string;
+    backgroundSecondaryColor?: string;
     backgroundImage?: string;
     backgroundImageBlur?: number;
     backgroundSimpleAnimation?: boolean;
+    suggestions?: Suggestions;
     detectOrientation?: boolean;
     fullScreen?: boolean;
     customIcons?: boolean;
@@ -12,7 +14,6 @@ export interface Settings {
     micIcon?: string;
     pauseIcon?: string;
     playIcon?: string;
-    keyboardIcon?: string;
     muteIcon?: string;
     volumeIcon?: string;
     upSop?: string;
@@ -33,9 +34,7 @@ export interface Settings {
         height: string;
         width: string;
     };
-    inputMode?: string;
-    interactionMode?: string;
-    standardQuestionMode?: string;
+    buttonInput?: boolean;
     inputAudio?: boolean;
     outputAudio?: boolean;
     reverseAvatarOrder?: boolean;
@@ -45,7 +44,23 @@ export interface Settings {
     sectionActive?: number;
     sound?: boolean;
     controlIcons?: {mic: boolean, mute: boolean, restart: boolean};
+    search?: boolean;
     showTooltips?: boolean;
+    suggestionMode?: SuggestionMode;
+    suggestionsListView?: boolean;
+    triggerImage?: string;
+    elasticSearchCharLimit?: {
+        limitOn: boolean,
+        charLimit: number
+    };
+    coreURL?: string;
+    cvutIcon?: boolean;
+    canvasID?: string;
+}
+
+export enum SuggestionMode {
+    STANDARD= "disappearing",
+    ALTERNATIVE= "non-disappearing"
 }
 
 export interface Background {
@@ -64,6 +79,13 @@ export interface AvatarStream {
 export enum AvatarTypeEnum {
     HLS = 'hls',
     WEBRTC = 'webrtc',
+}
+
+export interface Suggestions {
+    backgroundColor: string,
+    textColor: string,
+    hoverBackgroundColor?: string,
+    activeBackground?: string,
 }
 
 export enum ScreenTypeEnum {
