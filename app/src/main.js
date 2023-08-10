@@ -750,13 +750,13 @@ var createBot = (botUI, settings) => {
         console.log("answer: ", answer);
         setAttribute(
           "FAQ_Answer",
-          limitSearchResult(answer)
+          answer
         );
         bot.handleOnTextInput(`SUCCESS`, false, false);
       } else{
         setAttribute(
           "FAQ_Answer",
-          limitSearchResult(results.answer)
+          results.answer
         );
         bot.handleOnTextInput(`SUCCESS`, false, false);
       }
