@@ -931,6 +931,50 @@ var createBot = (botUI, settings) => {
       case "#loadingOff":
         botUI.toggleLoader(false);
         break;
+      case "#bot_settings": // change appearance of bot for each app (such as t-mobile, porsche etc.)
+        // everything is implemented here for now (easy testing) -> code cleanup will be necessary
+        // TODO move code to lib/ui (add a new function e.g. applyAppSettings(settings))
+        const params = payload["clientParams"];
+
+        botUI.setTitle(params["title"]);
+
+        // BACKGROUND
+        botUI.setBackgroundColor(params["backgroundColor"], params["backgroundSecondaryColor"]);
+
+        // MESSAGE COLORS
+        botUI.setBotMessageTextColor(params["botMessageTextColor"]);
+        botUI.setBotMessageBackgroundColor(params["botMessageBackgroundColor"]);
+        botUI.setUserMessageTextColor(params["userMessageTextColor"]);
+        botUI.setUserMessageBackgroundColor(params["userMessageBackgroundColor"]);
+
+        // SUGGESTION COLORS
+        botUI.setSuggestionColors(params["suggestions"]);
+
+        // CVUT ICON
+        botUI.setCvutIcon(params["cvutIcon"]);
+
+        // TRIGGER IMAGE (displayed when bot is collapsed)
+        BotUI.element.style.setProperty(
+            "--bot-ui-trigger-element-image",
+            `url("${params.triggerImage}")`
+        );
+
+        // BACKGROUND TEXT
+        document.getElementById("title").textContent = params["title"];
+
+
+        // CONTROL ICONS
+        // TODO change display of search icon and text input field
+        //botUI.setControllIcons({mic: false, mute: false, restart: false});
+        botUI.setControllIcons(params["controlIcons"]);
+        botUI.setControllIconStyles();
+
+        // elasticSearchActive = false;
+        // searchCommandActive = false;
+        // botUI.toggleSearchIcons(false);
+        // botUI.toggleElasticSearch(false);
+        //botUI.setTextInputEnabled(false);
+        break;
       default:
         break;
     }

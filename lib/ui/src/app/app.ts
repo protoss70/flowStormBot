@@ -2373,7 +2373,7 @@ class BotUI {
 
   
 
-  public setStartButton = (on : boolean) => { // TODO add hide param
+  public setStartButton = (on : boolean) => {
     const startButtonElement = BotUI.startButtonElement;
 
     if (on) {
@@ -2393,6 +2393,15 @@ class BotUI {
     startButtonElement.onclick = () => { this.startButtonCallback();};
 
   };
+
+  public setCvutIcon = (on : boolean) => {
+    if (on) {
+      BotUI.cvutIconElement.classList.remove("hidden");
+    } else {
+      BotUI.cvutIconElement.classList.add("hidden");
+    }
+  }
+
 }
 
 export { BotUI as default };
