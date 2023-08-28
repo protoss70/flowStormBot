@@ -452,6 +452,10 @@ $amount: 20;
           z-index: 1;
         }
 
+        &--thumbs-up{
+          z-index: 1;
+        }
+
         &--mic {
           top: 50%;
           transform: translateY(calc(-50% + 2px));

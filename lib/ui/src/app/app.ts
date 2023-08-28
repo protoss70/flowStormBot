@@ -156,7 +156,8 @@ const icons = [
   "upSop",
   "undo",
   "restart",
-  "feedback",
+  "thumbs-down",
+  "thumbs-up",
   "close",
   "search",
   "left",
@@ -1172,7 +1173,7 @@ class BotUI {
   public removeSuggestions = () => {
     if (this.getSettings().suggestionMode === SuggestionMode.STANDARD){
       const elemList = document.querySelectorAll(
-        "[data-messages] > div > [data-suggestions-container]"
+        "[data-messages] > div > [data-suggestions-container]:not(.feedback-buttons)"
       );
       elemList.forEach((element) => {
         const par = element.parentNode;
@@ -1181,10 +1182,34 @@ class BotUI {
     }
   };
 
+  public setFeedbackButtons(buttons: string[]){
+    // This function is a specialized version of setSuggestion() function
+
+    const messageElement = BotUI.messagesElement;
+    const suggestionContainer = getContentAsHtml(sopSuggestionContainer);
+    suggestionContainer.children[0].classList.add("list-view", "feedback-buttons");
+
+    messageElement.appendChild(suggestionContainer);
+
+    buttons.forEach((sug) => {
+      let btn = document.createElement("button");
+      btn.innerHTML = sug;
+      btn.setAttribute("data-suggestions-button", "");
+      btn.classList.add("data-suggestions-button");
+      btn.classList.add("list-view");
+      btn.onclick = (e) => {this.feedbackCallback(e)};
+      const allContainers = document.querySelectorAll("[data-suggestions-container].data-suggestions-container")
+      allContainers[allContainers.length - 1].appendChild(btn);
+    });
+
+    BotUI.scrollToLastMessage(messageElement);
+  }
+
   public setSuggestion = (suggestions: string[], listView: boolean = false) => {
     this.removeSuggestions();
     const messageElement = BotUI.messagesElement;
     const suggestionContainer = getContentAsHtml(sopSuggestionContainer);
+
     if (listView) {
       suggestionContainer.children[0].classList.add("list-view");
     }

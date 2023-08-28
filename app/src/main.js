@@ -923,6 +923,9 @@ var createBot = (botUI, settings) => {
         botUI.removeSuggestions();
         break;
       case "#exitSearch":
+        const feedBackButtons = [`<span class="icon icon--thumbs-up icon--content--thumbs-up"></span>`, 
+        `<span class="icon icon--thumbs-down icon--content--thumbs-down"></span>`]
+        botUI.setFeedbackButtons(feedBackButtons);
         elasticSearchActive = false;
         searchCommandActive = false;
         botUI.toggleSearchIcons(false);
@@ -1159,6 +1162,20 @@ var createBot = (botUI, settings) => {
     }
   };
 
+  botUI.feedbackCallback = (e) => {
+    const elem = e.target;
+    const parent = elem.parentElement;
+
+    if (elem.classList.contains("active")) {return}
+
+    for (let i = 0; i < parent.children.length; i++) {
+      const element = parent.children[i];
+      element.classList.remove("active");
+    }
+
+    elem.classList.add("active");
+  }
+
   botUI.collapseCallback = (collapsed) => {
     paused = !paused;
     run();
@@ -1242,7 +1259,6 @@ var createBot = (botUI, settings) => {
         const activeElems = parent.getElementsByClassName("active");
         if (activeElems.length > 0) {
           // Active class exists, initiate #go_to
-          console.log("here");
           console.log(activeElems);
           activeElems[0].classList.remove("active");
           self.classList.add("active");
