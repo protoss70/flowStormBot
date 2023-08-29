@@ -2427,6 +2427,36 @@ class BotUI {
     }
   }
 
+  public applyAppSettings = (params) => {
+      this.setTitle(params["title"]);
+
+      // BACKGROUND
+      this.setBackgroundColor(params["backgroundColor"], params["backgroundSecondaryColor"]);
+
+      // MESSAGE COLORS
+      this.setBotMessageTextColor(params["botMessageTextColor"]);
+      this.setBotMessageBackgroundColor(params["botMessageBackgroundColor"]);
+      this.setUserMessageTextColor(params["userMessageTextColor"]);
+      this.setUserMessageBackgroundColor(params["userMessageBackgroundColor"]);
+
+      // SUGGESTION COLORS
+      this.setSuggestionColors(params["suggestions"]);
+
+      // CVUT ICON
+      this.setCvutIcon(params["cvutIcon"]);
+
+      // TRIGGER IMAGE (displayed when bot is collapsed)
+      BotUI.element.style.setProperty(
+          "--bot-ui-trigger-element-image",
+          `url("${params.triggerImage}")`
+      );
+
+      // CONTROL ICONS
+      BotUI.settings.search = params["search"];
+      this.setControllIcons(params["controlIcons"]);
+      this.setTextInputEnabled(params["textInputEnabled"]);
+  }
+
 }
 
 export { BotUI as default };
