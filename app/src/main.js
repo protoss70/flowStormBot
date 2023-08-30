@@ -925,6 +925,8 @@ var createBot = (botUI, settings) => {
       case "#exitSearch":
         const feedBackButtons = [`<span class="icon icon--thumbs-up icon--content--thumbs-up"></span>`, 
         `<span class="icon icon--thumbs-down icon--content--thumbs-down"></span>`]
+        botUI.setUserText("feedback message");
+        botUI.getLastUserMessage().classList.add("hidden");
         botUI.setFeedbackButtons(feedBackButtons);
         elasticSearchActive = false;
         searchCommandActive = false;
@@ -1165,6 +1167,22 @@ var createBot = (botUI, settings) => {
   botUI.feedbackCallback = (e) => {
     const elem = e.target;
     const parent = elem.parentElement;
+    const containerElem = parent.parentElement;
+    const index = Array.from(containerElem.parentNode.children).indexOf(containerElem);
+    
+    const feedbackMessage = containerElem.parentNode.children[index-1];
+
+    
+    if (e.target.firstChild.classList.contains("icon--thumbs-down")){
+      feedbackMessage.innerHTML = `<span class="icon icon--thumbs-down icon--content--thumbs-down">\u0020</span>`;
+      feedbackMessage.classList.add("negative-feedback-message");
+    }else{
+      feedbackMessage.innerHTML = `<span class="icon icon--thumbs-up icon--content--thumbs-up">\u0020</span>`;
+      feedbackMessage.classList.add("positive-feedback-message");
+    }
+    feedbackMessage.classList.remove("hidden");
+
+    e.target.parentNode.remove();
 
     if (elem.classList.contains("active")) {return}
 

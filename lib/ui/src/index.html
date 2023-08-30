@@ -28,7 +28,7 @@
         controlIcons: { mic: false, mute: true, restart: true },
         suggestions: {textColor: "#000000", backgroundColor: "#BFBFBF", hoverBackgroundColor: "#ffffff80", activeBackground: "#ffffffb3"},
         triggerImage: `url(https://core.flowstorm.ai/file/assets/spaces/648ae13a8af625324045cf0d)`,
-        search: false,
+        search: true,
       });
 
       // window.addEventListener("click", (e) =>{
@@ -52,16 +52,16 @@
         "[**Bot said**](www.youtube.com)\n something more interesting and very long like it is very very interesting so that you wanna know what happening..."
       );
 
-      botUI.setSuggestion(
-        [
-          "Yes",
-          "No",
-          "This is a longer suggestion",
-          "These suggestions can be different lengths, but should all look nice",
-          "Client can make a better decision",
-        ],
-        true
-      );
+      // botUI.setSuggestion(
+      //   [
+      //     "Yes",
+      //     "No",
+      //     "This is a longer suggestion",
+      //     "These suggestions can be different lengths, but should all look nice",
+      //     "Client can make a better decision",
+      //   ],
+      //   true
+      // );
 
       // botUI.setUserText("You said");
       botUI.chatInputCallback = (inputValue) => {
@@ -100,6 +100,8 @@
 
       botUI.setButton({text: "This is a button"})
       botUI.setStartButton(true);
+      botUI.setFeedbackButtons([`<span class="icon icon--thumbs-up icon--content--thumbs-up"></span>`, 
+      `<span class="icon icon--thumbs-down icon--content--thumbs-down"></span>`])
     </script>
   </body>
 </html>

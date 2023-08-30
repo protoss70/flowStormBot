@@ -1196,6 +1196,7 @@ class BotUI {
       btn.innerHTML = sug;
       btn.setAttribute("data-suggestions-button", "");
       btn.classList.add("data-suggestions-button");
+      btn.classList.add("feedback-button");
       btn.classList.add("list-view");
       btn.onclick = (e) => {this.feedbackCallback(e)};
       const allContainers = document.querySelectorAll("[data-suggestions-container].data-suggestions-container")
@@ -1682,7 +1683,9 @@ class BotUI {
     this.showPrevPage();
   };
 
-  public feedbackCallback = (...value) => {};
+  public feedbackCallback = (e) => {
+    e.target.parent.classList.add("active");
+  };
 
   public searchElementCallback = (...value) => {};
 
