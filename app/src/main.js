@@ -926,7 +926,10 @@ var createBot = (botUI, settings) => {
         const feedBackButtons = [`<span class="icon icon--thumbs-up icon--content--thumbs-up"></span>`, 
         `<span class="icon icon--thumbs-down icon--content--thumbs-down"></span>`]
         botUI.setUserText("feedback message");
-        botUI.getLastUserMessage().classList.add("hidden");
+        const feedbackMessage =  botUI.getLastUserMessage()
+        feedbackMessage.classList.add("hidden");
+        feedbackMessage.setAttribute("turnID", bot.responses[bot.responses.length - 1].turnId);
+        botUI.getlas
         botUI.setFeedbackButtons(feedBackButtons);
         elasticSearchActive = false;
         searchCommandActive = false;
@@ -1166,14 +1169,16 @@ var createBot = (botUI, settings) => {
     const index = Array.from(containerElem.parentNode.children).indexOf(containerElem);
     
     const feedbackMessage = containerElem.parentNode.children[index-1];
-
+    const turnId = feedbackMessage.getAttribute("turnid");
     
     if (e.target.firstChild.classList.contains("icon--thumbs-down")){
       feedbackMessage.innerHTML = `<span class="icon icon--thumbs-down icon--content--thumbs-down">\u0020</span>`;
       feedbackMessage.classList.add("negative-feedback-message");
+      bot.sendVote(turnId, null, -1);
     }else{
       feedbackMessage.innerHTML = `<span class="icon icon--thumbs-up icon--content--thumbs-up">\u0020</span>`;
       feedbackMessage.classList.add("positive-feedback-message");
+      bot.sendVote(turnId, null, 1);
     }
     feedbackMessage.classList.remove("hidden");
 
