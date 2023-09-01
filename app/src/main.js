@@ -739,7 +739,7 @@ var createBot = (botUI, settings) => {
       bot.handleOnTextInput(`ERROR`, false, false);
       bot.audioInputCallback();
     } else if ((results.result && results.result.length === 0) && !results.answer) {
-      //NO PDF FILES FOUND
+      //NO SOLUTION FOUND
       bot.handleOnTextInput(`NO_SOLUTION`, false, false);
       bot.audioInputCallback();
     } else {
@@ -776,21 +776,25 @@ var createBot = (botUI, settings) => {
         break;
       case "PDF":
         if (botUI.getSettings().canvasID !== "#data-pdf-viewer"){
-          if (currentPDF === button.action[0]){
+          if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
             botUI.showPage(button.page);
             console.log("show page");
           }else{
-            currentPDF = button.action[0]
-            botUI.pdfStart(button.action[0], button.page);
+            // currentPDF = button.action[0]
+            currentPDF = `assets/main.pdf`;
+            console.log(3);
+            botUI.pdfStart(currentPDF, button.page);
           }
         }else{
-          if (currentPDF === button.action[0]){
+          if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
             botUI.showPage(button.page);
             botUI.setPDFMode(true);
             console.log("show page");
           }else{
-            currentPDF = button.action[0]
-            botUI.pdfStart(button.action[0], button.page);
+            // currentPDF = button.action[0]
+            currentPDF = `assets/main.pdf`;
+            console.log(2);
+            botUI.pdfStart(currentPDF, button.page);
             botUI.setPDFMode(true);
           }
         }
@@ -854,12 +858,14 @@ var createBot = (botUI, settings) => {
           };
         
           if (buttonType === "PDF" && botUI.getSettings().canvasID !== "#data-pdf-viewer"){
-            if (currentPDF === button.action[0]){
+            if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
               botUI.showPage(button.page);
               console.log("show page");
             }else{
-              currentPDF = button.action[0]
-              botUI.pdfStart(button.action[0], button.page);
+              // currentPDF = button.action[0]
+              console.log(1);
+              currentPDF = `assets/main.pdf`;
+              botUI.pdfStart(currentPDF, button.page);
             }
             break;
           }

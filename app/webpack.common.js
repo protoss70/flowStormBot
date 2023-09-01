@@ -1,5 +1,15 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
+
+const pdfFilePlugin = new CopyWebpackPlugin({
+  patterns: [
+    {
+      from: "public/main.pdf",
+      to: "assets",
+    },
+  ],
+});
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./public/index.html",
@@ -94,5 +104,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin],
+  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin, pdfFilePlugin],
 };
