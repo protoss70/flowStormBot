@@ -36,7 +36,7 @@ let defaultCoreUrl =
   environment === "local"
     ? "http://localhost:8080"
     : `https://core${environment}.flowstorm.ai`;
-let development = false;
+let development = true;
 
 let idToken = undefined;
 let accessToken = undefined;
@@ -151,6 +151,14 @@ export const initFSClientBot = (initParams = {}) => {
       "backgroundUrl",
       "backgroundBlur",
       "botBackgroundColorSecondary",
+      "textColorSuggestions",
+      "backgroundColorSuggestions",
+      "hoverBackgroundColorSuggestions",
+      "activeBackgroundColorSuggestions",
+      "textColorSuggestionsAlpha",
+      "backgroundColorSuggestionsAlpha",
+      "hoverBackgroundColorSuggestionsAlpha",
+      "activeBackgroundColorSuggestionsAlpha",
     ];
     const generatorButtonID = "generateEmbedCodeButton";
 
@@ -271,24 +279,43 @@ export const initFSClientBot = (initParams = {}) => {
           );
         };
 
+      if (id === "textColorSuggestions" || id === "backgroundColorSuggestions" || id === "hoverBackgroundColorSuggestions" || id === "activeBackgroundColorSuggestions"
+      || id === "textColorSuggestionsAlpha" || id === "backgroundColorSuggestionsAlpha" || id === "hoverBackgroundColorSuggestionsAlpha" || id === "activeBackgroundColorSuggestionsAlpha")
+        listenerFunction = () => {
+          botUI.setSuggestionColors({
+            textColor: ColorToRGBA("textColorSuggestionsAlpha", "textColorSuggestions"),
+            backgroundColor: ColorToRGBA("backgroundColorSuggestionsAlpha", "backgroundColorSuggestions"),
+            hoverBackgroundColor: ColorToRGBA("hoverBackgroundColorSuggestionsAlpha", "hoverBackgroundColorSuggestions"),
+            activeBackground: ColorToRGBA("activeBackgroundColorSuggestionsAlpha", "activeBackgroundColorSuggestions")
+          });
+          generatodEmbedLines["suggestions"] = {
+            textColor: ColorToRGBA("textColorSuggestionsAlpha", "textColorSuggestions"),
+            backgroundColor: ColorToRGBA("backgroundColorSuggestionsAlpha", "backgroundColorSuggestions"),
+            hoverBackgroundColor: ColorToRGBA("hoverBackgroundColorSuggestionsAlpha", "hoverBackgroundColorSuggestions"),
+            activeBackground: ColorToRGBA("activeBackgroundColorSuggestionsAlpha", "activeBackgroundColorSuggestions")
+          };
+        };
+
       document.getElementById(id).addEventListener("input", (e) => {
         listenerFunction(e);
       });
-      document
+    });
+    document
         .getElementById(generatorButtonID)
         .addEventListener("click", () => {
           document
-            .getElementById("embedParamsParent")
-            .classList.remove("hidden");
+              .getElementById("embedParamsParent")
+              .classList.remove("hidden");
           const embedElem = document.getElementById("embedParams");
           embedElem.innerHTML = preTags;
+
           Object.keys(generatodEmbedLines).forEach((key) => {
-            embedElem.innerHTML += `&emsp;&emsp;${key}: ${generatodEmbedLines[key]},<br />`;
+            let p = JSON.stringify(generatodEmbedLines[key]);
+            embedElem.innerHTML += `&emsp;&emsp;${key}: ${p},<br />`;
           });
           embedElem.innerHTML += endTags;
           window.scrollTo(0, document.body.scrollHeight);
         });
-    });
   }
 
   if (allowUrlParams) {
@@ -390,9 +417,14 @@ export const initFSClientBot = (initParams = {}) => {
         setTextEnabled();
       });
 
+      document.getElementById("cvutIcon").addEventListener("change", (e) => {
+        botUI.setCvutIcon(e.target.checked);
+        generatodEmbedLines["cvutIcon"] = e.target.checked;
+      });
+
       setPreviewCustomizations(botUI);
       const url = new URL(window.location.href);
-      const showCustomizationOptions = url.searchParams.get("c") === "u_uid";
+      const showCustomizationOptions = true;//url.searchParams.get("c") === "u_uid";
       if (!showCustomizationOptions) {
         document.getElementById("customizationOptions").remove();
         document.getElementById("showCustomButton").remove();
@@ -983,6 +1015,17 @@ var createBot = (botUI, settings) => {
         // BotUI.settings.search = params["search"];
         // botUI.setControllIcons(params["controlIcons"]);
         // botUI.setTextInputEnabled(params["textInputEnabled"]);
+
+        // // BACKGROUND IMAGE
+        // if (params["backgroundImage"] !== undefined && params["backgroundImageBlur"] !== undefined) {
+        //   botUI.setBackgroundImage(params["backgroundImage"], params["backgroundImageBlur"]);
+        // } else if (params["backgroundImage"] !== undefined) {
+        //   botUI.setBackgroundImage(params["backgroundImage"]);
+        // } else {
+        //   BotUI.backgroundElement.classList.remove("background--image");
+        //   BotUI.element.style.removeProperty("--bot-ui-background-url");
+        //   BotUI.element.style.removeProperty("--bot-ui-background-url-blur");
+        // }
         break;
       default:
         break;

@@ -2431,33 +2431,46 @@ class BotUI {
   }
 
   public applyAppSettings = (params) => {
-      this.setTitle(params["title"]);
+    this.setTitle(params["title"]);
 
-      // BACKGROUND
-      this.setBackgroundColor(params["backgroundColor"], params["backgroundSecondaryColor"]);
+    // BACKGROUND
+    this.setBackgroundColor(params["backgroundColor"], params["backgroundSecondaryColor"]);
 
-      // MESSAGE COLORS
-      this.setBotMessageTextColor(params["botMessageTextColor"]);
-      this.setBotMessageBackgroundColor(params["botMessageBackgroundColor"]);
-      this.setUserMessageTextColor(params["userMessageTextColor"]);
-      this.setUserMessageBackgroundColor(params["userMessageBackgroundColor"]);
+    // MESSAGE COLORS
+    this.setBotMessageTextColor(params["botMessageTextColor"]);
+    this.setBotMessageBackgroundColor(params["botMessageBackgroundColor"]);
+    this.setUserMessageTextColor(params["userMessageTextColor"]);
+    this.setUserMessageBackgroundColor(params["userMessageBackgroundColor"]);
 
-      // SUGGESTION COLORS
+    // SUGGESTION COLORS
+    if (params["suggestions"] !== undefined) {
       this.setSuggestionColors(params["suggestions"]);
+    }
 
-      // CVUT ICON
-      this.setCvutIcon(params["cvutIcon"]);
+    // CVUT ICON
+    this.setCvutIcon(params["cvutIcon"]);
 
-      // TRIGGER IMAGE (displayed when bot is collapsed)
-      BotUI.element.style.setProperty(
-          "--bot-ui-trigger-element-image",
-          `url("${params.triggerImage}")`
-      );
+    // TRIGGER IMAGE (displayed when bot is collapsed)
+    BotUI.element.style.setProperty(
+        "--bot-ui-trigger-element-image",
+        `url("${params.triggerImage}")`
+    );
 
-      // CONTROL ICONS
-      BotUI.settings.search = params["search"];
-      this.setControllIcons(params["controlIcons"]);
-      this.setTextInputEnabled(params["textInputEnabled"]);
+    // CONTROL ICONS
+    BotUI.settings.search = params["search"];
+    this.setControllIcons(params["controlIcons"]);
+    this.setTextInputEnabled(params["textInputEnabled"]);
+
+    // BACKGROUND IMAGE
+    if (params["backgroundImage"] !== undefined && params["backgroundImageBlur"] !== undefined) {
+      this.setBackgroundImage(params["backgroundImage"], params["backgroundImageBlur"]);
+    } else if (params["backgroundImage"] !== undefined) {
+      this.setBackgroundImage(params["backgroundImage"]);
+    } else {
+      BotUI.backgroundElement.classList.remove("background--image");
+      BotUI.element.style.removeProperty("--bot-ui-background-url");
+      BotUI.element.style.removeProperty("--bot-ui-background-url-blur");
+    }
   }
 
 }
