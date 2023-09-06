@@ -159,6 +159,7 @@ export const initFSClientBot = (initParams = {}) => {
       "backgroundColorSuggestionsAlpha",
       "hoverBackgroundColorSuggestionsAlpha",
       "activeBackgroundColorSuggestionsAlpha",
+      "triggerImgUrl"
     ];
     const generatorButtonID = "generateEmbedCodeButton";
 
@@ -276,6 +277,15 @@ export const initFSClientBot = (initParams = {}) => {
           botUI.setBackgroundColor(
             document.getElementById("botBackgroundColor").value,
             e.target.value
+          );
+        }
+
+      if (id === "triggerImgUrl")
+        listenerFunction = (e) => {
+          generatodEmbedLines["triggerImage"] = e.target.value;
+          BotUI.element.style.setProperty(
+              "--bot-ui-trigger-element-image",
+              `url("${e.target.value}")`
           );
         };
 
