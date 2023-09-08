@@ -698,6 +698,7 @@ class BotUI {
   };
 
   public setPdfPageNumber(num){
+    // Sets the page number visually for the display.
     for (let index = 0; index < allPageElems.length; index++) {
       const element = allPageElems[index];
       element.textContent = "Page: " + num + " / " + initialState.pageCount;
@@ -723,6 +724,7 @@ class BotUI {
   }
 
   public showPage = (pageNum) => {
+    // Goes to that page.
     if (initialState.pdfDoc === null || pageNum > initialState.pdfDoc._pdfInfo.numPages || pageNum < 0) 
       return;
 

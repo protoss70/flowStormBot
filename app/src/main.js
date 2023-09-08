@@ -776,6 +776,13 @@ var createBot = (botUI, settings) => {
       bot.audioInputCallback();
     } else {
       //SUCCESS
+      console.log("rrestl", results);
+
+      if (results.page_numbers && results.page_numbers.length > 0){
+        // Change pdf page
+        botUI.showPage(results.page_numbers[0]);
+      }
+
       if (results.result && results.result[0].meta.answer) {-4
         let answer = results.result[0].meta.answer
         // answer = answer.slice(0, answer.length -4) + answer.slice(answer.length - 3);

@@ -636,7 +636,7 @@ $amount: 20;
 
 .bot-custom-pdf-viewer{
   & > canvas{
-    height: 95%;
+    height: 93%;
     width: 100%;
   }
   & > .bot-pdf-control-container{
@@ -645,6 +645,8 @@ $amount: 20;
     display: flex;
     justify-content: center;
     gap: 10px;
+    border-top: solid 1px black;
+    padding-top: 8px;
 
     & > .bot-pdf-control-buttons{
       font-size: 14px;
