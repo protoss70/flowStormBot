@@ -13,7 +13,7 @@
 	
 </head>
 <body style="font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">
-	<div id="upvBotKey">
+	<div id="upvBotKey" style="width: 30%">
 		<div id="upvBotKeyWrapper" class="hidden">
 			<label for="botId">Enter the id of your application from the Flowstorm website</label>
 			<div>
@@ -32,8 +32,15 @@
 		<button id="showCustomButton" onclick="toggleCustomization(this)">Show Customization Options</button>
 		<div id="customizationOptions" class="hidden">
 			<hr/>
+			<h3>Manual PDF file</h3>
+			<label for="pdfFile"></label>
+			<input type="file" name="pdfFile" id="pdfFile">
+			<hr/>
 			<h3>Icons</h3>
 			<div>
+				<label for="cvutIcon">Show CVUT logo</label>
+				<input type="checkbox" checked name="cvutIcon" id="cvutIcon">
+				<br>
 				<label for="textInput">Enable Text Input</label>
 				<input type="checkbox" name="textInput" id="textInput">
 				<div id="iconSetter">
@@ -48,7 +55,7 @@
 			<div ><hr/></div>
 			<h3>Bot Message</h3>
 			<div style="display: flex; justify-content: space-between; align-items: center;">
-				<label id="UserMessageTextLabel" for="textColorBot">Text Color</label>
+				<label for="textColorBot">Text Color</label>
 				<input type="color" class="form-control" id="textColorBot" value="#FFFFFF" title="Choose your color" style="width: 90px;">
 			</div>
 			<div style="justify-content: space-between; align-items: center; display: none;">
@@ -60,13 +67,13 @@
 				<input type="color" class="form-control" id="messageBotBackground" value="rgb(0,0,0)" title="Choose your color" style="width: 90px;">
 			</div>
 			<div style="align-items:center; margin-top: 6px; display: flex; justify-content: space-between;">
-				<label id="customHeightLabel" style="margin-bottom:0;" for="botOpacity" class="form-label">Background Opacity</label>
+				<label style="margin-bottom:0;" for="botOpacity" class="form-label">Background Opacity</label>
 				<input type="range" value="0.4" min="0" style="width: 85px; margin-right: 1px;" max="1" step="0.05" class="form-range" id="botOpacity">
 			</div>
-			<hr style="width: 75%"/>
+			<hr/>
 			<h3>User Message</h3>
 			<div style="display: flex; justify-content: space-between; align-items: center;">
-				<label id="UserMessageTextLabel" for="textColorUser">Text Color</label>
+				<label for="textColorUser">Text Color</label>
 				<input type="color" class="form-control" id="textColorUser" value="#FFFFFF" title="Choose your color" style="width: 90px;">
 			</div>
 			<hr style="display: none"/>
@@ -79,14 +86,48 @@
 				<input type="color" class="form-control" id="messageBackgroundUser" value="#FFFFFF" title="Choose your color" style="width: 90px;">
 			</div>
 			<div style="align-items:center; margin-top: 6px; display: flex; justify-content: space-between;">
-				<label id="customHeightLabel" style="margin-bottom:0;" for="userOpacity" class="form-label">Background Opacity</label>
+				<label style="margin-bottom:0;" for="userOpacity" class="form-label">Background Opacity</label>
 				<input type="range" value="0.3" min="0" max="1" step="0.05" style="width: 85px; margin-right: 1px;" class="form-range" id="userOpacity">
+			</div>
+			<hr/>
+
+
+
+
+			<h3>Suggestions style</h3>
+			<div style="display: flex; justify-content: space-between; align-items: center;">
+				<label for="textColorSuggestions">Text Color and Alpha</label>
+				<span style="display: flex">
+					<input type="color" class="form-control" id="textColorSuggestions" value="#FFFFFF" title="Choose your color" style="width: 45px; margin-right: 0">
+					<input type="number" class="form-control" id="textColorSuggestionsAlpha"  value="1" max="1" min="0" step="0.1" title="Choose your color" style="margin-left: 0; width: 90px;">
+				</span>
+			</div>
+			<div style="display: flex; justify-content: space-between; align-items: center;">
+				<label for="backgroundColorSuggestions">Background Color and Alpha</label>
+				<span style="display: flex">
+					<input type="color" class="form-control" id="backgroundColorSuggestions" value="#FFFFFF" title="Choose your color" style="width: 45px; margin-right: 0">
+					<input type="number" class="form-control" id="backgroundColorSuggestionsAlpha" value="0.3" max="1" min="0" step="0.1" title="Choose your color" style="margin-left: 0; width: 90px;">
+				</span>
+			</div>
+			<div style="display: flex; justify-content: space-between; align-items: center;">
+				<label for="hoverBackgroundColorSuggestions">Hover Background Color and Alpha</label>
+				<span style="display: flex">
+					<input type="color" class="form-control" id="hoverBackgroundColorSuggestions" value="#FFFFFF" title="Choose your color" style="width: 45px; margin-right: 0">
+					<input type="number" class="form-control" id="hoverBackgroundColorSuggestionsAlpha"  value="0.5" max="1" min="0" step="0.1" title="Choose your color" style="margin-left: 0; width: 90px;">
+				</span>
+			</div>
+			<div style="display: flex; justify-content: space-between; align-items: center;">
+				<label for="activeBackgroundColorSuggestions">Active Background Color and Alpha</label>
+				<span style="display: flex">
+					<input type="color" class="form-control" id="activeBackgroundColorSuggestions" value="#FFFFFF" title="Choose your color" style="width: 45px; margin-right: 0">
+					<input type="number" class="form-control" id="activeBackgroundColorSuggestionsAlpha" value="0.7" max="1" min="0" step="0.1" title="Choose your color" style="margin-left: 0; width: 90px;">
+				</span>
 			</div>
 			<div>
 				<div ><hr/></div>
 				<h3>Background</h3>
 				<p>You can set the background as a color or an image.</p>
-				<hr style="width:80%">
+				<hr>
 				<div style="display:flex; justify-content: space-between; align-items:center;">
 					<label style="margin-bottom:0;" for="botBackgroundColor">Primary Color</label>
 					<input type="color" class="form-control" id="botBackgroundColor" value="#6737ff" title="Choose your color" style="width: 90px;">
@@ -108,7 +149,7 @@
 			<button id="generateEmbedCodeButton" style="margin-bottom: 20px; margin-top: 10px;">Generate Embed Code</button>
 			<div id="embedParamsParent" class="hidden">
 				Add the following lines to your embedded initFSClientBot parameters:
-				<div id="embedParams" style="background-color: #D9D9D9; padding: 20px; color:black; border-radius: 10px; margin-bottom: 20px;">
+				<div id="embedParams" style="background-color: #D9D9D9; padding: 20px; color:black; border-radius: 10px; margin-bottom: 20px;width: 100%; overflow: auto">
 						botKey: '6141f6fe302806105e62e745',<br>
 						collapsable: false,<br>
 						guiMode: 'chat',<br>
@@ -125,7 +166,8 @@
 		</div>
 	</div>
 	<div id="upvTest">
-		<h1 id="title">UPV TEST</h1>
+		<!--<h1 id="title">UPV TEST</h1>-->
+		<img id="title" src="https://core.flowstorm.ai/file/assets/spaces/64edefad35094e2b1ed97ef3" alt="CTU CIIRC logo">
 	</div>
 	
 	<div id="botContainer">
@@ -133,11 +175,7 @@
 	</div>
 	<script>
 		var url = new URL(window.location.href);
-		var title = url.searchParams.get("title");
-		if (!title){
-			title = "Flowstorm Bot";
-		}
-		document.getElementById("title").textContent = title;
+		var title = "App Selection";
 		var inputSettings = url.searchParams.get("settings");
 		let defaultIconSetup = {}
 		let textInputEnabled = false;
