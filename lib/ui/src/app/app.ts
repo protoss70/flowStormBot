@@ -134,6 +134,8 @@ const minAnimationParticles = 0;
 const maxAnimationParticles = 20;
 const chatHeight = "80px";
 const disabledHeight = "0px";
+const defaultPdfCanvasID = "#data-pdf-viewer";
+const allPageElems = []
 const avatarMaxHeightRatio = {
   [GUIMode.CHAT]: 2 / 3,
   [GUIMode.KIOSK]: 1,
@@ -645,7 +647,37 @@ class BotUI {
       .getPage(initialState.currentPage)
       .then((page) => {
         console.log('page', page);
-        const id = this.getSettings().canvasID
+        var id = ""
+        if (this.getSettings().canvasID === defaultPdfCanvasID){
+          id = this.getSettings().canvasID
+        }
+        else{
+          const pdfContainer = document.getElementById(this.getSettings().canvasID) as HTMLElement;
+          pdfContainer.classList.add("bot-custom-pdf-viewer")
+          pdfContainer.innerHTML = "";
+          const _canvas = document.createElement("canvas");
+          _canvas.id = "bot-custom-pdf-canvas";
+          const nextButton = document.createElement("button");
+          const prevButton = document.createElement("button");
+          const pageCount = document.createElement("div");
+          allPageElems.push(pageCount);
+          const controlContainer = document.createElement("div");
+          controlContainer.classList.add("bot-pdf-control-container");
+          pageCount.classList.add("bot-custom-pdf-page-display");
+          nextButton.innerText = "Next Page";
+          prevButton.innerText = "Previous Page";
+          nextButton.addEventListener("click", this.pdfNextCallback);
+          prevButton.addEventListener("click", this.pdfPreviousCallback);
+          nextButton.classList.add("bot-pdf-control-buttons");
+          prevButton.classList.add("bot-pdf-control-buttons");
+          pdfContainer.appendChild(_canvas);
+          controlContainer.appendChild(prevButton);
+          controlContainer.appendChild(pageCount);
+          controlContainer.appendChild(nextButton);
+          pdfContainer.appendChild(controlContainer);
+          id = "#bot-custom-pdf-canvas";
+          this.setPdfPageNumber(initialState.currentPage);
+        }
         const canvas = document.querySelector(id) as HTMLCanvasElement;
         const ctx = canvas.getContext("2d");
         const viewport = page.getViewport({
@@ -666,17 +698,22 @@ class BotUI {
   };
 
   public setPdfPageNumber(num){
-    BotUI.pdfPageDisplay.textContent = "Page: " + num;
+    for (let index = 0; index < allPageElems.length; index++) {
+      const element = allPageElems[index];
+      element.textContent = "Page: " + num + " / " + initialState.pageCount;
+    }
+    BotUI.pdfPageDisplay.textContent = "Page: " + num + " / " + initialState.pageCount;
   }
 
   public pdfStart(nameRoute, numPage){
     if(numPage < 0) return;
     initialState.currentPage = numPage;
-    this.setPdfPageNumber(numPage);
     // Render the page.
     pdfjsLib.getDocument(nameRoute)
     .promise.then((data) => {
       initialState.pdfDoc = data;
+      initialState.pageCount = initialState.pdfDoc._pdfInfo.numPages;
+      this.setPdfPageNumber(numPage);
       console.log('pdfDocument', initialState.pdfDoc);
       this.renderPage();
     })
