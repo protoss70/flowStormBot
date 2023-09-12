@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/protoss70/flowStormBot#readme",
   "dependencies": {
-    "firebase": "^9.15.0"
+    "firebase": "^9.23.0"
   }
 }
