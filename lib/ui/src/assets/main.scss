@@ -634,6 +634,38 @@ $amount: 20;
   }
 }
 
+.bot-custom-pdf-viewer{
+  & > canvas{
+    height: 93%;
+    width: 100%;
+  }
+  & > .bot-pdf-control-container{
+    height: 5%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    border-top: solid 1px black;
+    padding-top: 8px;
+
+    & > .bot-pdf-control-buttons{
+      font-size: 14px;
+      border-radius: 9999px;
+      width: 110px;
+      height: 30px;
+
+      &:hover{
+        background-color: rgb(205, 205, 205);
+        cursor: pointer;
+      }
+    }
+
+    & > .bot-custom-pdf-page-display{
+      line-height: 30px;
+    }
+  }
+}
+
 .pdf-controls-section{
   display: flex;
   justify-content: center;

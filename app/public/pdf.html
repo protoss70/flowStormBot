@@ -17,13 +17,13 @@
 	<div id="botContainer">
 		<div id="botDiv"></div>
 	</div>
-    <canvas id="pdf-div"></canvas>
+    <div id="pdf-div"></div>
 	<script>
 		const queryString = window.location.search;
 		const urlParams = new URLSearchParams(queryString);
-		var canvasID ="#pdf-div"
+		var canvasID ="pdf-div"
 		if(urlParams.get('builtin')){
-			canvasID = "#data-pdf-viewer"
+			canvasID = "data-pdf-viewer"
 		}
 
 		var clientParams = {
@@ -32,7 +32,7 @@
 			fullScreen: false,
 			guiMode: 'chat',
 			backgroundColor: '#6737ff',
-			textInputEnabled: false,
+			textInputEnabled: true,
 			domain: '.flowstorm.ai',
 			mode: 'voice',
 			elementId: "botDiv",

@@ -8,6 +8,7 @@
   </head>
   <body>
     <div id="stage"></div>
+    <div id="pdf-start"></div>
     <script>
       const botUI = new BotUI("stage", {
         guiMode: "chat", // 'kiosk' or 'chat'
@@ -29,6 +30,7 @@
         suggestions: {textColor: "#000000", backgroundColor: "#BFBFBF", hoverBackgroundColor: "#ffffff80", activeBackground: "#ffffffb3"},
         triggerImage: `url(https://core.flowstorm.ai/file/assets/spaces/648ae13a8af625324045cf0d)`,
         search: true,
+        canvasID: "pdf-start",
       });
 
       // window.addEventListener("click", (e) =>{
@@ -102,6 +104,14 @@
       botUI.setStartButton(true);
       botUI.setFeedbackButtons([`<span class="icon icon--thumbs-up icon--content--thumbs-up"></span>`, 
       `<span class="icon icon--thumbs-down icon--content--thumbs-down"></span>`])
+      botUI.pdfStart("https://www.sldttc.org/allpdf/21583473018.pdf", 2);
     </script>
+
+    <style>
+      #pdf-start{
+        height: 98vh;
+        width: 70%;
+      }
+    </style>
   </body>
 </html>
