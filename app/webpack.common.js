@@ -51,6 +51,14 @@ const tMobilePlugin = new HtmlWebPackPlugin({
   chunks: ["app"],
 });
 
+const centralPlugin = new HtmlWebPackPlugin({
+  template: "./public/index1.html",
+  filename: "./index1.html",
+  // scriptLoading: 'defer'
+  inject: "head",
+  chunks: ["app"],
+});
+
 module.exports = {
   entry: {
     app: "./src/main.js",
@@ -104,5 +112,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin, pdfFilePlugin],
+  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin, pdfFilePlugin, centralPlugin],
 };
