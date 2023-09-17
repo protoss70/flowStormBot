@@ -59,7 +59,7 @@ $animationDuration: 1s;
 $amount: 20;
 
 [data-text-input-wrap].hidden {
-  display: none;
+  display: none !important;
 }
 
 [data-header] {
@@ -293,8 +293,8 @@ $amount: 20;
     justify-content: center;
     opacity: 0.75;
 
-    &.pdf-mode{
-      padding: 0.1rem 0.2rem;
+    .hidden{
+      display: none !important;
     }
 
     &[no-controls] {

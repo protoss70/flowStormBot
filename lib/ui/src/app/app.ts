@@ -124,7 +124,7 @@ const defaults: Settings = {
   coreURL: "", // Flowstorm server url. (not important for this library)
   cvutIcon: false, // show cvut icon on the bottom left
   suggestionsListView: false, // Set the suggestions either as list view (true) or as a single line (false)
-  canvasID: "#data-pdf-viewer"
+  canvasID: "data-pdf-viewer",
 };
 
 // global variables
@@ -134,7 +134,7 @@ const minAnimationParticles = 0;
 const maxAnimationParticles = 20;
 const chatHeight = "80px";
 const disabledHeight = "0px";
-const defaultPdfCanvasID = "#data-pdf-viewer";
+const defaultPdfCanvasID = "data-pdf-viewer";
 const allPageElems = []
 const avatarMaxHeightRatio = {
   [GUIMode.CHAT]: 2 / 3,
@@ -657,6 +657,7 @@ class BotUI {
           pdfContainer.innerHTML = "";
           const _canvas = document.createElement("canvas");
           _canvas.id = "bot-custom-pdf-canvas";
+          pdfContainer.appendChild(_canvas);
           const nextButton = document.createElement("button");
           const prevButton = document.createElement("button");
           const pageCount = document.createElement("div");
@@ -670,12 +671,11 @@ class BotUI {
           prevButton.addEventListener("click", this.pdfPreviousCallback);
           nextButton.classList.add("bot-pdf-control-buttons");
           prevButton.classList.add("bot-pdf-control-buttons");
-          pdfContainer.appendChild(_canvas);
           controlContainer.appendChild(prevButton);
           controlContainer.appendChild(pageCount);
           controlContainer.appendChild(nextButton);
           pdfContainer.appendChild(controlContainer);
-          id = "#bot-custom-pdf-canvas";
+          id = "bot-custom-pdf-canvas";
           this.setPdfPageNumber(initialState.currentPage);
         }
         const canvas = document.querySelector(id) as HTMLCanvasElement;
@@ -760,14 +760,14 @@ class BotUI {
       BotUI.controlIconsWrapper.classList.add("hidden");
       BotUI.pdfViewerElement.classList.remove("hidden");
       BotUI.pdfControllers.classList.remove("hidden");
-      BotUI.chatTextInputElement.classList.add("pdf-mode");
+      BotUI.textInput.classList.add("hidden");
     }
     else{
       BotUI.messagesElement.classList.remove("hidden");
       BotUI.controlIconsWrapper.classList.remove("hidden");
       BotUI.pdfViewerElement.classList.add("hidden");
       BotUI.pdfControllers.classList.add("hidden");
-      BotUI.chatTextInputElement.classList.remove("pdf-mode");
+      BotUI.textInput.classList.remove("hidden");
     }
   }
 

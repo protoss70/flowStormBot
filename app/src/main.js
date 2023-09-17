@@ -390,47 +390,6 @@ export const initFSClientBot = (initParams = {}) => {
       }
     };
 
-    if (development) {
-      function setControlIconsMain() {
-        botUI.setControllIcons({
-          mic: document.getElementById("mic").checked,
-          mute: document.getElementById("mute").checked,
-          restart: document.getElementById("restart").checked,
-        });
-      }
-
-      function setTextEnabled() {
-        const textInputEnabled = document.getElementById("textInput").checked;
-        botUI.setTextInputEnabled(textInputEnabled);
-      }
-
-      document.getElementById("mute").addEventListener("change", () => {
-        setControlIconsMain();
-      });
-      document.getElementById("mic").addEventListener("change", () => {
-        setControlIconsMain();
-      });
-      document.getElementById("restart").addEventListener("change", () => {
-        setControlIconsMain();
-      });
-      document.getElementById("textInput").addEventListener("change", () => {
-        setTextEnabled();
-      });
-
-      document.getElementById("cvutIcon").addEventListener("change", (e) => {
-        botUI.setCvutIcon(e.target.checked);
-        generatodEmbedLines["cvutIcon"] = e.target.checked;
-      });
-
-      setPreviewCustomizations(botUI);
-      const url = new URL(window.location.href);
-      const showCustomizationOptions = true;//url.searchParams.get("c") === "u_uid";
-      if (!showCustomizationOptions) {
-        document.getElementById("customizationOptions").remove();
-        document.getElementById("showCustomButton").remove();
-      }
-    }
-
     if (settings.interactionMode === "SOP") {
       bot.getUser().then((user) => {
         console.log("User: ", user);
@@ -780,7 +739,11 @@ var createBot = (botUI, settings) => {
 
       if (results.page_numbers && results.page_numbers.length > 0){
         // Change pdf page
-        botUI.showPage(results.page_numbers[0]);
+        if (!botUI.getSettings().pdfPageCallback){
+          botUI.showPage(results.page_numbers[0]);
+        }else{
+          !botUI.getSettings().pdfPageCallback(results.page_numbers[0]);
+        }
       }
 
       if (results.result && results.result[0].meta.answer) {-4
@@ -814,7 +777,8 @@ var createBot = (botUI, settings) => {
         }  
         break;
       case "PDF":
-        if (botUI.getSettings().canvasID !== "#data-pdf-viewer"){
+        console.log("============================= here ============================")
+        if (botUI.getSettings().canvasID !== "data-pdf-viewer" && !botUI.getSettings().pdfPageCallback){
           if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
             botUI.showPage(button.page);
             console.log("show page");
@@ -824,7 +788,8 @@ var createBot = (botUI, settings) => {
             console.log(3);
             botUI.pdfStart(currentPDF, button.page);
           }
-        }else{
+        }else if (!botUI.getSettings().pdfPageCallback){
+          bot.skipPlayedMessages();
           if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
             botUI.showPage(button.page);
             botUI.setPDFMode(true);
@@ -836,6 +801,9 @@ var createBot = (botUI, settings) => {
             botUI.pdfStart(currentPDF, button.page);
             botUI.setPDFMode(true);
           }
+        }else{
+          console.log(222);
+          botUI.getSettings().pdfPageCallback(button.page);
         }
         break;
       default:
@@ -896,15 +864,19 @@ var createBot = (botUI, settings) => {
             ...button,
           };
         
-          if (buttonType === "PDF" && botUI.getSettings().canvasID !== "#data-pdf-viewer"){
+          if (buttonType === "PDF" && botUI.getSettings().canvasID !== "data-pdf-viewer"){
+            console.log("============================= here1 ============================")
             if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
               botUI.showPage(button.page);
               console.log("show page");
-            }else{
+            }else if(!botUI.getSettings().pdfPageCallback){
               // currentPDF = button.action[0]
               console.log(1);
               currentPDF = `assets/main.pdf`;
               botUI.pdfStart(currentPDF, button.page);
+            }else{
+              console.log(111);
+              botUI.getSettings().pdfPageCallback(button.page);
             }
             break;
           }

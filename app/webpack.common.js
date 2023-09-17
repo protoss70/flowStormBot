@@ -27,6 +27,14 @@ const upvPlugin = new HtmlWebPackPlugin({
   chunks: ["app"],
 });
 
+const pdfDemo = new HtmlWebPackPlugin({
+  template: "./public/pdfDemo.html",
+  filename: "./pdfDemo.html",
+  // scriptLoading: 'defer'
+  inject: "head",
+  chunks: ["app"],
+});
+
 const porschePlugin = new HtmlWebPackPlugin({
   template: "./public/porsche.html",
   filename: "./porsche.html",
@@ -104,5 +112,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin, pdfFilePlugin],
+  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin, pdfFilePlugin, pdfDemo],
 };
