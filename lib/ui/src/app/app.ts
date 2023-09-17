@@ -2474,12 +2474,22 @@ class BotUI {
 
     // BACKGROUND
     this.setBackgroundColor(params["backgroundColor"], params["backgroundSecondaryColor"]);
+    BotUI.settings.backgroundColor = params["backgroundColor"];
+    BotUI.settings.backgroundSecondaryColor = params["backgroundSecondaryColor"];
+
 
     // MESSAGE COLORS
     this.setBotMessageTextColor(params["botMessageTextColor"]);
+    BotUI.settings.botMessageTextColor = params["botMessageTextColor"];
+
     this.setBotMessageBackgroundColor(params["botMessageBackgroundColor"]);
+    BotUI.settings.botMessageBackgroundColor = params["botMessageBackgroundColor"];
+
     this.setUserMessageTextColor(params["userMessageTextColor"]);
+    BotUI.settings.userMessageTextColor = params["userMessageTextColor"];
+
     this.setUserMessageBackgroundColor(params["userMessageBackgroundColor"]);
+    BotUI.settings.userMessageBackgroundColor = params["userMessageBackgroundColor"];
 
     // SUGGESTION COLORS
     if (params["suggestions"] !== undefined) {
@@ -2488,6 +2498,7 @@ class BotUI {
 
     // CVUT ICON
     this.setCvutIcon(params["cvutIcon"]);
+    BotUI.settings.cvutIcon = params["cvutIcon"];
 
     // TRIGGER IMAGE (displayed when bot is collapsed)
     BotUI.element.style.setProperty(
@@ -2503,8 +2514,12 @@ class BotUI {
     // BACKGROUND IMAGE
     if (params["backgroundImage"] !== undefined && params["backgroundImageBlur"] !== undefined) {
       this.setBackgroundImage(params["backgroundImage"], params["backgroundImageBlur"]);
+      BotUI.settings.backgroundImage = params["backgroundImage"];
+      BotUI.settings.backgroundImageBlur = params["backgroundImageBlur"];
+
     } else if (params["backgroundImage"] !== undefined) {
       this.setBackgroundImage(params["backgroundImage"]);
+      BotUI.settings.backgroundImage = params["backgroundImage"];
     } else {
       BotUI.backgroundElement.classList.remove("background--image");
       BotUI.element.style.removeProperty("--bot-ui-background-url");

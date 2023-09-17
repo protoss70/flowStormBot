@@ -29,12 +29,35 @@
 			</div>
 		</div>
 		<br>
-		<button id="showCustomButton" onclick="toggleCustomization(this)">Show Customization Options</button>
-		<div id="customizationOptions" class="hidden">
+		<button id="showCustomButton" onclick="toggleCustomization(this)" class="hidden">Show Customization Options</button>
+		<div id="customizationOptions" >
+			<hr/>
+			<h3>Application</h3>
+
+			<label for="appNameInput">Name</label>
+			<input type="text" id="appNameInput">
+			<br>
+			<label for="introMessageInput">Intro Message</label>
+			<input type="text" id="introMessageInput">
+			<br>
+			<label for="introImgFile">Intro Picture</label>
+			<input type="file" id="introImgFile">
+
+
 			<hr/>
 			<h3>Manual PDF file</h3>
-			<label for="pdfFile"></label>
-			<input type="file" name="pdfFile" id="pdfFile">
+
+			<form id="uploadForm" action="https://universal-cqa-develop.alquist.ai/upload_manual" method="post" enctype="multipart/form-data" target="responseIframe">
+				<label for="pdfFile"></label>
+				<input type="file" name="file" id="pdfFile">
+				<button type="submit">Upload</button>
+			</form>
+			<label for="responseIframe" style="margin-top: 10px">API Response</label>
+			<br>
+			<iframe id="responseIframe" name="responseIframe" height="50em" width="70%"></iframe>
+
+
+
 			<hr/>
 			<h3>Icons</h3>
 			<div>
@@ -138,36 +161,31 @@
 				</div>
 				<hr>
 				<div style="display:flex; justify-content: space-between; align-items:center;">
-					<label style="margin-bottom:0;" for="backgroundUrl">Url</label>
+					<label style="margin-bottom:0;" for="backgroundUrl">Background Image URL</label>
 					<input type="text" class="form-control" id="backgroundUrl" placeholder="url..." title="Choose the url" style="width: 90px;">
 				</div>
 				<div style="display:flex; justify-content: space-between; align-items:center; margin-top: 3px;">
-					<label style="margin-bottom:0;" for="backgroundBlur">Blur</label>
+					<label for="backgroundBlur">Background Image Blur</label>
 					<input type="number" value="0" min="0" step="0.5" style="width: 90px; margin-right: 1px;" class="form-number" id="backgroundBlur">
+				</div>
+				<div style="display:flex; justify-content: space-between; align-items:center;">
+					<label style="margin-bottom:0;" for="triggerImgUrl">Trigger Image URL</label>
+					<input type="text" class="form-control" id="triggerImgUrl" placeholder="url..." title="Choose the url" style="width: 90px;">
 				</div>
 			</div>
 			<button id="generateEmbedCodeButton" style="margin-bottom: 20px; margin-top: 10px;">Generate Embed Code</button>
 			<div id="embedParamsParent" class="hidden">
-				Add the following lines to your embedded initFSClientBot parameters:
-				<div id="embedParams" style="background-color: #D9D9D9; padding: 20px; color:black; border-radius: 10px; margin-bottom: 20px;width: 100%; overflow: auto">
-						botKey: '6141f6fe302806105e62e745',<br>
-						collapsable: false,<br>
-						guiMode: 'chat',<br>
-						widgetSize: { width: '500px', height: '570px' }, <br>
-						fullScreen: false, <br>
-						attributes: { documentId: 'docId', personName: 'Name' }, <br>
-						userMessageTextColor: '#382929', <br>
-						botMessageTextColor: '#c85151', <br>
-						botMessageBackgroundColor: '#476885', <br>
-						userMessageBackgroundColor: '#7ba7d5', <br>
-						backgroundImageBlur: '3.4', <br>
-				</div>
+				JSON configuration file:
+				<button onclick="copyFunction();" style="float: right;" >Copy to clipboard</button>
+				<pre id="embedParams" style="background-color: #D9D9D9; padding: 20px; color:black; border-radius: 10px; margin-bottom: 20px;width: 100%; overflow: auto">
+				</pre>
+
 			</div>
 		</div>
 	</div>
 	<div id="upvTest">
 		<!--<h1 id="title">UPV TEST</h1>-->
-		<img id="title" src="https://core.flowstorm.ai/file/assets/spaces/64edefad35094e2b1ed97ef3" alt="CTU CIIRC logo">
+		<img id="title" class="hidden" src="https://core.flowstorm.ai/file/assets/spaces/64edefad35094e2b1ed97ef3" alt="CTU CIIRC logo">
 	</div>
 	
 	<div id="botContainer">
@@ -319,6 +337,17 @@
 			inner.textContent = text;
 			inner.classList.add("idItems");
 			document.getElementById("oldItemsList").append(el);
+		}
+
+		function copyFunction() {
+			const copyText = document.getElementById("embedParams").textContent;
+			const textArea = document.createElement('textarea');
+			textArea.style += "position: absolute; left: -100%;"
+			textArea.textContent = copyText;
+			document.body.append(textArea);
+			textArea.select();
+			document.execCommand("copy");
+			textArea.remove();
 		}
 		
 	</script>

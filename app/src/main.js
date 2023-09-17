@@ -47,7 +47,36 @@ var botInitializer = new BotInitializer();
 var buttonInput = false;
 var elasticSearchActive = false; // this is true when the actual query for the elastic search is being entered
 var searchCommandActive = false; // this is true when the #search command is called
-let generatodEmbedLines = {};
+
+let generatedEmbedLines = {
+  "cvutIcon" : true,
+  "textInputEnabled" : false,
+  "controlIcons" : {
+    "mic" : true,
+    "mute" : true,
+    "restart" : true
+  },
+  "botMessageBackgroundColor": "#00000066",
+  "botMessageTextColor": "#FFFFFF",
+  "userMessageTextColor": "#ffffff",
+  "userMessageBackgroundColor": "#ffffff4d",
+  "suggestions": {
+    "textColor": "#000000",
+    "backgroundColor": "#BFBFBF",
+    "hoverBackgroundColor": "#ffffff",
+    "activeBackground":"#ffffff"
+  },
+  "backgroundColor": "#6737ff",
+  "backgroundSecondaryColor": "#28568c",
+};
+
+let generatedJSONConfig = {
+  "appName": "App name",
+  "pdfFile": "",
+  "FAISSFile": "",
+  "firebaseID" : "",
+  "clientParams" : generatedEmbedLines
+}
 
 const audios = {};
 var latestUserInputID = ""; // Keeps track of the UserInput node id from flowstorm. Used for Alternative Suggestions
@@ -159,6 +188,7 @@ export const initFSClientBot = (initParams = {}) => {
       "backgroundColorSuggestionsAlpha",
       "hoverBackgroundColorSuggestionsAlpha",
       "activeBackgroundColorSuggestionsAlpha",
+      "triggerImgUrl"
     ];
     const generatorButtonID = "generateEmbedCodeButton";
 
@@ -188,32 +218,32 @@ export const initFSClientBot = (initParams = {}) => {
       var listenerFunction;
       if (id === "textColorUser")
         listenerFunction = (e) => {
-          generatodEmbedLines["userMessageTextColor"] = e.target.value;
+          generatedEmbedLines["userMessageTextColor"] = e.target.value;
           settings.userMessageTextColor = e.target.value;
           botUI.setUserMessageTextColor(e.target.value);
         };
       if (id === "textColorBot")
         listenerFunction = (e) => {
-          generatodEmbedLines["botMessageTextColor"] = e.target.value;
+          generatedEmbedLines["botMessageTextColor"] = e.target.value;
           settings.botMessageTextColor = e.target.value;
           botUI.setBotMessageTextColor(e.target.value);
         };
       if (id === "TextOutlineUser")
         listenerFunction = (e) => {
-          generatodEmbedLines["userMessageTextOutlineColor"] = e.target.value;
+          generatedEmbedLines["userMessageTextOutlineColor"] = e.target.value;
           settings.userMessageTextOutlineColor = e.target.value;
           botUI.setUserMessageTextOutlineColor(e.target.value);
         };
       if (id === "TextOutlineBot")
         listenerFunction = (e) => {
-          generatodEmbedLines["botMessageTextOutlineColor"] = e.target.value;
+          generatedEmbedLines["botMessageTextOutlineColor"] = e.target.value;
           settings.botMessageTextOutlineColor = e.target.value;
           botUI.setBotMessageTextOutlineColor(e.target.value);
         };
       if (id === "messageBackgroundUser")
         listenerFunction = () => {
           const color = ColorToRGBA("userOpacity", "messageBackgroundUser");
-          generatodEmbedLines["userMessageBackgroundColor"] = color;
+          generatedEmbedLines["userMessageBackgroundColor"] = color;
           settings.userMessageBackgroundColor = color;
           botUI.setUserMessageBackgroundColor(color);
         };
@@ -221,7 +251,7 @@ export const initFSClientBot = (initParams = {}) => {
       if (id === "messageBotBackground")
         listenerFunction = () => {
           const color = ColorToRGBA("botOpacity", "messageBotBackground");
-          generatodEmbedLines["botMessageBackgroundColor"] = color;
+          generatedEmbedLines["botMessageBackgroundColor"] = color;
           settings.botMessageBackgroundColor = color;
           botUI.setBotMessageBackgroundColor(color);
         };
@@ -229,7 +259,7 @@ export const initFSClientBot = (initParams = {}) => {
       if (id === "userOpacity")
         listenerFunction = () => {
           const color = ColorToRGBA("userOpacity", "messageBackgroundUser");
-          generatodEmbedLines["userMessageBackgroundColor"] = color;
+          generatedEmbedLines["userMessageBackgroundColor"] = color;
           settings.userMessageBackgroundColor = color;
           botUI.setUserMessageBackgroundColor(color);
         };
@@ -237,21 +267,21 @@ export const initFSClientBot = (initParams = {}) => {
       if (id === "botOpacity")
         listenerFunction = () => {
           const color = ColorToRGBA("botOpacity", "messageBotBackground");
-          generatodEmbedLines["botMessageBackgroundColor"] = color;
+          generatedEmbedLines["botMessageBackgroundColor"] = color;
           settings.botMessageBackgroundColor = color;
           botUI.setBotMessageBackgroundColor(color);
         };
 
       if (id === "botBackgroundColor")
         listenerFunction = (e) => {
-          generatodEmbedLines["backgroundColor"] = e.target.value;
+          generatedEmbedLines["backgroundColor"] = e.target.value;
           settings.backgroundColor = e.target.value;
           botUI.setBackgroundColor(e.target.value);
         };
 
       if (id === "backgroundBlur")
         listenerFunction = (e) => {
-          generatodEmbedLines["backgroundImageBlur"] = e.target.value;
+          generatedEmbedLines["backgroundImageBlur"] = e.target.value;
           settings.backgroundImageBlur = e.target.value;
           botUI.setBackgroundImage(
             document.getElementById("backgroundUrl").value,
@@ -261,7 +291,7 @@ export const initFSClientBot = (initParams = {}) => {
 
       if (id === "backgroundUrl")
         listenerFunction = (e) => {
-          generatodEmbedLines["backgroundImage"] = e.target.value;
+          generatedEmbedLines["backgroundImage"] = e.target.value;
           settings.backgroundImageBlur = e.target.value;
           botUI.setBackgroundImage(
             e.target.value,
@@ -271,11 +301,20 @@ export const initFSClientBot = (initParams = {}) => {
 
       if (id === "botBackgroundColorSecondary")
         listenerFunction = (e) => {
-          generatodEmbedLines["backgroundImageSecondaryColor"] = e.target.value;
+          generatedEmbedLines["backgroundImageSecondaryColor"] = e.target.value;
           settings.backgroundImageSecondaryColor = e.target.value;
           botUI.setBackgroundColor(
             document.getElementById("botBackgroundColor").value,
             e.target.value
+          );
+        }
+
+      if (id === "triggerImgUrl")
+        listenerFunction = (e) => {
+          generatedEmbedLines["triggerImage"] = e.target.value;
+          BotUI.element.style.setProperty(
+              "--bot-ui-trigger-element-image",
+              `url("${e.target.value}")`
           );
         };
 
@@ -288,7 +327,7 @@ export const initFSClientBot = (initParams = {}) => {
             hoverBackgroundColor: ColorToRGBA("hoverBackgroundColorSuggestionsAlpha", "hoverBackgroundColorSuggestions"),
             activeBackground: ColorToRGBA("activeBackgroundColorSuggestionsAlpha", "activeBackgroundColorSuggestions")
           });
-          generatodEmbedLines["suggestions"] = {
+          generatedEmbedLines["suggestions"] = {
             textColor: ColorToRGBA("textColorSuggestionsAlpha", "textColorSuggestions"),
             backgroundColor: ColorToRGBA("backgroundColorSuggestionsAlpha", "backgroundColorSuggestions"),
             hoverBackgroundColor: ColorToRGBA("hoverBackgroundColorSuggestionsAlpha", "hoverBackgroundColorSuggestions"),
@@ -307,13 +346,16 @@ export const initFSClientBot = (initParams = {}) => {
               .getElementById("embedParamsParent")
               .classList.remove("hidden");
           const embedElem = document.getElementById("embedParams");
-          embedElem.innerHTML = preTags;
 
-          Object.keys(generatodEmbedLines).forEach((key) => {
-            let p = JSON.stringify(generatodEmbedLines[key]);
-            embedElem.innerHTML += `&emsp;&emsp;${key}: ${p},<br />`;
-          });
-          embedElem.innerHTML += endTags;
+          // embedElem.innerHTML = preTags;
+          // Object.keys(generatedEmbedLines).forEach((key) => {
+          //   let p = JSON.stringify(generatedEmbedLines[key]);
+          //   embedElem.innerHTML += `&emsp;&emsp;${key}: ${p},<br />`;
+          // });
+          // embedElem.innerHTML += endTags;
+
+          embedElem.innerHTML = JSON.stringify(generatedJSONConfig, null, 2)
+
           window.scrollTo(0, document.body.scrollHeight);
         });
   }
@@ -389,6 +431,51 @@ export const initFSClientBot = (initParams = {}) => {
         botUI.toggleLoader(true);
       }
     };
+
+    if (development) {
+      function setControlIconsMain() {
+        botUI.setControllIcons({
+          mic: document.getElementById("mic").checked,
+          mute: document.getElementById("mute").checked,
+          restart: document.getElementById("restart").checked,
+        });
+      }
+
+      function setTextEnabled() {
+        const textInputEnabled = document.getElementById("textInput").checked;
+        botUI.setTextInputEnabled(textInputEnabled);
+      }
+
+      document.getElementById("mute").addEventListener("change", () => {
+        setControlIconsMain();
+        generatedEmbedLines["controlIcons"]["mute"] = e.target.checked;
+      });
+      document.getElementById("mic").addEventListener("change", () => {
+        setControlIconsMain();
+        generatedEmbedLines["controlIcons"]["mic"] = e.target.checked;
+      });
+      document.getElementById("restart").addEventListener("change", () => {
+        setControlIconsMain();
+        generatedEmbedLines["controlIcons"]["restart"] = e.target.checked;
+      });
+      document.getElementById("textInput").addEventListener("change", () => {
+        setTextEnabled();
+        generatedEmbedLines["textInputEnabled"] = e.target.checked;
+      });
+
+      document.getElementById("cvutIcon").addEventListener("change", (e) => {
+        botUI.setCvutIcon(e.target.checked);
+        generatedEmbedLines["cvutIcon"] = e.target.checked;
+      });
+
+      setPreviewCustomizations(botUI);
+      const url = new URL(window.location.href);
+      const showCustomizationOptions = true;//url.searchParams.get("c") === "u_uid";
+      if (!showCustomizationOptions) {
+        document.getElementById("customizationOptions").remove();
+        document.getElementById("showCustomButton").remove();
+      }
+    }
 
     if (settings.interactionMode === "SOP") {
       bot.getUser().then((user) => {
