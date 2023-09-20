@@ -91,20 +91,13 @@
       
       document.addEventListener("keydown", (event) => {
         if (event.keyCode === 66) {
-          botUI.setPDFMode(true);
-          botUI.setPDF("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 88);
+          botUI.toggleLoading(true);
         }
         if (event.keyCode === 86){
-          botUI.setPDFMode(true);
-          botUI.setPDF("https://web.engr.oregonstate.edu/~mjb/gamemaker/gmaker80.pdf", 1);
+          botUI.toggleLoading(false);
         }
       })
-
-      botUI.setButton({text: "This is a button"});
-
       botUI.setImage("https://core.flowstorm.ai/file/assets/spaces/64edeca2ed1e825d29b4c2c1");
-
-      botUI.pdfStart("https://www.sldttc.org/allpdf/21583473018.pdf", 2);
     </script>
 
     <style>

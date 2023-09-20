@@ -36,7 +36,7 @@ let defaultCoreUrl =
   environment === "local"
     ? "http://localhost:8080"
     : `https://core${environment}.flowstorm.ai`;
-let development = true;
+let development = false;
 
 let idToken = undefined;
 let accessToken = undefined;
@@ -428,7 +428,7 @@ export const initFSClientBot = (initParams = {}) => {
 
     bot.sttRecognizedCallback = () => {
       if (elasticSearchActive) {
-        botUI.toggleLoader(true);
+        botUI.toggleLoading(true);
       }
     };
 
@@ -1017,7 +1017,7 @@ var createBot = (botUI, settings) => {
         break;
       case "#ServerResults":
         console.log("payload: ", payload);
-        botUI.toggleLoader(false);
+        botUI.toggleLoading(false);
         bot.audioInputCallback();
         handleFlowstormApiCall(payload.result);
         break;
@@ -1041,7 +1041,7 @@ var createBot = (botUI, settings) => {
         botUI.toggleElasticSearch(false);
         break;
       case "#loadingOff":
-        botUI.toggleLoader(false);
+        botUI.toggleLoading(false);
         break;
       case "#bot_settings": // change appearance of bot for each app
         const params = payload["clientParams"];
@@ -1273,7 +1273,7 @@ var createBot = (botUI, settings) => {
   botUI.chatInputCallback = (inputValue) => {
     sendText(inputValue);
     if (elasticSearchActive) {
-      botUI.toggleLoader(true);
+      botUI.toggleLoading(true);
     }
   };
 
@@ -1348,7 +1348,7 @@ var createBot = (botUI, settings) => {
       searchCommandActive = false;
       botUI.toggleSearchIcons(false);
       botUI.toggleElasticSearch(false);
-      botUI.toggleLoader(false);
+      botUI.toggleLoading(false);
     }
 
     if (state === "SLEEPING" || state === undefined) {

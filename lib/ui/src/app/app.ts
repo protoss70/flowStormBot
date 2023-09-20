@@ -609,6 +609,29 @@ class BotUI {
     return warningElem;
   }
 
+  public toggleLoading(on: boolean){
+    if (on){
+      const loaderContainer = document.createElement("div")
+      loaderContainer.classList.add("loader");
+      loaderContainer.setAttribute("loader", "")
+  
+      const loaderText = document.createElement("span")
+      loaderText.classList.add("loader-text")
+      loaderText.setAttribute("loader-text", "")
+
+      loaderContainer.appendChild(loaderText)
+      
+      this.setBotText(`<div loader class="loader"><span loader-text class="loader-text">Loading...</span></div>`, "");
+    }else{
+      const allLoaders = BotUI.element.getElementsByClassName("loader");
+      while (allLoaders.length > 0) {
+        const element = allLoaders[0];
+        const messageContainer = element.parentElement.parentElement;
+        messageContainer.remove();
+      }
+    }
+  }
+
   public toggleSearchIcons(on: boolean){
     if (on){
       BotUI.searchElement.classList.add("hidden");
