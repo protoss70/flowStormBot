@@ -862,21 +862,19 @@ var createBot = (botUI, settings) => {
         break;
       case "PDF":
         if (botUI.getSettings().canvasID !== "data-pdf-viewer" && !botUI.getSettings().pdfPageCallback){
-          if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
+          if (currentPDF === button.action[0]){
             botUI.showPage(button.page);
           }else{
-            // currentPDF = button.action[0]
-            currentPDF = `assets/main.pdf`;
+            currentPDF = button.action[0]
             botUI.pdfStart(currentPDF, button.page);
           }
         }else if (!botUI.getSettings().pdfPageCallback){
           bot.skipPlayedMessages();
-          if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
+          if (currentPDF === button.action[0]){
             botUI.showPage(button.page);
             botUI.setPDFMode(true);
           }else{
-            // currentPDF = button.action[0]
-            currentPDF = `assets/main.pdf`;
+            currentPDF = button.action[0]
             botUI.pdfStart(currentPDF, button.page);
             botUI.setPDFMode(true);
           }
@@ -943,11 +941,10 @@ var createBot = (botUI, settings) => {
           };
         
           if (buttonType === "PDF" && botUI.getSettings().canvasID !== "data-pdf-viewer"){
-            if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
+            if (currentPDF === button.action[0]){
               botUI.showPage(button.page);
             }else if(!botUI.getSettings().pdfPageCallback){
-              // currentPDF = button.action[0]
-              currentPDF = `assets/main.pdf`;
+              currentPDF = button.action[0]
               botUI.pdfStart(currentPDF, button.page);
             }else{
               botUI.getSettings().pdfPageCallback(button.page);
