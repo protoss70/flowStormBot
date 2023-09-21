@@ -665,11 +665,9 @@ class BotUI {
 
   private renderPage = () => {
     // Load the first page.
-    console.log(initialState.pdfDoc, 'pdfDoc');
     initialState.pdfDoc
       .getPage(initialState.currentPage)
       .then((page) => {
-        console.log('page', page);
         var id = ""
         if (this.getSettings().canvasID === defaultPdfCanvasID){
           id = this.getSettings().canvasID
@@ -701,7 +699,7 @@ class BotUI {
           id = "bot-custom-pdf-canvas";
           this.setPdfPageNumber(initialState.currentPage);
         }
-        const canvas = document.querySelector(id) as HTMLCanvasElement;
+        const canvas = document.getElementById(id) as HTMLCanvasElement;
         const ctx = canvas.getContext("2d");
         const viewport = page.getViewport({
           scale: initialState.zoom,
@@ -738,7 +736,6 @@ class BotUI {
       initialState.pdfDoc = data;
       initialState.pageCount = initialState.pdfDoc._pdfInfo.numPages;
       this.setPdfPageNumber(numPage);
-      console.log('pdfDocument', initialState.pdfDoc);
       this.renderPage();
     })
     .catch((err) => {
