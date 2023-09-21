@@ -518,7 +518,6 @@ const initUI = (settings = {}) => {
   }
   const botUI = new BotUI(elementId, settings);
   botUI.setUserText();
-  console.log(botUI.getButtonInputMode());
 
   botElement = BotUI.element;
   if (!botElement) {
@@ -822,7 +821,6 @@ var createBot = (botUI, settings) => {
       bot.audioInputCallback();
     } else {
       //SUCCESS
-      console.log("rrestl", results);
 
       if (results.page_numbers && results.page_numbers.length > 0){
         // Change pdf page
@@ -836,7 +834,6 @@ var createBot = (botUI, settings) => {
       if (results.result && results.result[0].meta.answer) {-4
         let answer = results.result[0].meta.answer
         // answer = answer.slice(0, answer.length -4) + answer.slice(answer.length - 3);
-        console.log("answer: ", answer);
         setAttribute(
           "FAQ_Answer",
           answer
@@ -864,15 +861,12 @@ var createBot = (botUI, settings) => {
         }  
         break;
       case "PDF":
-        console.log("============================= here ============================")
         if (botUI.getSettings().canvasID !== "data-pdf-viewer" && !botUI.getSettings().pdfPageCallback){
           if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
             botUI.showPage(button.page);
-            console.log("show page");
           }else{
             // currentPDF = button.action[0]
             currentPDF = `assets/main.pdf`;
-            console.log(3);
             botUI.pdfStart(currentPDF, button.page);
           }
         }else if (!botUI.getSettings().pdfPageCallback){
@@ -880,16 +874,13 @@ var createBot = (botUI, settings) => {
           if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
             botUI.showPage(button.page);
             botUI.setPDFMode(true);
-            console.log("show page");
           }else{
             // currentPDF = button.action[0]
             currentPDF = `assets/main.pdf`;
-            console.log(2);
             botUI.pdfStart(currentPDF, button.page);
             botUI.setPDFMode(true);
           }
         }else{
-          console.log(222);
           botUI.getSettings().pdfPageCallback(button.page);
         }
         break;
@@ -952,17 +943,13 @@ var createBot = (botUI, settings) => {
           };
         
           if (buttonType === "PDF" && botUI.getSettings().canvasID !== "data-pdf-viewer"){
-            console.log("============================= here1 ============================")
             if (currentPDF === button.action[0] || currentPDF == `assets/main.pdf`){
               botUI.showPage(button.page);
-              console.log("show page");
             }else if(!botUI.getSettings().pdfPageCallback){
               // currentPDF = button.action[0]
-              console.log(1);
               currentPDF = `assets/main.pdf`;
               botUI.pdfStart(currentPDF, button.page);
             }else{
-              console.log(111);
               botUI.getSettings().pdfPageCallback(button.page);
             }
             break;
@@ -1392,7 +1379,6 @@ var createBot = (botUI, settings) => {
         const activeElems = parent.getElementsByClassName("active");
         if (activeElems.length > 0) {
           // Active class exists, initiate #go_to
-          console.log(activeElems);
           activeElems[0].classList.remove("active");
           self.classList.add("active");
           removeNodesAfterSuggestion(self);
