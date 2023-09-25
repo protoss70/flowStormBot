@@ -699,6 +699,16 @@ $amount: 20;
     }
   }
 
+  .icon--content--thumbs-up, .icon--content--thumbs-down{
+    &.negative-feedback-message{
+      color: #970707 !important;
+    }
+
+    &.positive-feedback-message{
+      color: #038903 !important;
+    }
+  }
+
   .bot {
     flex-direction: column;
 
@@ -756,14 +766,6 @@ $amount: 20;
 
       &.hidden{
         display: none !important;
-      }
-
-      &.negative-feedback-message{
-        color: #970707 !important;
-      }
-
-      &.positive-feedback-message{
-        color: #038903 !important;
       }
 
       & > div.chat-message--limit {
@@ -845,10 +847,6 @@ $amount: 20;
         &:after {
           background-color: var(--bot-ui-message-background-user);
         }
-      }
-
-      span:empty {
-        display: none;
       }
     }
 

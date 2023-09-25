@@ -1011,14 +1011,6 @@ var createBot = (botUI, settings) => {
         botUI.removeSuggestions();
         break;
       case "#exitSearch":
-        const feedBackButtons = [`<span class="icon icon--thumbs-up icon--content--thumbs-up"></span>`, 
-        `<span class="icon icon--thumbs-down icon--content--thumbs-down"></span>`]
-        botUI.setUserText("feedback message");
-        const feedbackMessage =  botUI.getLastUserMessage()
-        feedbackMessage.classList.add("hidden");
-        feedbackMessage.setAttribute("turnID", bot.responses[bot.responses.length - 1].turnId);
-        botUI.getlas
-        botUI.setFeedbackButtons(feedBackButtons);
         elasticSearchActive = false;
         searchCommandActive = false;
         botUI.toggleSearchIcons(false);
@@ -1366,6 +1358,7 @@ var createBot = (botUI, settings) => {
     }
 
     if (botUI.getSettings().suggestionMode === suggestionModes.ALTERNATIVE && (status !== undefined || status !== "SLEEPING")) {
+      // Alternative suggestion mode
       if (self.classList.contains("active")) {
         return;
       } else {
@@ -1398,8 +1391,22 @@ var createBot = (botUI, settings) => {
         }
       }
     } else {
-      bot.handleOnTextInput(self.innerHTML, false);
-      botUI.removeSuggestions();
+      if (self.innerHTML === self.textContent){
+        // suggestion buttons
+        bot.handleOnTextInput(self.innerHTML, false);
+        botUI.removeSuggestions();
+      }else{
+        // feedback buttons
+        if(self.firstChild.classList.contains("icon--thumbs-up")){
+          botUI.addFeedbackMessage(true);
+          bot.handleOnTextInput("_thumbs_up_", false, false);
+          botUI.removeSuggestions();
+        }else{
+          botUI.addFeedbackMessage(false);
+          bot.handleOnTextInput("_thumbs_down_", false, false);
+          botUI.removeSuggestions();
+        }
+      }
     }
   };
 

@@ -1229,6 +1229,15 @@ class BotUI {
     }
   };
 
+  public addFeedbackMessage(up: boolean){
+    const feedBackButtons = this.createFeedbackButtons(true);
+    if (up){
+      this.setUserText(feedBackButtons[0]);
+    }else{
+      this.setUserText(feedBackButtons[1]);
+    }
+  }
+
   public removeSuggestions = () => {
     if (this.getSettings().suggestionMode === SuggestionMode.STANDARD){
       const elemList = document.querySelectorAll(
@@ -1265,7 +1274,23 @@ class BotUI {
     BotUI.scrollToLastMessage(messageElement);
   }
 
+  public createFeedbackButtons(active: boolean = false){
+    if (!active){
+      return [`<span class="icon icon--thumbs-up icon--content--thumbs-up"></span>`, 
+      `<span class="icon icon--thumbs-down icon--content--thumbs-down"></span>`]
+    }
+    return [`<span class="icon icon--thumbs-up icon--content--thumbs-up positive-feedback-message"></span>`, 
+    `<span class="icon icon--thumbs-down icon--content--thumbs-down negative-feedback-message"></span>`]
+    
+    // this.setUserText("feedback message");
+    // const feedbackMessage =  this.getLastUserMessage() as HTMLElement
+    // feedbackMessage.classList.add("hidden");
+    // feedbackMessage.setAttribute("turnID", bot.responses[bot.responses.length - 1].turnId);
+    // this.setFeedbackButtons(feedBackButtons);
+  }
+
   public setSuggestion = (suggestions: string[], listView: boolean = false) => {
+
     this.removeSuggestions();
     const messageElement = BotUI.messagesElement;
     const suggestionContainer = getContentAsHtml(sopSuggestionContainer);
@@ -1303,9 +1328,14 @@ class BotUI {
         scrollFunction(e);
       });
     }
+  if (suggestions.includes("_thumbs_up_") || suggestions.includes("_thumbs_down_")){
+    const feedBackButtons = this.createFeedbackButtons();
+    suggestions[suggestions.indexOf("_thumbs_down_")] = feedBackButtons[1];
+    suggestions[suggestions.indexOf("_thumbs_up_")] = feedBackButtons[0];
+  }
     suggestions.forEach((sug) => {
       let btn = document.createElement("button");
-      btn.innerText = sug;
+      btn.innerHTML = sug;
       btn.setAttribute("data-suggestions-button", "");
       btn.classList.add("data-suggestions-button");
       if (listView) {
