@@ -10,54 +10,6 @@ const htmlPlugin = new HtmlWebPackPlugin({
   chunks: ["app"],
 });
 
-const upvPlugin = new HtmlWebPackPlugin({
-  template: "./public/upv.html",
-  filename: "./upv.html",
-  // scriptLoading: 'defer'
-  inject: "head",
-  chunks: ["app"],
-});
-
-const pdfDemo = new HtmlWebPackPlugin({
-  template: "./public/pdfDemo.html",
-  filename: "./pdfDemo.html",
-  // scriptLoading: 'defer'
-  inject: "head",
-  chunks: ["app"],
-});
-
-const porschePlugin = new HtmlWebPackPlugin({
-  template: "./public/porsche.html",
-  filename: "./porsche.html",
-  // scriptLoading: 'defer'
-  inject: "head",
-  chunks: ["app"],
-});
-
-const pdfPlugin = new HtmlWebPackPlugin({
-  template: "./public/pdf.html",
-  filename: "./pdf.html",
-  // scriptLoading: 'defer'
-  inject: "head",
-  chunks: ["app"],
-});
-
-const tMobilePlugin = new HtmlWebPackPlugin({
-  template: "./public/tmobile.html",
-  filename: "./tmobile.html",
-  // scriptLoading: 'defer'
-  inject: "head",
-  chunks: ["app"],
-});
-
-const centralPlugin = new HtmlWebPackPlugin({
-  template: "./public/index1.html",
-  filename: "./index1.html",
-  // scriptLoading: 'defer'
-  inject: "head",
-  chunks: ["app"],
-});
-
 module.exports = {
   entry: {
     app: "./src/main.js",
@@ -111,5 +63,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin, pdfDemo, centralPlugin],
+  plugins: [htmlPlugin],
 };
