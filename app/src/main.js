@@ -981,9 +981,9 @@ var createBot = (botUI, settings) => {
             suggestionText.push(node.text);
           });
           // Logic is if list view is not true, the default suggestion styles for mobile and web will be used
-          botUI.setSuggestion(suggestionText, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView);
+          botUI.setSuggestion(suggestionText, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView && true);
         } else {
-          botUI.setSuggestion(payload.suggestions, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView);
+          botUI.setSuggestion(payload.suggestions, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView && true);
         }
         break;
       case "#media":
@@ -1350,7 +1350,7 @@ var createBot = (botUI, settings) => {
   }
 
   botUI.suggestionsCallback = (e) => {
-    const self = e.target;
+    const self = e.currentTarget;
     const status = getStatus();
 
     if (status !== "LISTENING") {
