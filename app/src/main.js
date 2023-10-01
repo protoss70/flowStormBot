@@ -1016,9 +1016,6 @@ var createBot = (botUI, settings) => {
         botUI.toggleSearchIcons(false);
         botUI.toggleElasticSearch(false);
         break;
-      case "#loadingOff":
-        botUI.toggleLoading(false);
-        break;
       case "#bot_settings": // change appearance of bot for each app
         const params = payload["clientParams"];
         botUI.applyAppSettings(params);
@@ -1508,6 +1505,12 @@ var createBot = (botUI, settings) => {
     false, // called from Kotlin
     settings.ttsFileType
   );
+
+  bot.onMessageCallback = (param) => {
+    if (param.type === "Response"){
+      botUI.toggleLoading(false);
+    }
+  }
 
   if (settings.avatarURL) {
     bot.playAudio = (audio) => {
