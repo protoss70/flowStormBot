@@ -498,7 +498,7 @@ export const initFSClientBot = (initParams = {}) => {
     );
   }
 
-  return myBot;
+  return autoStartBot;
 };
 
 const initUI = (settings = {}) => {

@@ -639,6 +639,8 @@ class BotUI {
         BotUI.chatInputMicElement.classList.remove("hidden");
       }
       BotUI.textInput.classList.remove("hidden");
+      console.log(BotUI.textInput.children[0] as HTMLInputElement);
+      (BotUI.textInput.children[0] as HTMLInputElement).focus()
     }else{
       BotUI.searchElement.classList.remove("hidden");
       BotUI.chatInputMicElement.classList.add("hidden");
