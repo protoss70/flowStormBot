@@ -43,7 +43,7 @@ export interface Settings {
     sections?: string[];
     sectionActive?: number;
     sound?: boolean;
-    controlIcons?: {mic: boolean, mute: boolean, restart: boolean};
+    controlIcons?: {mic: boolean, mute: boolean, restart: boolean, magnifier: boolean};
     search?: boolean;
     showTooltips?: boolean;
     suggestionMode?: SuggestionMode;

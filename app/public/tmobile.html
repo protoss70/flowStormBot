@@ -116,8 +116,8 @@
 
 	<script>
 		function radioClick(){
-            console.log(bot);
-			bot.stop();
+			// bot.stop();
+			bot("#exit", {})
 			document.getElementById("botDiv").remove();
 			document.getElementById("botContainer").innerHTML = "<div id='botDiv'></div>";
 			bot = initBot();

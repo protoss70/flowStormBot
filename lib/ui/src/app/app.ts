@@ -111,7 +111,7 @@ const defaults: Settings = {
   collapsable: false, // UI will be rendered into overlayer fixed to the bottom of the page. By default is collapsed. It will use width and height of widgetSize. Fullscreen mode is not allowed in this case
   collapsed: false, // setting for collapsable mode. It is allowing to expend/collapse BotUI widget on init
   sound: true, // what is relation to inputAudio and outputAudio??
-  controlIcons: { mic: true, mute: true, restart: false }, // display control icons
+  controlIcons: { mic: true, mute: true, restart: true, magnifier: true }, // display control icons
   search: true, // setting for elastic search. It controls if the bot will do elastic search or not
   suggestionMode: SuggestionMode.ALTERNATIVE,
   showTooltips: true, // show tooltips of control icons
@@ -204,7 +204,6 @@ class BotUI {
   private static settings: Settings;
   private static orientation: OrientationEnum;
   public dialogueID: string = "";
-  public elasticSearchOn: boolean = false // If the elastic search from the Main.js is on this will be true
 
   private static rootElement: HTMLElement;
   private static avatarElement: HTMLElement;
@@ -635,23 +634,17 @@ class BotUI {
   public toggleSearchIcons(on: boolean){
     if (on){
       BotUI.searchElement.classList.add("hidden");
-      if (BotUI.settings.controlIcons.mic){
-        BotUI.chatInputMicElement.classList.remove("hidden");
-      }
       BotUI.textInput.classList.remove("hidden");
-      console.log(BotUI.textInput.children[0] as HTMLInputElement);
       (BotUI.textInput.children[0] as HTMLInputElement).focus()
+      this.setControlIconsByTextField(false);
     }else{
       BotUI.searchElement.classList.remove("hidden");
-      BotUI.chatInputMicElement.classList.add("hidden");
-      if (!BotUI.settings.textInputEnabled){
+      console.log(this.getSettings().textInputEnabled);
+      if (!this.getSettings().textInputEnabled){
         BotUI.textInput.classList.add("hidden");
+        this.setControlIconsByTextField(true);
       }
     }
-  }
-
-  public toggleElasticSearch(on: boolean){
-    this.elasticSearchOn = on;
   }
 
   public setTooltip(element, content) {
@@ -823,6 +816,7 @@ class BotUI {
     mic: boolean;
     mute: boolean;
     restart: boolean;
+    magnifier: boolean;
   }) => {
     BotUI.settings.controlIcons = controlIcons;
 
@@ -1376,6 +1370,33 @@ class BotUI {
     this.appSelectToggle(true, title);
   }
 
+  public setControlIconsByTextField(on: boolean){
+    const mic = BotUI.controlIconsWrapper.querySelector("[data-chat-input-mic]");
+    const restart = BotUI.controlIconsWrapper.querySelector("[data-chat-input-restart]");
+    const mute = BotUI.controlIconsWrapper.querySelector("[data-chat-input-mute]");
+    if (on){
+      if (this.getSettings().controlIcons.mic) {
+        mic.classList.add("chat-input-disabled");
+      }
+      if (this.getSettings().controlIcons.mute) {
+        mute.classList.add("chat-input-disabled");
+      }
+      if (this.getSettings().controlIcons.restart) {
+        restart.classList.add("chat-input-disabled");
+      }
+    }else{
+      if (this.getSettings().controlIcons.mic) {
+        mic.classList.remove("chat-input-disabled");
+      }
+      if (this.getSettings().controlIcons.mute) {
+        mute.classList.remove("chat-input-disabled");
+      }
+      if (this.getSettings().controlIcons.restart) {
+        restart.classList.remove("chat-input-disabled");
+      }
+    }
+  }
+
   /**
    * Controls visibility of the control icons - microphone, speaker and restart according to settings
    */
@@ -1413,7 +1434,7 @@ class BotUI {
     }
 
     // if elastic search is active then Mic icon is be replaced with the search icon
-    if (!BotUI.settings.search) {
+    if (!BotUI.settings.controlIcons.magnifier) {
       BotUI.controlIconsWrapper
         .querySelector("[data-chat-input-search]")
         .classList.add("hidden");
@@ -1422,10 +1443,6 @@ class BotUI {
         BotUI.controlIconsWrapper
         .querySelector("[data-chat-input-search]")
         .classList.remove("hidden");
-
-        BotUI.controlIconsWrapper
-        .querySelector("[data-chat-input-mic]")
-        .classList.add("hidden");
     }
     
     const childrenList = BotUI.controlIconsWrapper.querySelectorAll(
@@ -1456,15 +1473,6 @@ class BotUI {
       }
       if (index === childrenList.length - 1) {
         element.classList.add("left-icon");
-      }
-
-      // search icon and mic icon is given mirroring classes
-      if (BotUI.settings.search && BotUI.settings.controlIcons.mic){
-        ["firstIcon", "secondIcon", "right-icon", "thirdIcon", "fourthIcon", "left-icon"].forEach(cls => {
-          if (BotUI.searchElement.classList.contains(cls)){
-            BotUI.chatInputMicElement.classList.add(cls);
-          }
-        });
       }
     }
   }
@@ -1538,76 +1546,86 @@ class BotUI {
     this.setInputMode();
   };
 
-  public setButton = (settings: any = {}, callback: Function = () => {}) => {
-    const messageElement = BotUI.messagesElement;
-    const button = document.createElement("button");
+  public findActiveIndex(settings, button){
+    // Finds the active index for the carousel buttons
+    if (settings.background && settings.background.length > 1){
+      const carouselParent = button.getElementsByClassName("carouselBottomIndexContainer")[0];
+      var activeIndex = 0;
+      for (let index = 0; index < carouselParent.children.length; index++) {
+        const element = carouselParent.children[index];
+        if (element.classList.contains("active")){
+          activeIndex = index;
+          break;
+        }
+      } 
+      return activeIndex;
+    }else{
+      return undefined;
+    }
+  }
 
-    function findActiveIndex(){
-      if (settings.background && settings.background.length > 1){
-        const carouselParent = button.getElementsByClassName("carouselBottomIndexContainer")[0];
-        var activeIndex = 0;
-        for (let index = 0; index < carouselParent.children.length; index++) {
-          const element = carouselParent.children[index];
-          if (element.classList.contains("active")){
-            activeIndex = index;
-            break;
-          }
-        } 
-        return activeIndex;
-      }else{
-        return undefined;
+  private setCarouselButtons(settings, button, UI){
+    // Setting image select buttons as a carousel
+    for (let index = 0; index < settings.background.length; index++) {
+      const newImg = new Image();
+      button.append(newImg);
+      newImg.src = settings.background[index];
+      newImg.id = `imgID${index}`;
+      if (index !== 0){
+        newImg.classList.add("hidden");
       }
     }
+    function right(e){
+      // Carousel Move Right
+      e.stopPropagation();
+      const activeIndex = UI.findActiveIndex(settings, button);
+      const leftIcon = button.getElementsByClassName("icon--content--left")[0]
+      const carouselParent = button.getElementsByClassName("carouselBottomIndexContainer")[0];
+      carouselParent.children[activeIndex].classList.remove("active");
+      carouselParent.children[activeIndex + 1].classList.add("active");
+      
+      if (activeIndex + 1 === carouselParent.children.length - 1){
+        e.target.classList.add("disabled");
+      }
+      leftIcon.classList.remove("disabled");
+      (button as HTMLElement).querySelector(`#imgID${activeIndex}`).classList.add("hidden");
+      (button as HTMLElement).querySelector(`#imgID${activeIndex + 1}`).classList.remove("hidden");
+    }
+
+    function left(e){
+      // Carousel Move Left
+      e.stopPropagation();
+      const activeIndex = UI.findActiveIndex(settings, button);
+      const rightIcon = button.getElementsByClassName("icon--content--right")[0]
+      const carouselParent = button.getElementsByClassName("carouselBottomIndexContainer")[0];
+      carouselParent.children[activeIndex].classList.remove("active");
+      carouselParent.children[activeIndex - 1].classList.add("active");
+      
+      if (activeIndex - 1 === 0){
+        e.target.classList.add("disabled");
+      }
+      rightIcon.classList.remove("disabled");
+      (button as HTMLElement).querySelector(`#imgID${activeIndex}`).classList.add("hidden");
+      (button as HTMLElement).querySelector(`#imgID${activeIndex - 1}`).classList.remove("hidden");
+    }
+
+    this.setCarouselUI(settings.background.length, {right: (e) => {right(e)}, left: (e) => {left(e)}}).forEach(element => {
+      button.appendChild(element);
+    });
+    return button
+  }
+
+  public setButton = (settings: any = {}, callback: Function = () => {}) => {
+    const messageElement = BotUI.messagesElement;
+    var button = document.createElement("button");
 
     if (settings.background) {
       button.style.background = `transparent`;
       if (settings.background.length > 1){
-
-        for (let index = 0; index < settings.background.length; index++) {
-          const newImg = new Image();
-          button.append(newImg);
-          newImg.src = settings.background[index];
-          newImg.id = `imgID${index}`;
-          if (index !== 0){
-            newImg.classList.add("hidden");
-          }
-        }
-        function right(e){
-          e.stopPropagation();
-          const activeIndex = findActiveIndex();
-          const leftIcon = button.getElementsByClassName("icon--content--left")[0]
-          const carouselParent = button.getElementsByClassName("carouselBottomIndexContainer")[0];
-          carouselParent.children[activeIndex].classList.remove("active");
-          carouselParent.children[activeIndex + 1].classList.add("active");
-          
-          if (activeIndex + 1 === carouselParent.children.length - 1){
-            e.target.classList.add("disabled");
-          }
-          leftIcon.classList.remove("disabled");
-          (button as HTMLElement).querySelector(`#imgID${activeIndex}`).classList.add("hidden");
-          (button as HTMLElement).querySelector(`#imgID${activeIndex + 1}`).classList.remove("hidden");
-        }
-
-        function left(e){
-          e.stopPropagation();
-          const activeIndex = findActiveIndex();
-          const rightIcon = button.getElementsByClassName("icon--content--right")[0]
-          const carouselParent = button.getElementsByClassName("carouselBottomIndexContainer")[0];
-          carouselParent.children[activeIndex].classList.remove("active");
-          carouselParent.children[activeIndex - 1].classList.add("active");
-          
-          if (activeIndex - 1 === 0){
-            e.target.classList.add("disabled");
-          }
-          rightIcon.classList.remove("disabled");
-          (button as HTMLElement).querySelector(`#imgID${activeIndex}`).classList.add("hidden");
-          (button as HTMLElement).querySelector(`#imgID${activeIndex - 1}`).classList.remove("hidden");
-        }
-
-        this.setCarouselUI(settings.background.length, {right: (e) => {right(e)}, left: (e) => {left(e)}}).forEach(element => {
-          button.appendChild(element);
-        });
+        // Carousel Buttons
+        button = this.setCarouselButtons(settings, button, this);
       }else{
+        // Normal Buttons
         const newImg = new Image();
         button.append(newImg);
         newImg.src = settings.background[0];
@@ -1629,7 +1647,7 @@ class BotUI {
 
     button.onclick = () => {
 
-      this.disableButtonGroup(settings, callback, findActiveIndex);
+      this.disableButtonGroup(settings, callback, () => {this.findActiveIndex(settings, button)});
     };
 
     messageElement.appendChild(button);
@@ -1814,6 +1832,8 @@ class BotUI {
   public chatTextInputElementCallback = (...value) => {};
 
   public dataChannelMessageCallback = (...value) => {};
+
+  public getSearchActive = () => {return false}
 
   public collapsableTriggerCallback = (collapsed) => {};
 
@@ -2445,7 +2465,7 @@ class BotUI {
       }
     }
 
-    if (type === MessageType.BOT && this.getSettings().goTo && !this.elasticSearchOn) {
+    if (type === MessageType.BOT && this.getSettings().goTo && !this.getSearchActive()) {
       this.setGoToButton(id, dialogueID, clickCallback, messageTemplate);
     }
 

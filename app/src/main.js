@@ -45,7 +45,6 @@ let termsId = undefined;
 const converter = new Converter();
 var botInitializer = new BotInitializer();
 var buttonInput = false;
-var elasticSearchActive = false; // this is true when the actual query for the elastic search is being entered
 var searchCommandActive = false; // this is true when the #search command is called
 
 let generatedEmbedLines = {
@@ -213,6 +212,7 @@ export const initFSClientBot = (initParams = {}) => {
       const b = parseInt(color.substr(5, 2), 16);
       return `rgba(${r},${g},${b},${opacity})`;
     }
+
 
     listenerIDs.forEach((id) => {
       var listenerFunction;
@@ -398,13 +398,18 @@ export const initFSClientBot = (initParams = {}) => {
     };
   }
   const botUI = initUI(settings);
-  var myBot;
   if (botUI) {
     if(!botUI.getSettings().collapsable){
       botUI.setStartButton(true);
     }
 
-    myBot = createBot(botUI, settings);
+    if (botUI.getSettings().search){
+      searchCommandActive = true;
+      botUI.toggleSearchIcons(true);
+      botUI.removeSuggestions();
+    }
+
+    createBot(botUI, settings);
     initBot();
     bot.stateHandler = stateHandler;
     bot.setInCallback = () => {
@@ -427,7 +432,7 @@ export const initFSClientBot = (initParams = {}) => {
     };
 
     bot.sttRecognizedCallback = () => {
-      if (elasticSearchActive) {
+      if (searchCommandActive) {
         botUI.toggleLoading(true);
       }
     };
@@ -566,9 +571,6 @@ const checkBotUIOverlays = (element) => {
       modalContentElement.style.height =
         ((botHeight - parseInt(botPaddingBottom, 10)) * 3) / 5 + "px";
       modal.style.display = "block";
-    }
-    if (playButton) {
-      // playButton.style.display = 'block';
     }
   }
 };
@@ -728,86 +730,6 @@ var createBot = (botUI, settings) => {
       initBot();
     }
   };
-
-  function titleAndContext(tags, content) {
-    const h1 = (tags.h1_b = tags.h1_b.split(" |"));
-    const h2 = (tags.h2_b = tags.h2_b.split(" |"));
-    const h3 = (tags.h3_b = tags.h3_b.split(" |"));
-    h1.forEach((e, i) => {
-      if (e === "") h1.splice(i, 1);
-    });
-    h2.forEach((e, i) => {
-      if (e === "") h2.splice(i, 1);
-    });
-    h3.forEach((e, i) => {
-      if (e === "") h3.splice(i, 1);
-    });
-
-    let title;
-    let secondary;
-    if (h1.length > 1) {
-      title = h1[0];
-    } else if (h2.length > 0) {
-      title = h2[0];
-      h2.shift();
-    } else if (h3.length > 0) {
-      title = h3[0];
-      h3.shift();
-    } else {
-      title = content.slice(0, 10);
-      secondary = content.slice(10, 20);
-      return { title, secondary };
-    }
-
-    if (h2.length > 0) {
-      secondary = h2.join("\n");
-    } else if (h3.length > 0) {
-      secondary = h3.join("\n");
-    } else {
-      secondary = content.slice(0, 20);
-    }
-    return { title, secondary };
-  }
-
-  function findSubTags(inputString) {
-    const openingTagRegex = /<sub[^>]*>/g;
-    const closingTagRegex = /<\/sub>/g;
-  
-    const openingTags = [];
-    let openingTagMatch;
-    while ((openingTagMatch = openingTagRegex.exec(inputString)) !== null) {
-      openingTags.push({ tag: openingTagMatch[0], index: openingTagMatch.index });
-    }
-  
-    const closingTags = [];
-    let closingTagMatch;
-    while ((closingTagMatch = closingTagRegex.exec(inputString)) !== null) {
-      closingTags.push({ tag: closingTagMatch[0], index: closingTagMatch.index });
-    }
-  
-    return { openingTags, closingTags };
-  }
-
-  function limitSearchResult(inputString){
-    const charLimit = 800; // TODO increase the limit
-    if (inputString.length <= charLimit){
-      return inputString;
-    }
-
-    const {openingTags, closingTags} = findSubTags(inputString);
-    for (let index = 0; index < openingTags.length; index++) {
-      const opening = openingTags[index];
-      const closing = closingTags[index];
-      if (opening.index > charLimit){
-        break;
-      }else if(opening.index <= charLimit && closing.index > charLimit){
-        inputString = inputString.substring(0, opening.index);
-        break;
-      }
-    }
-
-    return inputString.substring(0, charLimit);
-  }
 
   async function handleFlowstormApiCall(results) {
     console.log("results", results);
@@ -1006,15 +928,13 @@ var createBot = (botUI, settings) => {
         handleFlowstormApiCall(payload.result);
         break;
       case "#enterSearch":
-        elasticSearchActive = true;
+        searchCommandActive = true;
         botUI.toggleSearchIcons(true);
         botUI.removeSuggestions();
         break;
       case "#exitSearch":
-        elasticSearchActive = false;
         searchCommandActive = false;
         botUI.toggleSearchIcons(false);
-        botUI.toggleElasticSearch(false);
         break;
       case "#bot_settings": // change appearance of bot for each app
         const params = payload["clientParams"];
@@ -1245,7 +1165,8 @@ var createBot = (botUI, settings) => {
 
   botUI.chatInputCallback = (inputValue) => {
     sendText(inputValue);
-    if (elasticSearchActive) {
+    console.log(searchCommandActive);
+    if (searchCommandActive) {
       botUI.toggleLoading(true);
     }
   };
@@ -1295,7 +1216,8 @@ var createBot = (botUI, settings) => {
       }
       bot.handleOnTextInput(`#search`, false, false);
       searchCommandActive = true;
-      botUI.toggleElasticSearch(true);
+      botUI.toggleSearchIcons(true);
+      botUI.removeSuggestions();
     }
   };
 
@@ -1315,14 +1237,10 @@ var createBot = (botUI, settings) => {
     const state = getStatus();
     botUI.removeSuggestions();
     bot.audioInputCallback();
-    if (botUI.getSettings().search) {
-      // Restart elastic search functions
-      elasticSearchActive = false;
-      searchCommandActive = false;
-      botUI.toggleSearchIcons(false);
-      botUI.toggleElasticSearch(false);
-      botUI.toggleLoading(false);
-    }
+    // Restart elastic search functions
+    searchCommandActive = false;
+    botUI.toggleSearchIcons(false);
+    botUI.toggleLoading(false);
 
     if (state === "SLEEPING" || state === undefined) {
       run();
@@ -1346,6 +1264,53 @@ var createBot = (botUI, settings) => {
     }
   }
 
+  function setAlternativeSuggestions(self){
+    // Creates lasting suggestion buttons for users to easily go from one suggestion to another
+    if (self.classList.contains("active")) {
+      return;
+    } else {
+      if (botUI.getButtonInputMode()) {
+        exitButtonMode(false);
+      }
+      const parent = self.parentElement;
+      const activeElems = parent.getElementsByClassName("active");
+      if (activeElems.length > 0) {
+        // Active class exists, initiate #go_to
+        activeElems[0].classList.remove("active");
+        self.classList.add("active");
+        removeNodesAfterSuggestion(self);
+        const nodeID = self.parentElement.getAttribute("nodeId");
+        const dialogueID = self.parentElement.getAttribute("dialogueID");
+        setAttribute("nodeId", parseInt(nodeID));
+        setAttribute("dialogueID", dialogueID);
+        bot.handleOnTextInput("#go_to", false, false);
+        alternativeReInput = true;
+        alternativeLatestText = self.innerHTML;
+      } else {
+        // First time clicking this group of suggestions.
+        self.classList.add("active");
+        self.parentElement.setAttribute("nodeId", latestUserInputID);
+        self.parentElement.setAttribute(
+          "dialogueID",
+          dialogueIDs[dialogueIDs.length - 1]
+        );
+        bot.handleOnTextInput(self.innerHTML, false, false);
+      }
+    }
+  }
+
+  function setFeedbackSuggestions(self){
+    if(self.firstChild.classList.contains("icon--thumbs-up")){
+      botUI.addFeedbackMessage(true);
+      bot.handleOnTextInput("_thumbs_up_", false, false);
+      botUI.removeSuggestions();
+    }else{
+      botUI.addFeedbackMessage(false);
+      bot.handleOnTextInput("_thumbs_down_", false, false);
+      botUI.removeSuggestions();
+    }
+  }
+
   botUI.suggestionsCallback = (e) => {
     const self = e.currentTarget;
     const status = getStatus();
@@ -1355,54 +1320,16 @@ var createBot = (botUI, settings) => {
     }
 
     if (botUI.getSettings().suggestionMode === suggestionModes.ALTERNATIVE && (status !== undefined || status !== "SLEEPING")) {
-      // Alternative suggestion mode
-      if (self.classList.contains("active")) {
-        return;
-      } else {
-        if (botUI.getButtonInputMode()) {
-          exitButtonMode(false);
-        }
-        const parent = self.parentElement;
-        const activeElems = parent.getElementsByClassName("active");
-        if (activeElems.length > 0) {
-          // Active class exists, initiate #go_to
-          activeElems[0].classList.remove("active");
-          self.classList.add("active");
-          removeNodesAfterSuggestion(self);
-          const nodeID = self.parentElement.getAttribute("nodeId");
-          const dialogueID = self.parentElement.getAttribute("dialogueID");
-          setAttribute("nodeId", parseInt(nodeID));
-          setAttribute("dialogueID", dialogueID);
-          bot.handleOnTextInput("#go_to", false, false);
-          alternativeReInput = true;
-          alternativeLatestText = self.innerHTML;
-        } else {
-          // First time clicking this group of suggestions.
-          self.classList.add("active");
-          self.parentElement.setAttribute("nodeId", latestUserInputID);
-          self.parentElement.setAttribute(
-            "dialogueID",
-            dialogueIDs[dialogueIDs.length - 1]
-          );
-          bot.handleOnTextInput(self.innerHTML, false, false);
-        }
-      }
+      // lasting suggestion buttons
+      setAlternativeSuggestions(self);
     } else {
       if (self.innerHTML === self.textContent){
-        // suggestion buttons
+        // disappearing suggestion buttons
         bot.handleOnTextInput(self.innerHTML, false);
         botUI.removeSuggestions();
       }else{
         // feedback buttons
-        if(self.firstChild.classList.contains("icon--thumbs-up")){
-          botUI.addFeedbackMessage(true);
-          bot.handleOnTextInput("_thumbs_up_", false, false);
-          botUI.removeSuggestions();
-        }else{
-          botUI.addFeedbackMessage(false);
-          bot.handleOnTextInput("_thumbs_down_", false, false);
-          botUI.removeSuggestions();
-        }
+        setFeedbackSuggestions(self);
       }
     }
   };
@@ -1455,7 +1382,7 @@ var createBot = (botUI, settings) => {
     const charLimitSetting = settings.elasticSearchCharLimit;
 
     // limit the amount of char if limit is set
-    if (search && charLimitSetting.limitOn && elasticSearchActive){
+    if (search && charLimitSetting.limitOn && searchCommandActive){
       if (e.target.value.length > charLimitSetting.charLimit){
         botUI.addWarning("Character limit reached", 1300)
         e.target.value = e.target.value.substring(0, charLimitSetting.charLimit);
@@ -1468,6 +1395,10 @@ var createBot = (botUI, settings) => {
       bot.startTyping();
     }
   };
+
+  botUI.getSearchActive = () => {
+    return searchCommandActive;
+  }
 
   botUI.dataChannelMessageCallback = (dataArray) => {
     const messageType = dataArray[0];
