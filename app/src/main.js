@@ -47,7 +47,36 @@ var botInitializer = new BotInitializer();
 var buttonInput = false;
 var elasticSearchActive = false; // this is true when the actual query for the elastic search is being entered
 var searchCommandActive = false; // this is true when the #search command is called
-let generatodEmbedLines = {};
+
+let generatedEmbedLines = {
+  "cvutIcon" : true,
+  "textInputEnabled" : false,
+  "controlIcons" : {
+    "mic" : true,
+    "mute" : true,
+    "restart" : true
+  },
+  "botMessageBackgroundColor": "#00000066",
+  "botMessageTextColor": "#FFFFFF",
+  "userMessageTextColor": "#ffffff",
+  "userMessageBackgroundColor": "#ffffff4d",
+  "suggestions": {
+    "textColor": "#000000",
+    "backgroundColor": "#BFBFBF",
+    "hoverBackgroundColor": "#ffffff",
+    "activeBackground":"#ffffff"
+  },
+  "backgroundColor": "#6737ff",
+  "backgroundSecondaryColor": "#28568c",
+};
+
+let generatedJSONConfig = {
+  "appName": "App name",
+  "pdfFile": "",
+  "FAISSFile": "",
+  "firebaseID" : "",
+  "clientParams" : generatedEmbedLines
+}
 
 const audios = {};
 var latestUserInputID = ""; // Keeps track of the UserInput node id from flowstorm. Used for Alternative Suggestions
@@ -151,6 +180,15 @@ export const initFSClientBot = (initParams = {}) => {
       "backgroundUrl",
       "backgroundBlur",
       "botBackgroundColorSecondary",
+      "textColorSuggestions",
+      "backgroundColorSuggestions",
+      "hoverBackgroundColorSuggestions",
+      "activeBackgroundColorSuggestions",
+      "textColorSuggestionsAlpha",
+      "backgroundColorSuggestionsAlpha",
+      "hoverBackgroundColorSuggestionsAlpha",
+      "activeBackgroundColorSuggestionsAlpha",
+      "triggerImgUrl"
     ];
     const generatorButtonID = "generateEmbedCodeButton";
 
@@ -180,32 +218,32 @@ export const initFSClientBot = (initParams = {}) => {
       var listenerFunction;
       if (id === "textColorUser")
         listenerFunction = (e) => {
-          generatodEmbedLines["userMessageTextColor"] = e.target.value;
+          generatedEmbedLines["userMessageTextColor"] = e.target.value;
           settings.userMessageTextColor = e.target.value;
           botUI.setUserMessageTextColor(e.target.value);
         };
       if (id === "textColorBot")
         listenerFunction = (e) => {
-          generatodEmbedLines["botMessageTextColor"] = e.target.value;
+          generatedEmbedLines["botMessageTextColor"] = e.target.value;
           settings.botMessageTextColor = e.target.value;
           botUI.setBotMessageTextColor(e.target.value);
         };
       if (id === "TextOutlineUser")
         listenerFunction = (e) => {
-          generatodEmbedLines["userMessageTextOutlineColor"] = e.target.value;
+          generatedEmbedLines["userMessageTextOutlineColor"] = e.target.value;
           settings.userMessageTextOutlineColor = e.target.value;
           botUI.setUserMessageTextOutlineColor(e.target.value);
         };
       if (id === "TextOutlineBot")
         listenerFunction = (e) => {
-          generatodEmbedLines["botMessageTextOutlineColor"] = e.target.value;
+          generatedEmbedLines["botMessageTextOutlineColor"] = e.target.value;
           settings.botMessageTextOutlineColor = e.target.value;
           botUI.setBotMessageTextOutlineColor(e.target.value);
         };
       if (id === "messageBackgroundUser")
         listenerFunction = () => {
           const color = ColorToRGBA("userOpacity", "messageBackgroundUser");
-          generatodEmbedLines["userMessageBackgroundColor"] = color;
+          generatedEmbedLines["userMessageBackgroundColor"] = color;
           settings.userMessageBackgroundColor = color;
           botUI.setUserMessageBackgroundColor(color);
         };
@@ -213,7 +251,7 @@ export const initFSClientBot = (initParams = {}) => {
       if (id === "messageBotBackground")
         listenerFunction = () => {
           const color = ColorToRGBA("botOpacity", "messageBotBackground");
-          generatodEmbedLines["botMessageBackgroundColor"] = color;
+          generatedEmbedLines["botMessageBackgroundColor"] = color;
           settings.botMessageBackgroundColor = color;
           botUI.setBotMessageBackgroundColor(color);
         };
@@ -221,7 +259,7 @@ export const initFSClientBot = (initParams = {}) => {
       if (id === "userOpacity")
         listenerFunction = () => {
           const color = ColorToRGBA("userOpacity", "messageBackgroundUser");
-          generatodEmbedLines["userMessageBackgroundColor"] = color;
+          generatedEmbedLines["userMessageBackgroundColor"] = color;
           settings.userMessageBackgroundColor = color;
           botUI.setUserMessageBackgroundColor(color);
         };
@@ -229,21 +267,21 @@ export const initFSClientBot = (initParams = {}) => {
       if (id === "botOpacity")
         listenerFunction = () => {
           const color = ColorToRGBA("botOpacity", "messageBotBackground");
-          generatodEmbedLines["botMessageBackgroundColor"] = color;
+          generatedEmbedLines["botMessageBackgroundColor"] = color;
           settings.botMessageBackgroundColor = color;
           botUI.setBotMessageBackgroundColor(color);
         };
 
       if (id === "botBackgroundColor")
         listenerFunction = (e) => {
-          generatodEmbedLines["backgroundColor"] = e.target.value;
+          generatedEmbedLines["backgroundColor"] = e.target.value;
           settings.backgroundColor = e.target.value;
           botUI.setBackgroundColor(e.target.value);
         };
 
       if (id === "backgroundBlur")
         listenerFunction = (e) => {
-          generatodEmbedLines["backgroundImageBlur"] = e.target.value;
+          generatedEmbedLines["backgroundImageBlur"] = e.target.value;
           settings.backgroundImageBlur = e.target.value;
           botUI.setBackgroundImage(
             document.getElementById("backgroundUrl").value,
@@ -253,7 +291,7 @@ export const initFSClientBot = (initParams = {}) => {
 
       if (id === "backgroundUrl")
         listenerFunction = (e) => {
-          generatodEmbedLines["backgroundImage"] = e.target.value;
+          generatedEmbedLines["backgroundImage"] = e.target.value;
           settings.backgroundImageBlur = e.target.value;
           botUI.setBackgroundImage(
             e.target.value,
@@ -263,32 +301,63 @@ export const initFSClientBot = (initParams = {}) => {
 
       if (id === "botBackgroundColorSecondary")
         listenerFunction = (e) => {
-          generatodEmbedLines["backgroundImageSecondaryColor"] = e.target.value;
+          generatedEmbedLines["backgroundImageSecondaryColor"] = e.target.value;
           settings.backgroundImageSecondaryColor = e.target.value;
           botUI.setBackgroundColor(
             document.getElementById("botBackgroundColor").value,
             e.target.value
           );
+        }
+
+      if (id === "triggerImgUrl")
+        listenerFunction = (e) => {
+          generatedEmbedLines["triggerImage"] = e.target.value;
+          BotUI.element.style.setProperty(
+              "--bot-ui-trigger-element-image",
+              `url("${e.target.value}")`
+          );
+        };
+
+      if (id === "textColorSuggestions" || id === "backgroundColorSuggestions" || id === "hoverBackgroundColorSuggestions" || id === "activeBackgroundColorSuggestions"
+      || id === "textColorSuggestionsAlpha" || id === "backgroundColorSuggestionsAlpha" || id === "hoverBackgroundColorSuggestionsAlpha" || id === "activeBackgroundColorSuggestionsAlpha")
+        listenerFunction = () => {
+          botUI.setSuggestionColors({
+            textColor: ColorToRGBA("textColorSuggestionsAlpha", "textColorSuggestions"),
+            backgroundColor: ColorToRGBA("backgroundColorSuggestionsAlpha", "backgroundColorSuggestions"),
+            hoverBackgroundColor: ColorToRGBA("hoverBackgroundColorSuggestionsAlpha", "hoverBackgroundColorSuggestions"),
+            activeBackground: ColorToRGBA("activeBackgroundColorSuggestionsAlpha", "activeBackgroundColorSuggestions")
+          });
+          generatedEmbedLines["suggestions"] = {
+            textColor: ColorToRGBA("textColorSuggestionsAlpha", "textColorSuggestions"),
+            backgroundColor: ColorToRGBA("backgroundColorSuggestionsAlpha", "backgroundColorSuggestions"),
+            hoverBackgroundColor: ColorToRGBA("hoverBackgroundColorSuggestionsAlpha", "hoverBackgroundColorSuggestions"),
+            activeBackground: ColorToRGBA("activeBackgroundColorSuggestionsAlpha", "activeBackgroundColorSuggestions")
+          };
         };
 
       document.getElementById(id).addEventListener("input", (e) => {
         listenerFunction(e);
       });
-      document
+    });
+    document
         .getElementById(generatorButtonID)
         .addEventListener("click", () => {
           document
-            .getElementById("embedParamsParent")
-            .classList.remove("hidden");
+              .getElementById("embedParamsParent")
+              .classList.remove("hidden");
           const embedElem = document.getElementById("embedParams");
-          embedElem.innerHTML = preTags;
-          Object.keys(generatodEmbedLines).forEach((key) => {
-            embedElem.innerHTML += `&emsp;&emsp;${key}: ${generatodEmbedLines[key]},<br />`;
-          });
-          embedElem.innerHTML += endTags;
+
+          // embedElem.innerHTML = preTags;
+          // Object.keys(generatedEmbedLines).forEach((key) => {
+          //   let p = JSON.stringify(generatedEmbedLines[key]);
+          //   embedElem.innerHTML += `&emsp;&emsp;${key}: ${p},<br />`;
+          // });
+          // embedElem.innerHTML += endTags;
+
+          embedElem.innerHTML = JSON.stringify(generatedJSONConfig, null, 2)
+
           window.scrollTo(0, document.body.scrollHeight);
         });
-    });
   }
 
   if (allowUrlParams) {
@@ -359,7 +428,7 @@ export const initFSClientBot = (initParams = {}) => {
 
     bot.sttRecognizedCallback = () => {
       if (elasticSearchActive) {
-        botUI.toggleLoader(true);
+        botUI.toggleLoading(true);
       }
     };
 
@@ -379,20 +448,29 @@ export const initFSClientBot = (initParams = {}) => {
 
       document.getElementById("mute").addEventListener("change", () => {
         setControlIconsMain();
+        generatedEmbedLines["controlIcons"]["mute"] = e.target.checked;
       });
       document.getElementById("mic").addEventListener("change", () => {
         setControlIconsMain();
+        generatedEmbedLines["controlIcons"]["mic"] = e.target.checked;
       });
       document.getElementById("restart").addEventListener("change", () => {
         setControlIconsMain();
+        generatedEmbedLines["controlIcons"]["restart"] = e.target.checked;
       });
       document.getElementById("textInput").addEventListener("change", () => {
         setTextEnabled();
+        generatedEmbedLines["textInputEnabled"] = e.target.checked;
+      });
+
+      document.getElementById("cvutIcon").addEventListener("change", (e) => {
+        botUI.setCvutIcon(e.target.checked);
+        generatedEmbedLines["cvutIcon"] = e.target.checked;
       });
 
       setPreviewCustomizations(botUI);
       const url = new URL(window.location.href);
-      const showCustomizationOptions = url.searchParams.get("c") === "u_uid";
+      const showCustomizationOptions = true;//url.searchParams.get("c") === "u_uid";
       if (!showCustomizationOptions) {
         document.getElementById("customizationOptions").remove();
         document.getElementById("showCustomButton").remove();
@@ -420,7 +498,7 @@ export const initFSClientBot = (initParams = {}) => {
     );
   }
 
-  return myBot;
+  return autoStartBot;
 };
 
 const initUI = (settings = {}) => {
@@ -440,7 +518,6 @@ const initUI = (settings = {}) => {
   }
   const botUI = new BotUI(elementId, settings);
   botUI.setUserText();
-  console.log(botUI.getButtonInputMode());
 
   botElement = BotUI.element;
   if (!botElement) {
@@ -739,15 +816,24 @@ var createBot = (botUI, settings) => {
       bot.handleOnTextInput(`ERROR`, false, false);
       bot.audioInputCallback();
     } else if ((results.result && results.result.length === 0) && !results.answer) {
-      //NO PDF FILES FOUND
+      //NO SOLUTION FOUND
       bot.handleOnTextInput(`NO_SOLUTION`, false, false);
       bot.audioInputCallback();
     } else {
       //SUCCESS
+
+      if (results.page_numbers && results.page_numbers.length > 0){
+        // Change pdf page
+        if (!botUI.getSettings().pdfPageCallback){
+          botUI.showPage(results.page_numbers[0]);
+        }else{
+          !botUI.getSettings().pdfPageCallback(results.page_numbers[0]);
+        }
+      }
+
       if (results.result && results.result[0].meta.answer) {-4
         let answer = results.result[0].meta.answer
         // answer = answer.slice(0, answer.length -4) + answer.slice(answer.length - 3);
-        console.log("answer: ", answer);
         setAttribute(
           "FAQ_Answer",
           answer
@@ -775,24 +861,25 @@ var createBot = (botUI, settings) => {
         }  
         break;
       case "PDF":
-        if (botUI.getSettings().canvasID !== "#data-pdf-viewer"){
+        if (botUI.getSettings().canvasID !== "data-pdf-viewer" && !botUI.getSettings().pdfPageCallback){
           if (currentPDF === button.action[0]){
             botUI.showPage(button.page);
-            console.log("show page");
           }else{
             currentPDF = button.action[0]
-            botUI.pdfStart(button.action[0], button.page);
+            botUI.pdfStart(currentPDF, button.page);
+          }
+        }else if (!botUI.getSettings().pdfPageCallback){
+          bot.skipPlayedMessages();
+          if (currentPDF === button.action[0]){
+            botUI.showPage(button.page);
+            botUI.setPDFMode(true);
+          }else{
+            currentPDF = button.action[0]
+            botUI.pdfStart(currentPDF, button.page);
+            botUI.setPDFMode(true);
           }
         }else{
-          if (currentPDF === button.action[0]){
-            botUI.showPage(button.page);
-            botUI.setPDFMode(true);
-            console.log("show page");
-          }else{
-            currentPDF = button.action[0]
-            botUI.pdfStart(button.action[0], button.page);
-            botUI.setPDFMode(true);
-          }
+          botUI.getSettings().pdfPageCallback(button.page);
         }
         break;
       default:
@@ -853,13 +940,14 @@ var createBot = (botUI, settings) => {
             ...button,
           };
         
-          if (buttonType === "PDF" && botUI.getSettings().canvasID !== "#data-pdf-viewer"){
+          if (buttonType === "PDF" && botUI.getSettings().canvasID !== "data-pdf-viewer"){
             if (currentPDF === button.action[0]){
               botUI.showPage(button.page);
-              console.log("show page");
-            }else{
+            }else if(!botUI.getSettings().pdfPageCallback){
               currentPDF = button.action[0]
-              botUI.pdfStart(button.action[0], button.page);
+              botUI.pdfStart(currentPDF, button.page);
+            }else{
+              botUI.getSettings().pdfPageCallback(button.page);
             }
             break;
           }
@@ -893,9 +981,9 @@ var createBot = (botUI, settings) => {
             suggestionText.push(node.text);
           });
           // Logic is if list view is not true, the default suggestion styles for mobile and web will be used
-          botUI.setSuggestion(suggestionText, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView);
+          botUI.setSuggestion(suggestionText, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView && true);
         } else {
-          botUI.setSuggestion(payload.suggestions, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView);
+          botUI.setSuggestion(payload.suggestions, !botUI.isMobileDevice() || botUI.getSettings().suggestionsListView && true);
         }
         break;
       case "#media":
@@ -913,7 +1001,7 @@ var createBot = (botUI, settings) => {
         break;
       case "#ServerResults":
         console.log("payload: ", payload);
-        botUI.toggleLoader(false);
+        botUI.toggleLoading(false);
         bot.audioInputCallback();
         handleFlowstormApiCall(payload.result);
         break;
@@ -928,8 +1016,55 @@ var createBot = (botUI, settings) => {
         botUI.toggleSearchIcons(false);
         botUI.toggleElasticSearch(false);
         break;
-      case "#loadingOff":
-        botUI.toggleLoader(false);
+      case "#bot_settings": // change appearance of bot for each app
+        const params = payload["clientParams"];
+        botUI.applyAppSettings(params);
+
+
+        // TODO REMOVE - FOR DEVELOPMENT PURPOSES ONLY
+        // botUI.setTitle(params["title"]);
+        //
+        // // BACKGROUND
+        // botUI.setBackgroundColor(params["backgroundColor"], params["backgroundSecondaryColor"]);
+        //
+        // // MESSAGE COLORS
+        // botUI.setBotMessageTextColor(params["botMessageTextColor"]);
+        // botUI.setBotMessageBackgroundColor(params["botMessageBackgroundColor"]);
+        // botUI.setUserMessageTextColor(params["userMessageTextColor"]);
+        // botUI.setUserMessageBackgroundColor(params["userMessageBackgroundColor"]);
+        //
+        // // SUGGESTION COLORS
+        // botUI.setSuggestionColors(params["suggestions"]);
+        //
+        // // CVUT ICON
+        // botUI.setCvutIcon(params["cvutIcon"]);
+        //
+        // // TRIGGER IMAGE (displayed when bot is collapsed)
+        // BotUI.element.style.setProperty(
+        //     "--bot-ui-trigger-element-image",
+        //     `url("${params.triggerImage}")`
+        // );
+        //
+        // // BACKGROUND TEXT
+        // // document.getElementById("title").textContent = params["title"];
+        //
+        //
+        // // CONTROL ICONS
+        // //botUI.setControllIcons({mic: true, mute: true, restart: true});
+        // BotUI.settings.search = params["search"];
+        // botUI.setControllIcons(params["controlIcons"]);
+        // botUI.setTextInputEnabled(params["textInputEnabled"]);
+
+        // // BACKGROUND IMAGE
+        // if (params["backgroundImage"] !== undefined && params["backgroundImageBlur"] !== undefined) {
+        //   botUI.setBackgroundImage(params["backgroundImage"], params["backgroundImageBlur"]);
+        // } else if (params["backgroundImage"] !== undefined) {
+        //   botUI.setBackgroundImage(params["backgroundImage"]);
+        // } else {
+        //   BotUI.backgroundElement.classList.remove("background--image");
+        //   BotUI.element.style.removeProperty("--bot-ui-background-url");
+        //   BotUI.element.style.removeProperty("--bot-ui-background-url-blur");
+        // }
         break;
       default:
         break;
@@ -1111,9 +1246,41 @@ var createBot = (botUI, settings) => {
   botUI.chatInputCallback = (inputValue) => {
     sendText(inputValue);
     if (elasticSearchActive) {
-      botUI.toggleLoader(true);
+      botUI.toggleLoading(true);
     }
   };
+
+  botUI.feedbackCallback = (e) => {
+    const elem = e.target;
+    const parent = elem.parentElement;
+    const containerElem = parent.parentElement;
+    const index = Array.from(containerElem.parentNode.children).indexOf(containerElem);
+    
+    const feedbackMessage = containerElem.parentNode.children[index-1];
+    const turnId = feedbackMessage.getAttribute("turnid");
+    
+    if (e.target.firstChild.classList.contains("icon--thumbs-down")){
+      feedbackMessage.innerHTML = `<span class="icon icon--thumbs-down icon--content--thumbs-down">\u0020</span>`;
+      feedbackMessage.classList.add("negative-feedback-message");
+      bot.sendVote(turnId, null, -1);
+    }else{
+      feedbackMessage.innerHTML = `<span class="icon icon--thumbs-up icon--content--thumbs-up">\u0020</span>`;
+      feedbackMessage.classList.add("positive-feedback-message");
+      bot.sendVote(turnId, null, 1);
+    }
+    feedbackMessage.classList.remove("hidden");
+
+    e.target.parentNode.remove();
+
+    if (elem.classList.contains("active")) {return}
+
+    for (let i = 0; i < parent.children.length; i++) {
+      const element = parent.children[i];
+      element.classList.remove("active");
+    }
+
+    elem.classList.add("active");
+  }
 
   botUI.collapseCallback = (collapsed) => {
     paused = !paused;
@@ -1154,7 +1321,7 @@ var createBot = (botUI, settings) => {
       searchCommandActive = false;
       botUI.toggleSearchIcons(false);
       botUI.toggleElasticSearch(false);
-      botUI.toggleLoader(false);
+      botUI.toggleLoading(false);
     }
 
     if (state === "SLEEPING" || state === undefined) {
@@ -1180,7 +1347,7 @@ var createBot = (botUI, settings) => {
   }
 
   botUI.suggestionsCallback = (e) => {
-    const self = e.target;
+    const self = e.currentTarget;
     const status = getStatus();
 
     if (status !== "LISTENING") {
@@ -1188,6 +1355,7 @@ var createBot = (botUI, settings) => {
     }
 
     if (botUI.getSettings().suggestionMode === suggestionModes.ALTERNATIVE && (status !== undefined || status !== "SLEEPING")) {
+      // Alternative suggestion mode
       if (self.classList.contains("active")) {
         return;
       } else {
@@ -1198,8 +1366,6 @@ var createBot = (botUI, settings) => {
         const activeElems = parent.getElementsByClassName("active");
         if (activeElems.length > 0) {
           // Active class exists, initiate #go_to
-          console.log("here");
-          console.log(activeElems);
           activeElems[0].classList.remove("active");
           self.classList.add("active");
           removeNodesAfterSuggestion(self);
@@ -1222,8 +1388,22 @@ var createBot = (botUI, settings) => {
         }
       }
     } else {
-      bot.handleOnTextInput(self.innerHTML, false);
-      botUI.removeSuggestions();
+      if (self.innerHTML === self.textContent){
+        // suggestion buttons
+        bot.handleOnTextInput(self.innerHTML, false);
+        botUI.removeSuggestions();
+      }else{
+        // feedback buttons
+        if(self.firstChild.classList.contains("icon--thumbs-up")){
+          botUI.addFeedbackMessage(true);
+          bot.handleOnTextInput("_thumbs_up_", false, false);
+          botUI.removeSuggestions();
+        }else{
+          botUI.addFeedbackMessage(false);
+          bot.handleOnTextInput("_thumbs_down_", false, false);
+          botUI.removeSuggestions();
+        }
+      }
     }
   };
 
@@ -1325,6 +1505,12 @@ var createBot = (botUI, settings) => {
     false, // called from Kotlin
     settings.ttsFileType
   );
+
+  bot.onMessageCallback = (param) => {
+    if (param.type === "Response"){
+      botUI.toggleLoading(false);
+    }
+  }
 
   if (settings.avatarURL) {
     bot.playAudio = (audio) => {

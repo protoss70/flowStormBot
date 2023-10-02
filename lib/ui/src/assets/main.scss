@@ -59,7 +59,7 @@ $animationDuration: 1s;
 $amount: 20;
 
 [data-text-input-wrap].hidden {
-  display: none;
+  display: none !important;
 }
 
 [data-header] {
@@ -125,7 +125,6 @@ $amount: 20;
     }
   }
 }
-
 
 @media only screen and (max-width: 1000px) {
   [data-collapsable][data-collapsable="expanded"] {
@@ -294,8 +293,8 @@ $amount: 20;
     justify-content: center;
     opacity: 0.75;
 
-    &.pdf-mode{
-      padding: 0.1rem 0.2rem;
+    .hidden{
+      display: none !important;
     }
 
     &[no-controls] {
@@ -635,6 +634,38 @@ $amount: 20;
   }
 }
 
+.bot-custom-pdf-viewer{
+  & > canvas{
+    height: 93%;
+    width: 100%;
+  }
+  & > .bot-pdf-control-container{
+    height: 5%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    border-top: solid 1px black;
+    padding-top: 8px;
+
+    & > .bot-pdf-control-buttons{
+      font-size: 14px;
+      border-radius: 9999px;
+      width: 110px;
+      height: 30px;
+
+      &:hover{
+        background-color: rgb(205, 205, 205);
+        cursor: pointer;
+      }
+    }
+
+    & > .bot-custom-pdf-page-display{
+      line-height: 30px;
+    }
+  }
+}
+
 .pdf-controls-section{
   display: flex;
   justify-content: center;
@@ -665,6 +696,16 @@ $amount: 20;
           padding-bottom: 0.7rem;
         }
       }
+    }
+  }
+
+  .icon--content--thumbs-up, .icon--content--thumbs-down{
+    &.negative-feedback-message{
+      color: #970707 !important;
+    }
+
+    &.positive-feedback-message{
+      color: #038903 !important;
     }
   }
 
@@ -720,8 +761,12 @@ $amount: 20;
       position: relative;
       overflow-wrap: break-word;
       padding: 0.55rem;
-      border-radius: 0.7rem;
+      border-radius: 0.7rem;  
       margin: 0.2rem 0.7rem 0 0.7rem;
+
+      &.hidden{
+        display: none !important;
+      }
 
       & > div.chat-message--limit {
         overflow-y: auto;
@@ -802,10 +847,6 @@ $amount: 20;
         &:after {
           background-color: var(--bot-ui-message-background-user);
         }
-      }
-
-      span:empty {
-        display: none;
       }
     }
 
@@ -906,7 +947,7 @@ p.bot-text-styles {
 
       &-user {
         color: var(--bot-ui-message-color-user);
-
+        
         span:not([data-empty]) {
           &:before {
             content: open-quote;
@@ -1323,16 +1364,15 @@ p.bot-text-styles {
     color: white;
     outline: #000000;
     font-weight: bold;
-    margin-bottom: 10px;
-    font-size: 20px;
+    font-size: 16px;
+    margin-left: 25px;
   }
 
   &.loader {
     z-index: 1;
-    width: 100%;
-    height: 100%;
+    width: 200px;
+    height: 60px;
     flex-basis: 100%;
-    flex-direction: column;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1344,11 +1384,11 @@ p.bot-text-styles {
     visibility: hidden;
   }
 
-  &.loader::after {
+  &.loader::before {
     content: "";
-    width: 75px;
-    height: 75px;
-    border: 15px solid #dddddd;
+    width: 35px;
+    height: 35px;
+    border: 9px solid #dddddd;
     border-top-color: #009578;
     border-radius: 50%;
     animation: loading 0.75s ease infinite;

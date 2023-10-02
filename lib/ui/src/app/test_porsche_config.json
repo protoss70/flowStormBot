@@ -1,0 +1,30 @@
+{
+    "appName": "Porsche",
+    "introPicture": "picture-url",
+    "introMusic": "music-url",
+    "pdfFile": "pdf-url",
+    "flowstormId": "id",
+    "FAISSFile": "file-url",
+    "clientParams" : {
+        "botKey": "64be9d234992877fa1d4cd9b",
+        "allowUrlParams": true,
+        "fullScreen": false,
+        "guiMode": "chat",
+        "textInputEnabled": false,
+        "domain": ".flowstorm.ai",
+        "mode": "voice",
+        "elementId": "botDiv",
+        "collapsable": true,
+        "interactionMode": "GUIDE",
+        "sound": true,
+        "title": "Porsche",
+        "search": true,
+        "controlIcons": {"mic": true, "mute": true, "restart": true},
+
+        "backgroundColor": "#6737ff",
+        "botMessageBackgroundColor": "#00000066",
+        "botMessageTextColor": "#FFFFFF",
+        "userMessageTextColor": "#ffffff",
+        "userMessageBackgroundColor": "#ffffff4d"
+    }
+}

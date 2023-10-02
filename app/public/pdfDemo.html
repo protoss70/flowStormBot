@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Porsche Bot</title>
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	
+	
+</head>
+<body style="font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">
+	
+	<div id="botContainer">
+		<div id="botDiv"></div>
+	</div>
+    <div>
+        <canvas id="cnv"></canvas>
+    </div>
+    <button id="prev">Prev</button>
+    <button id="next">Next</button>
+    <span id="npages">not yet</span>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.min.js"></script>
+	<script>
+		
+
+		// https://medium.com/geekculture/how-to-use-pdf-js-and-how-to-create-a-simple-pdf-viewer-for-your-web-in-javascript-5cff608a3a10
+		
+		const PDFStart = nameRoute => {
+		}
+		const startPdf = () => {
+			PDFStart('https://protoss70.github.io/flowstorm-pdf/main.pdf')
+		}
+		
+		
+		nameRoute = 'https://protoss70.github.io/flowstorm-pdf/main.pdf';
+		window.addEventListener('load', startPdf);
+		console.log ('startPdf  ' + startPdf )
+		console.log ('nameRoute  ' + nameRoute )
+		let loadingTask = pdfjsLib.getDocument(nameRoute),
+		pdfDoc = null,
+		canvas = document.querySelector('#cnv'),
+		ctx = canvas.getContext('2d'),
+		scale = 1.5,
+		numPage = 1;
+		
+		loadingTask.promise.then(pdfDoc_ => {
+			pdfDoc = pdfDoc_;
+			document.querySelector('#npages').innerHTML = pdfDoc.numPages;
+			GeneratePDF(numPage)
+		});
+		
+		const GeneratePDF = numPage => {
+			pdfDoc.getPage(numPage).then(page => {
+				let viewport = page.getViewport({ scale: scale });
+				canvas.height = viewport.height;
+				canvas.width = viewport.width;
+				let renderContext = {
+					canvasContext: ctx,
+					viewport: viewport
+				}
+				page.render(renderContext);
+			})
+			document.querySelector('#npages').innerHTML = numPage;
+		}
+		
+		const PrevPage = () => {
+			if (numPage === 1) {
+				return
+			}
+			numPage--;
+			GeneratePDF(numPage);
+		}
+		
+		const NextPage = () => {
+			if (numPage >= pdfDoc.numPages) {
+				return
+			}
+			numPage++;
+			GeneratePDF(numPage);
+		}
+		
+		document.querySelector('#prev').addEventListener('click', PrevPage)
+		document.querySelector('#next').addEventListener('click', NextPage)
+		
+		const container = document.getElementById("cnv"); // Replace with your PDF viewer container.
+		
+		container.addEventListener("wheel", (event) => {
+			// Calculate the intended page navigation.
+			const isScrollingUp = event.deltaY < 0;
+		
+			if (isScrollingUp && numPage > 1) {
+				numPage--; // Scroll up to the previous page.
+			} else if (!isScrollingUp && numPage < pdfDoc.numPages) {
+				numPage++; // Scroll down to the next page.
+			}
+		
+			// Perform page navigation using PDF.js.
+			GeneratePDF(numPage);
+		
+			// Prevent the default scroll behavior only if navigating pages.
+			if (numPage !== 1 && numPage !== pdfDoc.numPages) {
+				event.preventDefault();
+			}
+		});
+		
+		
+		
+			</script>
+	<script>
+		const queryString = window.location.search;
+		const urlParams = new URLSearchParams(queryString);
+		var canvasID ="pdf-div"
+		if(urlParams.get('builtin')){
+			canvasID = "data-pdf-viewer"
+		}
+
+		var clientParams = {
+            botKey: "64c78b654992877fa1eafef9",
+			allowUrlParams: true,
+			fullScreen: false,
+			guiMode: 'chat',
+			backgroundColor: '#6737ff',
+			textInputEnabled: true,
+			domain: '.flowstorm.ai',
+			mode: 'voice',
+			elementId: "botDiv",
+			collapsable: true,
+			interactionMode: "GUIDE",
+			sound: true,
+			title: "Porsche",
+			search: false,
+			controlIcons: {mic: true, mute: true, restart: true},
+            canvasID,
+			pdfPageCallback: GeneratePDF,
+		};
+
+		initFSClientBot({
+			...clientParams,
+		});
+		
+	</script>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+
+<style>
+	#porscheTest{
+		display: flex;
+		width:90vw;
+		height: 80vh;
+		justify-content: center;
+		align-items: center;
+		font-size: 3vw;
+		font-family: 'Roboto Mono', monospace;
+	}
+
+	#cnv{
+		max-width: 60vw;
+		min-height: 80vh;
+	}
+
+    #pdf-div{
+        width: 70%;
+        height: 100vh;
+    }
+</style>
+</body>
+</html>

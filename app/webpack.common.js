@@ -1,6 +1,7 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const path = require("path");
 
+
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./public/index.html",
   filename: "./index.html",
@@ -12,6 +13,14 @@ const htmlPlugin = new HtmlWebPackPlugin({
 const upvPlugin = new HtmlWebPackPlugin({
   template: "./public/upv.html",
   filename: "./upv.html",
+  // scriptLoading: 'defer'
+  inject: "head",
+  chunks: ["app"],
+});
+
+const pdfDemo = new HtmlWebPackPlugin({
+  template: "./public/pdfDemo.html",
+  filename: "./pdfDemo.html",
   // scriptLoading: 'defer'
   inject: "head",
   chunks: ["app"],
@@ -36,6 +45,14 @@ const pdfPlugin = new HtmlWebPackPlugin({
 const tMobilePlugin = new HtmlWebPackPlugin({
   template: "./public/tmobile.html",
   filename: "./tmobile.html",
+  // scriptLoading: 'defer'
+  inject: "head",
+  chunks: ["app"],
+});
+
+const centralPlugin = new HtmlWebPackPlugin({
+  template: "./public/index1.html",
+  filename: "./index1.html",
   // scriptLoading: 'defer'
   inject: "head",
   chunks: ["app"],
@@ -94,5 +111,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin],
+  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin, pdfDemo, centralPlugin],
 };

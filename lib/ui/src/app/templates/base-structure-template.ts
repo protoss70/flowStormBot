@@ -17,9 +17,6 @@ export const baseStructureTemplate = `
             </div>
             <canvas data-pdf-viewer class="hidden" id="data-pdf-viewer">
             </canvas>
-            <div loader class="loader hidden">
-                <span loader-text class="loader-text">Loading...</span>
-            </div>
         <div data-chat-input class="chat-input">
             <div class="chat-input-wrapper">
                 <div bot-logo class="bot-logo">

@@ -90,6 +90,8 @@ PERFORMANCE OF THIS SOFTWARE.
 
 /*! exports provided: isFiniteNumber, MAX_SAFE_INTEGER */
 
+/*! https://mths.be/punycode v1.4.1 by @mathias */
+
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 
 /*! no static exports found */

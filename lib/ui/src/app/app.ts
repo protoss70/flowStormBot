@@ -124,7 +124,7 @@ const defaults: Settings = {
   coreURL: "", // Flowstorm server url. (not important for this library)
   cvutIcon: false, // show cvut icon on the bottom left
   suggestionsListView: false, // Set the suggestions either as list view (true) or as a single line (false)
-  canvasID: "#data-pdf-viewer"
+  canvasID: "data-pdf-viewer",
 };
 
 // global variables
@@ -134,6 +134,8 @@ const minAnimationParticles = 0;
 const maxAnimationParticles = 20;
 const chatHeight = "80px";
 const disabledHeight = "0px";
+const defaultPdfCanvasID = "data-pdf-viewer";
+const allPageElems = []
 const avatarMaxHeightRatio = {
   [GUIMode.CHAT]: 2 / 3,
   [GUIMode.KIOSK]: 1,
@@ -156,7 +158,8 @@ const icons = [
   "upSop",
   "undo",
   "restart",
-  "feedback",
+  "thumbs-down",
+  "thumbs-up",
   "close",
   "search",
   "left",
@@ -606,6 +609,29 @@ class BotUI {
     return warningElem;
   }
 
+  public toggleLoading(on: boolean){
+    if (on){
+      const loaderContainer = document.createElement("div")
+      loaderContainer.classList.add("loader");
+      loaderContainer.setAttribute("loader", "")
+  
+      const loaderText = document.createElement("span")
+      loaderText.classList.add("loader-text")
+      loaderText.setAttribute("loader-text", "")
+
+      loaderContainer.appendChild(loaderText)
+      
+      this.setBotText(`<div loader class="loader"><span loader-text class="loader-text">Loading...</span></div>`, "");
+    }else{
+      const allLoaders = BotUI.element.getElementsByClassName("loader");
+      while (allLoaders.length > 0) {
+        const element = allLoaders[0];
+        const messageContainer = element.parentElement.parentElement;
+        messageContainer.remove();
+      }
+    }
+  }
+
   public toggleSearchIcons(on: boolean){
     if (on){
       BotUI.searchElement.classList.add("hidden");
@@ -613,6 +639,8 @@ class BotUI {
         BotUI.chatInputMicElement.classList.remove("hidden");
       }
       BotUI.textInput.classList.remove("hidden");
+      console.log(BotUI.textInput.children[0] as HTMLInputElement);
+      (BotUI.textInput.children[0] as HTMLInputElement).focus()
     }else{
       BotUI.searchElement.classList.remove("hidden");
       BotUI.chatInputMicElement.classList.add("hidden");
@@ -639,13 +667,41 @@ class BotUI {
 
   private renderPage = () => {
     // Load the first page.
-    console.log(initialState.pdfDoc, 'pdfDoc');
     initialState.pdfDoc
       .getPage(initialState.currentPage)
       .then((page) => {
-        console.log('page', page);
-        const id = this.getSettings().canvasID
-        const canvas = document.querySelector(id) as HTMLCanvasElement;
+        var id = ""
+        if (this.getSettings().canvasID === defaultPdfCanvasID){
+          id = this.getSettings().canvasID
+        }
+        else{
+          const pdfContainer = document.getElementById(this.getSettings().canvasID) as HTMLElement;
+          pdfContainer.classList.add("bot-custom-pdf-viewer")
+          pdfContainer.innerHTML = "";
+          const _canvas = document.createElement("canvas");
+          _canvas.id = "bot-custom-pdf-canvas";
+          pdfContainer.appendChild(_canvas);
+          const nextButton = document.createElement("button");
+          const prevButton = document.createElement("button");
+          const pageCount = document.createElement("div");
+          allPageElems.push(pageCount);
+          const controlContainer = document.createElement("div");
+          controlContainer.classList.add("bot-pdf-control-container");
+          pageCount.classList.add("bot-custom-pdf-page-display");
+          nextButton.innerText = "Next Page";
+          prevButton.innerText = "Previous Page";
+          nextButton.addEventListener("click", this.pdfNextCallback);
+          prevButton.addEventListener("click", this.pdfPreviousCallback);
+          nextButton.classList.add("bot-pdf-control-buttons");
+          prevButton.classList.add("bot-pdf-control-buttons");
+          controlContainer.appendChild(prevButton);
+          controlContainer.appendChild(pageCount);
+          controlContainer.appendChild(nextButton);
+          pdfContainer.appendChild(controlContainer);
+          id = "bot-custom-pdf-canvas";
+          this.setPdfPageNumber(initialState.currentPage);
+        }
+        const canvas = document.getElementById(id) as HTMLCanvasElement;
         const ctx = canvas.getContext("2d");
         const viewport = page.getViewport({
           scale: initialState.zoom,
@@ -665,18 +721,23 @@ class BotUI {
   };
 
   public setPdfPageNumber(num){
-    BotUI.pdfPageDisplay.textContent = "Page: " + num;
+    // Sets the page number visually for the display.
+    for (let index = 0; index < allPageElems.length; index++) {
+      const element = allPageElems[index];
+      element.textContent = "Page: " + num + " / " + initialState.pageCount;
+    }
+    BotUI.pdfPageDisplay.textContent = "Page: " + num + " / " + initialState.pageCount;
   }
 
   public pdfStart(nameRoute, numPage){
     if(numPage < 0) return;
     initialState.currentPage = numPage;
-    this.setPdfPageNumber(numPage);
     // Render the page.
     pdfjsLib.getDocument(nameRoute)
     .promise.then((data) => {
       initialState.pdfDoc = data;
-      console.log('pdfDocument', initialState.pdfDoc);
+      initialState.pageCount = initialState.pdfDoc._pdfInfo.numPages;
+      this.setPdfPageNumber(numPage);
       this.renderPage();
     })
     .catch((err) => {
@@ -685,6 +746,7 @@ class BotUI {
   }
 
   public showPage = (pageNum) => {
+    // Goes to that page.
     if (initialState.pdfDoc === null || pageNum > initialState.pdfDoc._pdfInfo.numPages || pageNum < 0) 
       return;
 
@@ -720,14 +782,14 @@ class BotUI {
       BotUI.controlIconsWrapper.classList.add("hidden");
       BotUI.pdfViewerElement.classList.remove("hidden");
       BotUI.pdfControllers.classList.remove("hidden");
-      BotUI.chatTextInputElement.classList.add("pdf-mode");
+      BotUI.textInput.classList.add("hidden");
     }
     else{
       BotUI.messagesElement.classList.remove("hidden");
       BotUI.controlIconsWrapper.classList.remove("hidden");
       BotUI.pdfViewerElement.classList.add("hidden");
       BotUI.pdfControllers.classList.add("hidden");
-      BotUI.chatTextInputElement.classList.remove("pdf-mode");
+      BotUI.textInput.classList.remove("hidden");
     }
   }
 
@@ -1169,10 +1231,19 @@ class BotUI {
     }
   };
 
+  public addFeedbackMessage(up: boolean){
+    const feedBackButtons = this.createFeedbackButtons(true);
+    if (up){
+      this.setUserText(feedBackButtons[0]);
+    }else{
+      this.setUserText(feedBackButtons[1]);
+    }
+  }
+
   public removeSuggestions = () => {
     if (this.getSettings().suggestionMode === SuggestionMode.STANDARD){
       const elemList = document.querySelectorAll(
-        "[data-messages] > div > [data-suggestions-container]"
+        "[data-messages] > div > [data-suggestions-container]:not(.feedback-buttons)"
       );
       elemList.forEach((element) => {
         const par = element.parentNode;
@@ -1181,10 +1252,51 @@ class BotUI {
     }
   };
 
+  public setFeedbackButtons(buttons: string[]){
+    // This function is a specialized version of setSuggestion() function
+
+    const messageElement = BotUI.messagesElement;
+    const suggestionContainer = getContentAsHtml(sopSuggestionContainer);
+    suggestionContainer.children[0].classList.add("list-view", "feedback-buttons");
+
+    messageElement.appendChild(suggestionContainer);
+
+    buttons.forEach((sug) => {
+      let btn = document.createElement("button");
+      btn.innerHTML = sug;
+      btn.setAttribute("data-suggestions-button", "");
+      btn.classList.add("data-suggestions-button");
+      btn.classList.add("feedback-button");
+      btn.classList.add("list-view");
+      btn.onclick = (e) => {this.feedbackCallback(e)};
+      const allContainers = document.querySelectorAll("[data-suggestions-container].data-suggestions-container")
+      allContainers[allContainers.length - 1].appendChild(btn);
+    });
+
+    BotUI.scrollToLastMessage(messageElement);
+  }
+
+  public createFeedbackButtons(active: boolean = false){
+    if (!active){
+      return [`<span class="icon icon--thumbs-up icon--content--thumbs-up"></span>`, 
+      `<span class="icon icon--thumbs-down icon--content--thumbs-down"></span>`]
+    }
+    return [`<span class="icon icon--thumbs-up icon--content--thumbs-up positive-feedback-message"></span>`, 
+    `<span class="icon icon--thumbs-down icon--content--thumbs-down negative-feedback-message"></span>`]
+    
+    // this.setUserText("feedback message");
+    // const feedbackMessage =  this.getLastUserMessage() as HTMLElement
+    // feedbackMessage.classList.add("hidden");
+    // feedbackMessage.setAttribute("turnID", bot.responses[bot.responses.length - 1].turnId);
+    // this.setFeedbackButtons(feedBackButtons);
+  }
+
   public setSuggestion = (suggestions: string[], listView: boolean = false) => {
+
     this.removeSuggestions();
     const messageElement = BotUI.messagesElement;
     const suggestionContainer = getContentAsHtml(sopSuggestionContainer);
+
     if (listView) {
       suggestionContainer.children[0].classList.add("list-view");
     }
@@ -1218,9 +1330,14 @@ class BotUI {
         scrollFunction(e);
       });
     }
+  if (suggestions.includes("_thumbs_up_") || suggestions.includes("_thumbs_down_")){
+    const feedBackButtons = this.createFeedbackButtons();
+    suggestions[suggestions.indexOf("_thumbs_down_")] = feedBackButtons[1];
+    suggestions[suggestions.indexOf("_thumbs_up_")] = feedBackButtons[0];
+  }
     suggestions.forEach((sug) => {
       let btn = document.createElement("button");
-      btn.innerText = sug;
+      btn.innerHTML = sug;
       btn.setAttribute("data-suggestions-button", "");
       btn.classList.add("data-suggestions-button");
       if (listView) {
@@ -1657,7 +1774,9 @@ class BotUI {
     this.showPrevPage();
   };
 
-  public feedbackCallback = (...value) => {};
+  public feedbackCallback = (e) => {
+    e.target.parent.classList.add("active");
+  };
 
   public searchElementCallback = (...value) => {};
 
@@ -2373,7 +2492,7 @@ class BotUI {
 
   
 
-  public setStartButton = (on : boolean) => { // TODO add hide param
+  public setStartButton = (on : boolean) => {
     const startButtonElement = BotUI.startButtonElement;
 
     if (on) {
@@ -2393,6 +2512,73 @@ class BotUI {
     startButtonElement.onclick = () => { this.startButtonCallback();};
 
   };
+
+  public setCvutIcon = (on : boolean) => {
+    if (on) {
+      BotUI.cvutIconElement.classList.remove("hidden");
+    } else {
+      BotUI.cvutIconElement.classList.add("hidden");
+    }
+  }
+
+  public applyAppSettings = (params) => {
+    this.setTitle(params["title"]);
+
+    // BACKGROUND
+    this.setBackgroundColor(params["backgroundColor"], params["backgroundSecondaryColor"]);
+    BotUI.settings.backgroundColor = params["backgroundColor"];
+    BotUI.settings.backgroundSecondaryColor = params["backgroundSecondaryColor"];
+
+
+    // MESSAGE COLORS
+    this.setBotMessageTextColor(params["botMessageTextColor"]);
+    BotUI.settings.botMessageTextColor = params["botMessageTextColor"];
+
+    this.setBotMessageBackgroundColor(params["botMessageBackgroundColor"]);
+    BotUI.settings.botMessageBackgroundColor = params["botMessageBackgroundColor"];
+
+    this.setUserMessageTextColor(params["userMessageTextColor"]);
+    BotUI.settings.userMessageTextColor = params["userMessageTextColor"];
+
+    this.setUserMessageBackgroundColor(params["userMessageBackgroundColor"]);
+    BotUI.settings.userMessageBackgroundColor = params["userMessageBackgroundColor"];
+
+    // SUGGESTION COLORS
+    if (params["suggestions"] !== undefined) {
+      this.setSuggestionColors(params["suggestions"]);
+    }
+
+    // CVUT ICON
+    this.setCvutIcon(params["cvutIcon"]);
+    BotUI.settings.cvutIcon = params["cvutIcon"];
+
+    // TRIGGER IMAGE (displayed when bot is collapsed)
+    BotUI.element.style.setProperty(
+        "--bot-ui-trigger-element-image",
+        `url("${params.triggerImage}")`
+    );
+
+    // CONTROL ICONS
+    BotUI.settings.search = params["search"];
+    this.setControllIcons(params["controlIcons"]);
+    this.setTextInputEnabled(params["textInputEnabled"]);
+
+    // BACKGROUND IMAGE
+    if (params["backgroundImage"] !== undefined && params["backgroundImageBlur"] !== undefined) {
+      this.setBackgroundImage(params["backgroundImage"], params["backgroundImageBlur"]);
+      BotUI.settings.backgroundImage = params["backgroundImage"];
+      BotUI.settings.backgroundImageBlur = params["backgroundImageBlur"];
+
+    } else if (params["backgroundImage"] !== undefined) {
+      this.setBackgroundImage(params["backgroundImage"]);
+      BotUI.settings.backgroundImage = params["backgroundImage"];
+    } else {
+      BotUI.backgroundElement.classList.remove("background--image");
+      BotUI.element.style.removeProperty("--bot-ui-background-url");
+      BotUI.element.style.removeProperty("--bot-ui-background-url-blur");
+    }
+  }
+
 }
 
 export { BotUI as default };
