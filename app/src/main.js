@@ -90,6 +90,11 @@ const suggestionModes = {
   ALTERNATIVE: "non-disappearing",
 };
 
+const voiceMode = {
+  PUSH: "push",
+  TOGGLE: "toggle"
+}
+
 const botUIDefaultSettings = {
   guiMode: "chat",
   fullScreen: false,
@@ -116,6 +121,8 @@ const botUIDefaultSettings = {
   },
   cvutIcon: false,
   suggestionsListView: false,
+  voiceMode: voiceMode.PUSH,
+  searchMethods: {text: true, voice: true}
 };
 
 const clientDefaultSetting = {
@@ -411,7 +418,6 @@ export const initFSClientBot = (initParams = {}) => {
 
     createBot(botUI, settings);
     initBot();
-    bot.stateHandler = stateHandler;
     bot.setInCallback = () => {
       if (settings.inputAudio) {
         document
@@ -439,7 +445,7 @@ export const initFSClientBot = (initParams = {}) => {
 
     if (development) {
       function setControlIconsMain() {
-        botUI.setControllIcons({
+        botUI.setControlIcons({
           mic: document.getElementById("mic").checked,
           mute: document.getElementById("mute").checked,
           restart: document.getElementById("restart").checked,
@@ -482,18 +488,7 @@ export const initFSClientBot = (initParams = {}) => {
       }
     }
 
-    if (settings.interactionMode === "SOP") {
-      bot.getUser().then((user) => {
-        console.log("User: ", user);
-        settings;
-        if (user === null) {
-          botUI.setSection("LOGIN");
-        }
-      });
-    } else if (
-      settings.interactionMode === "GUIDE" ||
-      settings.interactionMode === "SOP"
-    ) {
+    if (settings.interactionMode === "GUIDE") {
       bot.setInAudio(false, getStatus());
     }
   } else {
@@ -581,8 +576,6 @@ const setDialogueIDs = (newDialogueIDs, botUI) => {
     botUI.dialogueChangeCallback(dialogueIDs);
   }
 };
-
-var stateHandler;
 
 var createBot = (botUI, settings) => {
   const { status = undefined } = botState;
@@ -683,15 +676,6 @@ var createBot = (botUI, settings) => {
     }
   };
 
-  stateHandler = (section, status) => {
-    if (section === "SOP" || section === "QUESTION") {
-      if (status === undefined || status === "SLEEPING") {
-        botUI.removeOverlay();
-        run();
-      }
-    }
-  };
-
   defaultCallback.addVideo = (url, callback) => {
     botUI.setVideo(url, callback);
   };
@@ -732,12 +716,12 @@ var createBot = (botUI, settings) => {
   };
 
   async function handleFlowstormApiCall(results) {
-    console.log("results", results);
+    console.log("res arrived", results);
     if (results === undefined) {
       //SERVER ERROR
       bot.handleOnTextInput(`ERROR`, false, false);
       bot.audioInputCallback();
-    } else if ((results.result && results.result.length === 0) && !results.answer) {
+    } else if (!results.result || results.result[0].content === "out of domain") {
       //NO SOLUTION FOUND
       bot.handleOnTextInput(`NO_SOLUTION`, false, false);
       bot.audioInputCallback();
@@ -816,7 +800,7 @@ var createBot = (botUI, settings) => {
 
   defaultCallback.handleCommand = async (command, code, t) => {
     const payload = JSON.parse(code);
-    console.log(payload);
+    // console.log(payload);
     switch (command) {
       case "#expression":
         botUI.sendRTCData({ Expression: { Name: payload["name"] } });
@@ -970,9 +954,9 @@ var createBot = (botUI, settings) => {
         //
         //
         // // CONTROL ICONS
-        // //botUI.setControllIcons({mic: true, mute: true, restart: true});
+        // //botUI.setControlIcons({mic: true, mute: true, restart: true});
         // BotUI.settings.search = params["search"];
-        // botUI.setControllIcons(params["controlIcons"]);
+        // botUI.setControlIcons(params["controlIcons"]);
         // botUI.setTextInputEnabled(params["textInputEnabled"]);
 
         // // BACKGROUND IMAGE
@@ -1062,6 +1046,9 @@ var createBot = (botUI, settings) => {
 
   const run = (minimize = false) => {
     const status = getStatus();
+    if (status === undefined || status === "SLEEPING"){
+      botUI.removeAllMessages();
+    }
     let pauseOnListening = false;
     bot.setOutAudio(settings.sound, status);
     switch (status) {
@@ -1071,29 +1058,21 @@ var createBot = (botUI, settings) => {
         }
         break;
       case "LISTENING":
-        if (settings.interactionMode !== "SOP") {
-          bot.setInAudio(false, getStatus());
-          pauseOnListening = !pauseOnListening;
-          changePlayIcon(pauseOnListening, botUI);
-        }
+        bot.setInAudio(false, getStatus());
+        pauseOnListening = !pauseOnListening;
+        changePlayIcon(pauseOnListening, botUI);
         break;
       case "RESPONDING":
-        if (settings.interactionMode !== "SOP") {
-          bot.pause();
-          if (settings.avatarURL) {
-            botUI.sendRTCData({ Pause: "true" });
-            botUI.removeOverlay();
-          }
+        bot.pause();
+        if (settings.avatarURL) {
+          botUI.sendRTCData({ Pause: "true" });
+          botUI.removeOverlay();
         }
         break;
       case "PAUSED":
         bot.resume();
         if (settings.avatarURL) {
           botUI.sendRTCData({ Pause: "false" });
-          bot.setInAudio(
-            false,
-            getStatus()
-          );
         }
         break;
       case undefined:
@@ -1165,7 +1144,6 @@ var createBot = (botUI, settings) => {
 
   botUI.chatInputCallback = (inputValue) => {
     sendText(inputValue);
-    console.log(searchCommandActive);
     if (searchCommandActive) {
       botUI.toggleLoading(true);
     }
@@ -1205,7 +1183,10 @@ var createBot = (botUI, settings) => {
 
   botUI.collapseCallback = (collapsed) => {
     paused = !paused;
-    run();
+    const status = getStatus()
+    if (!collapsed && (status === undefined || status === "SLEEPING")){
+      run();
+    }
   };
 
   botUI.searchElementCallback = () => {
@@ -1248,7 +1229,6 @@ var createBot = (botUI, settings) => {
     } else {
       stop();
       setTimeout(() => {
-        botUI.removeAllMessages();
         run();
       }, 750);
     }
@@ -1333,34 +1313,6 @@ var createBot = (botUI, settings) => {
       }
     }
   };
-
-  botUI.setModeCallback = (mode) => {
-    if (mode === "voice") {
-      bot.setInAudio(true, getStatus());
-      if (getStatus() === "LISTENING") {
-        bot.inAudio("LISTENING");
-        botUI.addOverlay();
-      }
-    } else if (mode === "sop") {
-      bot.setInAudio(false, getStatus());
-    }
-  };
-
-  botUI.chatMicCallback = (inputValue) => {
-    if (
-      settings.interactionMode === "SOP" ||
-      settings.interactionMode === "GUIDE"
-    ) {
-      const status = getStatus();
-      if (status === "SLEEPING" || status === undefined) {
-        run();
-      } else {
-        stop();
-      }
-    } else {
-      botUI.chatMicrophoneCallback();
-    }
-  };
   botUI.chatMicCallback = (inputValue) => {
     if (getStatus() === "LISTENING") {
       settings.inputAudio = !settings.inputAudio;
@@ -1412,16 +1364,6 @@ var createBot = (botUI, settings) => {
     }
   };
 
-  botUI.collapsableTriggerCallback = (collapsed) => {
-    const status = getStatus();
-    if (
-      (status === undefined || status === "SLEEPING") &&
-      !collapsed &&
-      (section === "SOP" || section === "QUESTION")
-    ) {
-      run(true);
-    }
-  };
 
   const clientCallback = {
     ...defaultCallback,
@@ -1438,6 +1380,7 @@ var createBot = (botUI, settings) => {
   );
 
   bot.onMessageCallback = (param) => {
+    // console.log("params: ", param.type, param)
     if (param.type === "Response"){
       botUI.toggleLoading(false);
     }

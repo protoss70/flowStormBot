@@ -56,6 +56,7 @@ export interface Settings {
     coreURL?: string;
     cvutIcon?: boolean;
     canvasID?: string;
+    searchMethods?: {text: boolean, voice: boolean};
 }
 
 export enum SuggestionMode {

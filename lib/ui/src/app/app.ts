@@ -125,6 +125,7 @@ const defaults: Settings = {
   cvutIcon: false, // show cvut icon on the bottom left
   suggestionsListView: false, // Set the suggestions either as list view (true) or as a single line (false)
   canvasID: "data-pdf-viewer",
+  searchMethods: {text: true, voice: true},
 };
 
 // global variables
@@ -415,7 +416,7 @@ class BotUI {
 
     // control display of the control icons
     if (BotUI.settings.controlIcons) {
-      this.setControllIconStyles();
+      this.setControlIconStyles();
     }
     if (!BotUI.settings.customIcons) {
       this.setIcons();
@@ -632,15 +633,36 @@ class BotUI {
   }
 
   public toggleSearchIcons(on: boolean){
+    const settings = this.getSettings() 
     if (on){
-      BotUI.searchElement.classList.add("hidden");
-      BotUI.textInput.classList.remove("hidden");
-      (BotUI.textInput.children[0] as HTMLInputElement).focus()
-      this.setControlIconsByTextField(false);
+
+      //Adjust icons for search
+      const icons = {
+        mute: settings.controlIcons.mute,
+        restart:  settings.controlIcons.restart,
+        magnifier: false,
+        mic: settings.searchMethods.voice
+      }
+      this.setControlIcons(icons)
+      
+      // Adjust text field for search
+      if (settings.searchMethods.text){
+        BotUI.textInput.classList.remove("hidden");
+        (BotUI.textInput.children[0] as HTMLInputElement).focus()
+        this.setControlIconsByTextField(false);
+      }
+    
     }else{
-      BotUI.searchElement.classList.remove("hidden");
-      console.log(this.getSettings().textInputEnabled);
-      if (!this.getSettings().textInputEnabled){
+      
+      const icons = {
+        mute: settings.controlIcons.mute,
+        restart:  settings.controlIcons.restart,
+        magnifier: settings.controlIcons.magnifier,
+        mic: settings.controlIcons.mic
+      }
+      this.setControlIcons(icons)
+      
+      if (!settings.textInputEnabled && settings.searchMethods.text){
         BotUI.textInput.classList.add("hidden");
         this.setControlIconsByTextField(true);
       }
@@ -812,7 +834,7 @@ class BotUI {
    * Public method to change icon display settings
    * @param controlIcons - controls the display of individual icons - microphone, speaker and restart
    */
-  public setControllIcons = (controlIcons: {
+  public setControlIcons = (controlIcons: {
     mic: boolean;
     mute: boolean;
     restart: boolean;
@@ -820,7 +842,7 @@ class BotUI {
   }) => {
     BotUI.settings.controlIcons = controlIcons;
 
-    this.setControllIconStyles();
+    this.setControlIconStyles();
   };
 
   public setDialogueID(id: string) {
@@ -1400,7 +1422,7 @@ class BotUI {
   /**
    * Controls visibility of the control icons - microphone, speaker and restart according to settings
    */
-  public setControllIconStyles() {
+  public setControlIconStyles() {
     
     if (!BotUI.settings.controlIcons.mic) {
       BotUI.controlIconsWrapper
@@ -2580,7 +2602,7 @@ class BotUI {
 
     // CONTROL ICONS
     BotUI.settings.search = params["search"];
-    this.setControllIcons(params["controlIcons"]);
+    this.setControlIcons(params["controlIcons"]);
     this.setTextInputEnabled(params["textInputEnabled"]);
 
     // BACKGROUND IMAGE

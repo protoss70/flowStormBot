@@ -12,13 +12,15 @@
 
 > - **collapsable**: _boolean_, allow the bot to collapse, if false the bot will remain open.
 
-> - **search**: _boolean_, allow AI powered elastic search from the bot, you need to contact us first in order to use this feature.
+> - **search**: _boolean_, Initialize the bot on the "search" mode
 
 > - **guiMode**: _string_, ("kiosk", "chat"), choose between two modes, kiosk (IN DEVELOPMENT) and chat
 
 > - **pdfPageCallback**: _function_, This callback function activates when the search locates a particular page in your PDF, enabling you to change pages using it.
 
 > - **sound**: _boolean_, toggles the application's audio output (on/off).
+
+> - **searchMethods**: {text: boolean, voice: boolean}, decide which types of search you allow, voice search and/or text search
 
 # UI
 
@@ -42,7 +44,7 @@
 
 > - **suggestionsListView**: _boolean_, aligns suggestions to give a more orderly look while taking more space.
 
-> - **controlIcons**: {mic: boolean, mute: boolean, restart: boolean}, choose which of the three icons you want shown in your bot.
+> - **controlIcons**: {mic: boolean, mute: boolean, restart: boolean, magnifier: boolean}, choose which of the three icons you want shown in your bot.
 
 > - **backgroundColor**: _string_, Primary background color for the bot
 
