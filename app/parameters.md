@@ -22,6 +22,8 @@
 
 > - **searchMethods**: {text: boolean, voice: boolean}, decide which types of search you allow, voice search and/or text search
 
+> - **elasticSearchCharLimit**: { charLimit: _number_, limitOn: _boolean_ }: limitOn turns on or off the maximum character limit for the search, charLimit decides the maximum number of characters in a search query allowed. 
+
 # UI
 
 > - **title**: _string_, title displayed in the UI header
