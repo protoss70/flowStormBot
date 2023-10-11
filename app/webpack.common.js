@@ -18,6 +18,14 @@ const upvPlugin = new HtmlWebPackPlugin({
   chunks: ["app"],
 });
 
+const taycanPlugin = new HtmlWebPackPlugin({
+  template: "./public/taycan.html",
+  filename: "./taycan.html",
+  // scriptLoading: 'defer'
+  inject: "head",
+  chunks: ["app"],
+});
+
 const pdfDemo = new HtmlWebPackPlugin({
   template: "./public/pdfDemo.html",
   filename: "./pdfDemo.html",
@@ -111,5 +119,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin, pdfDemo, centralPlugin],
+  plugins: [htmlPlugin, upvPlugin, tMobilePlugin, porschePlugin, pdfPlugin, pdfDemo, centralPlugin, taycanPlugin],
 };
